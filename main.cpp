@@ -20,6 +20,13 @@ and change, but not for commercial use
 
 #include <stdio.h>
 #include <SDL2/SDL.h>
+#include <malloc.h>
+#include "libs/logger/logger.h"
+
+//external definitions
+void system_print(char* str) {
+    printf("%s\n", str);
+}
 
 #define WINDOW_WIDTH            640
 #define WINDOW_HEIGHT           480
@@ -29,18 +36,18 @@ int main(int argc, char* args[]) {
     //SDL_Surface* screenSurface = NULL;
 
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("INFO [SDL_INIT] Could not init video, code: %d\n", SDL_GetError());
+        log_error("SDL", "Could not init video, code: ", -1);
         return -1;
     }
-    printf("INFO [SDL_INIT] SDL Inited\n");
+    log_info("SDL", "SDL Inited");
 
     mainFrame = SDL_CreateWindow("Animals War", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 
     if(mainFrame == NULL) {
-        printf("INFO [WNDW] Could not create window\n");
+        log_error("WNDW", "Could not create window", -1);
         return -1;
     }
-    printf("INFO [WNDW] Created window\n");
+    log_info("WNDW", "Created window");
     SDL_Renderer* renderer = SDL_CreateRenderer(mainFrame, -1, 0);
 
     //screenSurface = SDL_GetWindowSurface(mainFrame);
@@ -82,7 +89,7 @@ int main(int argc, char* args[]) {
     }
 
     SDL_DestroyWindow(mainFrame);
-    printf("INFO [WNDW] Destroyed window\n");
+    log_info("WNDW", "Destroyed window");
     SDL_Quit();
 
     return 0;
