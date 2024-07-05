@@ -1,0 +1,33 @@
+/*
+###########################################################
+
+@file:app.h
+
+@author: Tanasescu Darius
+
+@Licence: Apache2.0
+
+@Copyleft the-nightraven, product is open source and has
+absolutely no warranty, you are free to copy, distribute
+and change, but not for commercial use
+
+@Revision: InfDev
+
+@Description: app definitions
+
+###########################################################
+*/
+
+#ifndef APP_HEADER
+#define APP_HEADER
+
+//includes
+#include "includes.h"
+#include "logger/logger.h"
+#include "window/window.h"
+
+//fucntions
+G_STATUS app_init();
+G_STATUS app_loop();
+
+#endif
