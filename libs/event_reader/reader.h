@@ -25,19 +25,21 @@ and change, but not for commercial use
 
 typedef struct SysEvt_TypeDef {
     int SDL_Hook;
-    void (*callback);
+    int* value;
+    void (*callback)(int*);
 };
 
 typedef struct KeyEvt_TypeDef {
     int SDL_Hook;
     int Key;
-    void (*callback);
+    int* value;
+    void (*callback)(int*);
 };
 
 G_STATUS init();
 G_STATUS register_sys_event(SysEvt_TypeDef* evt);
-G_STATUS register_key_enevnt(KeyEvt_TypeDef* evt);
+G_STATUS register_key_event(KeyEvt_TypeDef* evt);
 
-G_STATUS poll_events();
+G_STATUS poll_events(SDL_Event *e);
 
 #endif

@@ -29,7 +29,7 @@ and change, but not for commercial use
 
 //fucntions
 G_STATUS init_window(SDL_Window **mainFrame, SDL_Renderer **renderer);
-G_STATUS deinit_window(SDL_Window **mainFrame);
+G_STATUS deinit_window(SDL_Window **mainFrame, SDL_Renderer **renderer);
 
 // SDL_Window* get_window_instance();
 // SDL_Renderer* get_renderer_instance();

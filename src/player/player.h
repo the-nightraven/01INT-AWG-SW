@@ -1,7 +1,7 @@
 /*
 ###########################################################
 
-@file:app.h
+@file: player.h
 
 @author: Tanasescu Darius
 
@@ -13,24 +13,7 @@ and change, but not for commercial use
 
 @Revision: InfDev
 
-@Description: app definitions
+@Description: player constants
 
 ###########################################################
 */
-
-#ifndef APP_HEADER
-#define APP_HEADER
-
-//includes
-#include "includes.h"
-#include "logger/logger.h"
-#include "window/window.h"
-#include "event_reader/reader.h"
-
-//fucntions
-G_STATUS app_init();
-G_STATUS app_loop();
-
-void end_game(int *val);
-
-#endif

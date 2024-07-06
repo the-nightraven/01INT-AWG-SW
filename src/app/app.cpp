@@ -20,37 +20,32 @@ and change, but not for commercial use
 
 #include "app.h"
 
+//variables
 SDL_Window* mainFrame = NULL;
 SDL_Renderer* renderer = NULL;
+int is_running = 1;
+
+//functions
 
 G_STATUS app_init() {
+    SysEvt_TypeDef sysExit = {SDL_QUIT, &is_running, end_game};
+    register_sys_event(&sysExit);
+    log_info("APP", "registered_event");
     init_window(&mainFrame, &renderer);
     return G_STATUS_OK;
 }
 
 G_STATUS app_loop() {
-    bool quit = false;
     float speed = 0;
     float w = WINDOW_WIDTH / 2 - 50;
     G_STATUS status;
 
     //evt_process
-    while(!quit) {
+    log_info("APP", "Loop Started!");
+    while(is_running) {
         SDL_Event e;
-        while(SDL_PollEvent(&e)) {
-            if(e.type == SDL_QUIT) {
-                quit = true;
-            }
-            if(e.type == SDL_KEYUP) {
-                speed = 0;
-            }else if(e.type == SDL_KEYDOWN) {
-                if(e.key.keysym.scancode == SDL_SCANCODE_LEFT) {
-                    speed = -0.1;
-                }else if(e.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
-                    speed = 0.1;
-                }
-            }
-        }
+        poll_events(&e);
+
 
         //update
         w += speed;
@@ -67,6 +62,10 @@ G_STATUS app_loop() {
         SDL_RenderDrawRect(renderer, &player);
         SDL_RenderPresent( renderer );
     }
-    status = deinit_window(&mainFrame);
+    status = deinit_window(&mainFrame, &renderer);
     return status;
+}
+
+void end_game(int *val) {
+    *val = 0;
 }
