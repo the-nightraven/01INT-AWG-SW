@@ -17,3 +17,21 @@ and change, but not for commercial use
 
 ###########################################################
 */
+
+#ifndef PLAYER_H
+#define PLAYER_H
+
+#include "app/includes.h"
+
+typedef struct Player_Typedef {
+    float x;
+    float y;
+    float speed;
+};
+
+G_STATUS init_player();
+void player_move_left(float *speed);
+void player_move_right(float *speed);
+
+
+#endif

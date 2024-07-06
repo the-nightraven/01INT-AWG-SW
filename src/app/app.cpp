@@ -66,6 +66,6 @@ G_STATUS app_loop() {
     return status;
 }
 
-void end_game(int *val) {
-    *val = 0;
+void end_game(void *val) {
+    *((int*)(val)) = 0;
 }

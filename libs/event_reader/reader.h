@@ -25,15 +25,15 @@ and change, but not for commercial use
 
 typedef struct SysEvt_TypeDef {
     int SDL_Hook;
-    int* value;
-    void (*callback)(int*);
+    void* value;
+    void (*callback)(void*);
 };
 
 typedef struct KeyEvt_TypeDef {
     int SDL_Hook;
     int Key;
-    int* value;
-    void (*callback)(int*);
+    void* value;
+    void (*callback)(void*);
 };
 
 G_STATUS init();
