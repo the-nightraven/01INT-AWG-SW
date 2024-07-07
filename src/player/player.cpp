@@ -17,3 +17,26 @@ and change, but not for commercial use
 
 ###########################################################
 */
+
+#include "app/includes.h"
+
+
+//functions
+G_STATUS init_player() {
+    //register keys and renderer
+    return G_STATUS_OK;
+}
+
+void player_move_left(float *x, float *speed) {
+    *(x) -= *(speed);
+    return;
+}
+
+void player_move_right(float *x, float *speed) {
+    *(x) += *(speed);
+    return;
+}
+
+void player_render_cb() {
+    return;
+}

@@ -21,12 +21,9 @@ and change, but not for commercial use
 #include "reader.h"
 
 //TODO: dinamically hold data
-SysEvt_TypeDef sys_events[10];
-KeyEvt_TypeDef key_down_events[10];
-KeyEvt_TypeDef key_up_events[10];
-int sys_evt_len = 0;
-int key_down_evt_len = 0;
-int key_up_evt_len = 0;
+SysEvtItem_TypeDef *sys_list = NULL;
+KeyEvtItem_TypeDef *key_up_list = NULL;
+KeyEvtItem_TypeDef *key_down_list = NULL;
 
 G_STATUS init() {
     return G_STATUS_OK;
@@ -37,9 +34,15 @@ G_STATUS register_sys_event(SysEvt_TypeDef* evt) {
         return G_STATUS_FAIL;
     }
 
-    sys_events[sys_evt_len] = *evt;
-    sys_evt_len++;
-    return G_STATUS_OK;
+    if(sys_list == NULL) {
+        sys_list = (SysEvtItem_TypeDef*)init_event_list(SYS_EVENT_FLAG, (void*)evt);
+        if(sys_list == NULL) {
+                return G_STATUS_FAIL;
+            }
+            return G_STATUS_OK;
+    }else {
+        return add_event_item(SYS_EVENT_FLAG, (void*)sys_list, (void*)evt);
+    }
 }
 
 G_STATUS register_key_event(KeyEvt_TypeDef* evt){
@@ -48,38 +51,140 @@ G_STATUS register_key_event(KeyEvt_TypeDef* evt){
     }
 
     if((*evt).SDL_Hook == SDL_KEYDOWN) {
-        key_down_events[key_down_evt_len++] = *evt;
+        if(key_down_list == NULL) {
+            key_down_list = (KeyEvtItem_TypeDef*)init_event_list(KEY_EVENT_FLAG, (void*)evt);
+            if(key_down_list == NULL) {
+                return G_STATUS_FAIL;
+            }
+            return G_STATUS_OK;
+        }else {
+            return add_event_item(KEY_EVENT_FLAG, (void*)key_down_list, (void*)evt);
+        }
     }else if((*evt).SDL_Hook == SDL_KEYUP) {
-        key_up_events[key_up_evt_len++] = *evt;
+        if(key_up_list == NULL) {
+            key_up_list = (KeyEvtItem_TypeDef*)init_event_list(KEY_EVENT_FLAG, (void*)evt);
+            if(key_up_list == NULL) {
+                return G_STATUS_FAIL;
+            }
+            return G_STATUS_OK;
+        }else {
+            return add_event_item(KEY_EVENT_FLAG, (void*)key_up_list, (void*)evt);
+        }
     }else {
         return G_STATUS_FAIL;
     }
-
-
-    return G_STATUS_OK;
 }
 
 G_STATUS poll_events(SDL_Event* e) {
     while(SDL_PollEvent(e)) {
         if((*e).type == SDL_KEYDOWN) {
-            for(int i = 0; i < key_down_evt_len; i++) {
-                if(key_down_events[i].Key == (*e).key.keysym.scancode) {
-                    key_down_events[i].callback(key_down_events[i].value);
-                }
+            KeyEvtItem_TypeDef *ind = (KeyEvtItem_TypeDef*)get_event_by_hook(KEY_EVENT_FLAG, key_down_list, (*e).key.keysym.scancode);
+            if(ind != NULL) {
+                ind->evt.callback(ind->evt.value);
             }
         }else if((*e).type == SDL_KEYDOWN) {
-            for(int i = 0; i < key_up_evt_len; i++) {
-                if(key_up_events[i].Key == (*e).key.keysym.scancode) {
-                    key_up_events[i].callback(key_up_events[i].value);
-                }
+            KeyEvtItem_TypeDef *ind = (KeyEvtItem_TypeDef*)get_event_by_hook(KEY_EVENT_FLAG, key_up_list, (*e).key.keysym.scancode);
+            if(ind != NULL) {
+                ind->evt.callback(ind->evt.value);
             }
         }else {
-            for(int i = 0; i < sys_evt_len; i++) {
-                if(sys_events[i].SDL_Hook == (*e).type) {
-                    sys_events[i].callback(sys_events[i].value);
-                }
+            SysEvtItem_TypeDef *ind = (SysEvtItem_TypeDef*)get_event_by_hook(SYS_EVENT_FLAG, sys_list, (*e).type);
+            if(ind != NULL) {
+                ind->evt.callback(ind->evt.value);
             }
         }
     }
     return G_STATUS_OK;
+}
+
+G_STATUS add_event_item(uint8_t type_flag, void *list, void *item) {
+    if(list == item) {
+        return G_STATUS_FAIL;
+    }
+
+    void* tmp = init_event_list(type_flag, item);
+
+    if(tmp == NULL) {
+        return G_STATUS_FAIL;
+    }
+
+    if(type_flag == SYS_EVENT_FLAG) {
+        SysEvtItem_TypeDef *ind = (SysEvtItem_TypeDef*)list;
+
+        while(ind->next != NULL) {
+            ind = ind->next;
+        }
+        
+        ind->next = (SysEvtItem_TypeDef*)tmp;
+        return G_STATUS_OK;
+
+    }else if(type_flag == KEY_EVENT_FLAG) {
+        KeyEvtItem_TypeDef *ind = (KeyEvtItem_TypeDef*)list;
+
+        while(ind->next != NULL) {
+            ind = ind->next;
+        }
+
+        ind->next = (KeyEvtItem_TypeDef*)tmp;
+        return G_STATUS_OK;
+    }else {
+        return G_STATUS_FAIL;
+    }
+}
+
+void* init_event_list(uint8_t type_flag, void *item) {
+    void* status;
+    if(type_flag == SYS_EVENT_FLAG) {
+        SysEvtItem_TypeDef *tmp = (SysEvtItem_TypeDef*)malloc(sizeof(SysEvtItem_TypeDef));
+        status = memcpy(&(tmp->evt), item, sizeof(SysEvt_TypeDef));
+
+        if(status == NULL) {
+            return NULL;
+        }
+
+        tmp->next = NULL;
+        return tmp;
+    }else if(type_flag == KEY_EVENT_FLAG) {
+        KeyEvtItem_TypeDef *tmp = (KeyEvtItem_TypeDef*)malloc(sizeof(KeyEvtItem_TypeDef));
+        status = memcpy(&(tmp->evt), item, sizeof(KeyEvt_TypeDef));
+
+        if(status == NULL) {
+            return NULL;
+        }
+
+        tmp->next = NULL;
+        return tmp;
+    }else {
+        return NULL;
+    }
+}
+
+void* get_event_by_hook(uint8_t type_flag, void *list, int hook) {
+    if(list == NULL) {
+        return NULL;
+    }
+
+    if(type_flag == SYS_EVENT_FLAG) {
+        SysEvtItem_TypeDef *ind = (SysEvtItem_TypeDef*)list;
+
+        while(ind != NULL) {
+            if(ind->evt.SDL_Hook == hook) {
+                return ind;
+            }
+            ind = ind->next;
+        }
+        return NULL;
+    }else if(type_flag == KEY_EVENT_FLAG) {
+        KeyEvtItem_TypeDef *ind = (KeyEvtItem_TypeDef*)list;
+
+        while(ind != NULL) {
+            if(ind->evt.Key == hook) {
+                return ind;
+            }
+            ind = ind->next;
+        }
+        return NULL;
+    }else {
+        return NULL;
+    }
 }

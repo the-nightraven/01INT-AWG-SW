@@ -1,8 +1,13 @@
+##################################################################################
+#
 # GNU Makefile for Animal War game
 #
-# @author: Tanasescu Darius, Ivan Corina
+# @author: Tanasescu Darius for game engine and code, Ivan Corina for concept 
+#          art, visuals and mechanics
+#
 # @desc: build rules for cpp targets including flags for compiling and linking
 #
+##################################################################################
 
 BUILD_DIR = build/
 LIBS_DIR = libs/

@@ -22,7 +22,12 @@ and change, but not for commercial use
 #define READER_H
 
 #include "app/includes.h"
+#include <inttypes.h>
 
+#define SYS_EVENT_FLAG             0x03
+#define KEY_EVENT_FLAG             0x04
+
+//events typedefs
 typedef struct SysEvt_TypeDef {
     int SDL_Hook;
     void* value;
@@ -36,10 +41,28 @@ typedef struct KeyEvt_TypeDef {
     void (*callback)(void*);
 };
 
+
+//datastructures typedefs
+typedef struct SysEvtItem_TypeDef {
+    SysEvt_TypeDef evt;
+    SysEvtItem_TypeDef *next;
+};
+
+typedef struct KeyEvtItem_TypeDef {
+    KeyEvt_TypeDef evt;
+    KeyEvtItem_TypeDef *next;
+};
+
+//reader utils
 G_STATUS init();
 G_STATUS register_sys_event(SysEvt_TypeDef* evt);
 G_STATUS register_key_event(KeyEvt_TypeDef* evt);
 
 G_STATUS poll_events(SDL_Event *e);
+
+//conatiner utils
+G_STATUS add_event_item(uint8_t type_flag, void *list, void *item);
+void* get_event_by_hook(uint8_t type_flag, void *list, int hook);
+void* init_event_list(uint8_t type_flag, void *item);
 
 #endif

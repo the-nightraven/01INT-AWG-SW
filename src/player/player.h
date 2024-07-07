@@ -29,9 +29,14 @@ typedef struct Player_Typedef {
     float speed;
 };
 
+//extern functions like render
+extern void draw_player();
+
+//functions
 G_STATUS init_player();
-void player_move_left(float *speed);
-void player_move_right(float *speed);
+void player_move_left(float *x, float *speed);
+void player_move_right(float *x, float *speed);
+void player_render_cb();
 
 
 #endif
