@@ -18,6 +18,10 @@ and change, but not for commercial use
 ###########################################################
 */
 
+//@TODO: Android APK support     WIP
+//@TODO: IOS support             WIP
+
+
 #include "app.h"
 
 //variables
@@ -28,10 +32,33 @@ int is_running = 1;
 //functions
 
 G_STATUS app_init() {
-    SysEvt_TypeDef sysExit = {SDL_QUIT, &is_running, end_game};
-    register_sys_event(&sysExit);
-    log_info("APP", "registered_event");
-    init_window(&mainFrame, &renderer);
+    G_STATUS status;
+
+    UpdateCallback_TypeDef sysExit = {false, &is_running, end_game};
+    SysEvt_TypeDef sysExit_evt = {SDL_QUIT, sysExit};
+    status = register_sys_event(&sysExit_evt);
+
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot register event", G_STATUS_FAIL);
+        return G_STATUS_FAIL;
+    }
+    log_info("APP", "registered QUIT event");
+
+    // UpdateCallback_TypeDef keyExit = {false, NULL, test};
+    // KeyEvt_TypeDef close = {SDL_KEYDOWN, SDL_SCANCODE_A, keyExit};
+    // status = register_key_event(&close);
+    // if(status == G_STATUS_FAIL) {
+    //     log_error(APP_TAG, "Cannot register event", G_STATUS_FAIL);
+    //     return G_STATUS_FAIL;
+    // }
+    // log_info("APP", "registered KEY event on: A");
+
+    status = init_window(&mainFrame, &renderer);
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot init window", G_STATUS_FAIL);
+        return G_STATUS_FAIL;
+    }
+    log_info("APP", "window initialized");
     return G_STATUS_OK;
 }
 
@@ -41,15 +68,27 @@ G_STATUS app_loop() {
     G_STATUS status;
 
     //evt_process
-    log_info("APP", "Loop Started!");
+    log_info(APP_TAG, "Loop Started!");
     while(is_running) {
         SDL_Event e;
-        poll_events(&e);
+        status = poll_events(&e);
+
+        if(status == G_STATUS_FAIL) {
+            is_running = 0;
+            log_error(APP_TAG, "cannot poll event", G_STATUS_FAIL);
+            return G_STATUS_FAIL;
+        }
 
 
         //update
-        w += speed;
+        //w += speed;
+        status = updater_run_time_delta();
 
+        if(status == G_STATUS_FAIL) {
+            is_running = 0;
+            log_error(APP_TAG, "cannot update objects", G_STATUS_FAIL);
+            return G_STATUS_FAIL;
+        }
 
         //render
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -68,4 +107,10 @@ G_STATUS app_loop() {
 
 void end_game(void *val) {
     *((int*)(val)) = 0;
+}
+
+void test(void* val) {
+    SDL_Event e;
+    e.type = SDL_QUIT;
+    SDL_PushEvent(&e);
 }

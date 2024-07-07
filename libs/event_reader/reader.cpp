@@ -18,9 +18,15 @@ and change, but not for commercial use
 ###########################################################
 */
 
+//@TODO: System events support            DONE
+//@TODO: Keyboard support                 DONE
+//@TODO: Mouse support                    WIP
+//@TODO: Xbox Controller support          WIP
+
+
 #include "reader.h"
 
-//TODO: dinamically hold data
+
 SysEvtItem_TypeDef *sys_list = NULL;
 KeyEvtItem_TypeDef *key_up_list = NULL;
 KeyEvtItem_TypeDef *key_down_list = NULL;
@@ -80,17 +86,17 @@ G_STATUS poll_events(SDL_Event* e) {
         if((*e).type == SDL_KEYDOWN) {
             KeyEvtItem_TypeDef *ind = (KeyEvtItem_TypeDef*)get_event_by_hook(KEY_EVENT_FLAG, key_down_list, (*e).key.keysym.scancode);
             if(ind != NULL) {
-                ind->evt.callback(ind->evt.value);
+                ind->evt.update_cb.flag = true;
             }
         }else if((*e).type == SDL_KEYDOWN) {
             KeyEvtItem_TypeDef *ind = (KeyEvtItem_TypeDef*)get_event_by_hook(KEY_EVENT_FLAG, key_up_list, (*e).key.keysym.scancode);
             if(ind != NULL) {
-                ind->evt.callback(ind->evt.value);
+                ind->evt.update_cb.flag = true;
             }
         }else {
             SysEvtItem_TypeDef *ind = (SysEvtItem_TypeDef*)get_event_by_hook(SYS_EVENT_FLAG, sys_list, (*e).type);
             if(ind != NULL) {
-                ind->evt.callback(ind->evt.value);
+                ind->evt.update_cb.flag = true;
             }
         }
     }
@@ -184,6 +190,22 @@ void* get_event_by_hook(uint8_t type_flag, void *list, int hook) {
             ind = ind->next;
         }
         return NULL;
+    }else {
+        return NULL;
+    }
+}
+
+void* get_event_list(uint8_t type_flag, uint8_t subflag) {
+    if(type_flag == SYS_EVENT_FLAG) {
+        return (void*)sys_list;
+    }else if(type_flag == KEY_EVENT_FLAG) {
+        if(subflag == KEYDOWN_SUBFLAG) {
+            return (void*)key_down_list;
+        }else if(subflag == KEYUP_SUBFLAG) {
+            return (void*)key_up_list;
+        }else {
+            return NULL;
+        }
     }else {
         return NULL;
     }

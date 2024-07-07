@@ -22,36 +22,14 @@ and change, but not for commercial use
 #define READER_H
 
 #include "app/includes.h"
-#include <inttypes.h>
+#include "updater/updater.h"
 
 #define SYS_EVENT_FLAG             0x03
 #define KEY_EVENT_FLAG             0x04
 
-//events typedefs
-typedef struct SysEvt_TypeDef {
-    int SDL_Hook;
-    void* value;
-    void (*callback)(void*);
-};
+#define KEYUP_SUBFLAG              0x05
+#define KEYDOWN_SUBFLAG            0x06
 
-typedef struct KeyEvt_TypeDef {
-    int SDL_Hook;
-    int Key;
-    void* value;
-    void (*callback)(void*);
-};
-
-
-//datastructures typedefs
-typedef struct SysEvtItem_TypeDef {
-    SysEvt_TypeDef evt;
-    SysEvtItem_TypeDef *next;
-};
-
-typedef struct KeyEvtItem_TypeDef {
-    KeyEvt_TypeDef evt;
-    KeyEvtItem_TypeDef *next;
-};
 
 //reader utils
 G_STATUS init();
@@ -64,5 +42,6 @@ G_STATUS poll_events(SDL_Event *e);
 G_STATUS add_event_item(uint8_t type_flag, void *list, void *item);
 void* get_event_by_hook(uint8_t type_flag, void *list, int hook);
 void* init_event_list(uint8_t type_flag, void *item);
+void* get_event_list(uint8_t type_flag, uint8_t subflag);
 
 #endif

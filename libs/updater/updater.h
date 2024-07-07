@@ -22,7 +22,13 @@ header
 #ifndef UPDATER_H
 #define UPDATER_H
 
+#include "app/includes.h"
+#include "event_reader/reader.h"
 
-
+bool check_updater_flag(UpdateCallback_TypeDef target);
+G_STATUS updater_run_time_delta();
+G_STATUS call_updater(UpdateCallback_TypeDef *target);
+G_STATUS update_sys_events(SysEvtItem_TypeDef *list);
+G_STATUS update_key_events(KeyEvtItem_TypeDef *list);
 
 #endif
