@@ -26,6 +26,8 @@ and change, but not for commercial use
 typedef struct Player_Typedef {
     float x;
     float y;
+    float w;
+    float h;
     float speed;
 };
 
@@ -34,9 +36,10 @@ extern void draw_player();
 
 //functions
 G_STATUS init_player();
-void player_move_left(float *x, float *speed);
-void player_move_right(float *x, float *speed);
+void player_move_left(void *val);
+void player_move_right(void *val);
 void player_render_cb();
+Player_Typedef* get_player_instance();
 
 
 #endif

@@ -34,6 +34,8 @@ int is_running = 1;
 G_STATUS app_init() {
     G_STATUS status;
 
+    init_player();
+
     UpdateCallback_TypeDef sysExit = {false, &is_running, end_game};
     SysEvt_TypeDef sysExit_evt = {SDL_QUIT, sysExit};
     status = register_sys_event(&sysExit_evt);
@@ -43,6 +45,24 @@ G_STATUS app_init() {
         return G_STATUS_FAIL;
     }
     log_info("APP", "registered QUIT event");
+
+    UpdateCallback_TypeDef pl_move_r = {false, get_player_instance(), player_move_right};
+    UpdateCallback_TypeDef pl_move_l = {false, get_player_instance(), player_move_left};
+
+    KeyEvt_TypeDef pl_move_r_evt = {SDL_KEYDOWN, SDL_SCANCODE_D, pl_move_r};
+    KeyEvt_TypeDef pl_move_l_evt = {SDL_KEYDOWN, SDL_SCANCODE_A, pl_move_l};
+
+    status = register_key_event(&pl_move_l_evt);
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot regsiter key event", G_STATUS_FAIL);
+    }
+    log_info(APP_TAG, "Registered event on A");
+
+    status = register_key_event(&pl_move_r_evt);
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot regsiter key event", G_STATUS_FAIL);
+    }
+    log_info(APP_TAG, "Registered event on D");
 
     // UpdateCallback_TypeDef keyExit = {false, NULL, test};
     // KeyEvt_TypeDef close = {SDL_KEYDOWN, SDL_SCANCODE_A, keyExit};
@@ -94,11 +114,14 @@ G_STATUS app_loop() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        //world
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDrawLine(renderer, 0, 380, 640, 380);
 
-        SDL_Rect player = {w, 330, 50, 50};
-        SDL_RenderDrawRect(renderer, &player);
+        //player
+        Player_Typedef* pl = get_player_instance();
+        SDL_Rect player_rect = {pl->x, pl->y, pl->h, pl->w};
+        SDL_RenderDrawRect(renderer, &player_rect);
         SDL_RenderPresent( renderer );
     }
     status = deinit_window(&mainFrame, &renderer);

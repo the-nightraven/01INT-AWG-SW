@@ -29,6 +29,7 @@ and change, but not for commercial use
 #include "window/window.h"
 #include "event_reader/reader.h"
 #include "updater/updater.h"
+#include "player/player.h"
 
 //fucntions
 G_STATUS app_init();

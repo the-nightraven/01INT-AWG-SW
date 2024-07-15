@@ -34,4 +34,8 @@ typedef uint8_t G_STATUS;
 #define G_STATUS_OK          0x00
 #define G_STATUS_FAIL        0x01
 
+//config
+#define WINDOW_WIDTH            640
+#define WINDOW_HEIGHT           480
+
 #endif

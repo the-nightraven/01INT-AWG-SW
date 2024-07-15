@@ -31,4 +31,6 @@ G_STATUS call_updater(UpdateCallback_TypeDef *target);
 G_STATUS update_sys_events(SysEvtItem_TypeDef *list);
 G_STATUS update_key_events(KeyEvtItem_TypeDef *list);
 
+float updater_get_delta_time();
+
 #endif

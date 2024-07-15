@@ -23,8 +23,6 @@ and change, but not for commercial use
 
 #include "app/includes.h"
 //defines
-#define WINDOW_WIDTH            640
-#define WINDOW_HEIGHT           480
 #define WINDOW_TAG              "WNDW"
 
 //fucntions

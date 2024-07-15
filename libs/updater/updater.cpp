@@ -20,6 +20,9 @@ and change, but not for commercial use
 
 #include "updater.h"
 
+uint32_t u_ticks_count = 0;
+float delta_time = 0;
+
 G_STATUS call_updater(UpdateCallback_TypeDef *target) {
     if(target == NULL) {
         return G_STATUS_FAIL;
@@ -34,7 +37,17 @@ G_STATUS call_updater(UpdateCallback_TypeDef *target) {
 
 G_STATUS updater_run_time_delta() {
     G_STATUS status;
+
+    while (!SDL_TICKS_PASSED(SDL_GetTicks(), u_ticks_count + 16))
+      ;
+
+    delta_time = (SDL_GetTicks() - u_ticks_count) / 1000.0f;
+    u_ticks_count = SDL_GetTicks();
     //delta wait
+
+    if (delta_time > 0.05f) {
+      delta_time = 0.05f;
+   }
 
     //get events
     SysEvtItem_TypeDef *sys_evt = (SysEvtItem_TypeDef*)get_event_list(SYS_EVENT_FLAG, 0);
@@ -101,4 +114,8 @@ G_STATUS update_key_events(KeyEvtItem_TypeDef *list) {
         ind = ind->next;
     }
     return G_STATUS_OK;
+}
+
+float updater_get_delta_time() {
+    return delta_time;
 }
