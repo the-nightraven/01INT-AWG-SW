@@ -27,11 +27,11 @@ bool is_init = false;
 
 //functions
 G_STATUS init_player() {
-    player.w = 50;
-    player.h = 50;
-    player.x = 0;
-    player.y = WINDOW_HEIGHT / 2 - player.h / 2;
-    player.speed = 300;
+    player.w = PLAYER_SIZE_W;
+    player.h = PLAYER_SIZE_H;
+    player.x = PLAYER_START_X;
+    player.y = PLAYER_START_Y;
+    player.speed = 0;
     is_init = true;
     //register keys and renderer
     return G_STATUS_OK;
@@ -39,15 +39,28 @@ G_STATUS init_player() {
 
 void player_move_left(void* val) {
     Player_Typedef *pu = (Player_Typedef*)val;
-    pu->x -= pu->speed * updater_get_delta_time();
-    printf("Should move left \n");
+    //pu->x -= pu->speed * updater_get_delta_time();
+    if(pu->speed > -1 * PLAYER_BASE_SPEED) {
+        pu->speed -= PLAYER_BASE_SPEED;
+    }
+    printf("Should move left\n");
     return;
 }
 
 void player_move_right(void* val) {
     Player_Typedef *pu = (Player_Typedef*)val;
-    pu->x += pu->speed * updater_get_delta_time();
-    printf("Should move left \n");
+    //pu->x += pu->speed * updater_get_delta_time();
+    if(pu->speed < PLAYER_BASE_SPEED) {
+        pu->speed += PLAYER_BASE_SPEED;
+    }
+    printf("Should move right\n");
+    return;
+}
+
+void player_stop_move(void *val) {
+    printf("Should stop movement\n");
+    Player_Typedef* pu = (Player_Typedef*)val;
+    pu->speed = 0;
     return;
 }
 
@@ -61,4 +74,11 @@ Player_Typedef* get_player_instance() {
     }
 
     return &player;
+}
+
+void process_player_movement(void* player_instance) {
+    Player_Typedef* pl = (Player_Typedef*) player_instance;
+
+    pl->x += pl->speed * updater_get_delta_time();
+    return;
 }

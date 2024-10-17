@@ -48,21 +48,48 @@ G_STATUS app_init() {
 
     UpdateCallback_TypeDef pl_move_r = {false, get_player_instance(), player_move_right};
     UpdateCallback_TypeDef pl_move_l = {false, get_player_instance(), player_move_left};
+    UpdateCallback_TypeDef pl_move_stop = {false, get_player_instance(), player_stop_move};
 
-    KeyEvt_TypeDef pl_move_r_evt = {SDL_KEYDOWN, SDL_SCANCODE_D, pl_move_r};
-    KeyEvt_TypeDef pl_move_l_evt = {SDL_KEYDOWN, SDL_SCANCODE_A, pl_move_l};
+    KeyEvt_TypeDef pl_move_r_evt = {SDL_KEYDOWN, SDL_SCANCODE_D, pl_move_r, true};
+    KeyEvt_TypeDef pl_move_l_evt = {SDL_KEYDOWN, SDL_SCANCODE_A, pl_move_l, true};
+    KeyEvt_TypeDef pl_move_stop_r_evt = {SDL_KEYUP, SDL_SCANCODE_D, pl_move_stop, false};
+    KeyEvt_TypeDef pl_move_stop_l_evt = {SDL_KEYUP, SDL_SCANCODE_A, pl_move_stop, false};
 
     status = register_key_event(&pl_move_l_evt);
     if(status == G_STATUS_FAIL) {
         log_error(APP_TAG, "Cannot regsiter key event", G_STATUS_FAIL);
+        return G_STATUS_FAIL;
     }
-    log_info(APP_TAG, "Registered event on A");
+    log_info(APP_TAG, "Registered keydown event on A");
+
+    status = register_key_event(&pl_move_stop_l_evt);
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot register keyup event on A", G_STATUS_FAIL);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Registered keyup event on A");
 
     status = register_key_event(&pl_move_r_evt);
     if(status == G_STATUS_FAIL) {
         log_error(APP_TAG, "Cannot regsiter key event", G_STATUS_FAIL);
+        return G_STATUS_FAIL;
     }
-    log_info(APP_TAG, "Registered event on D");
+    log_info(APP_TAG, "Registered keydown event on D");
+
+    status = register_key_event(&pl_move_stop_r_evt);
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot register keyup event on D", G_STATUS_FAIL);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Registered keyup event on D");
+
+    UpdateComponent_Typedef player_movement = {get_player_instance(), process_player_movement};
+    status = register_update_components(player_movement);
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot register player movement cb", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Registered player movement callback");
 
     // UpdateCallback_TypeDef keyExit = {false, NULL, test};
     // KeyEvt_TypeDef close = {SDL_KEYDOWN, SDL_SCANCODE_A, keyExit};
@@ -83,8 +110,6 @@ G_STATUS app_init() {
 }
 
 G_STATUS app_loop() {
-    float speed = 0;
-    float w = WINDOW_WIDTH / 2 - 50;
     G_STATUS status;
 
     //evt_process
@@ -101,7 +126,6 @@ G_STATUS app_loop() {
 
 
         //update
-        //w += speed;
         status = updater_run_time_delta();
 
         if(status == G_STATUS_FAIL) {

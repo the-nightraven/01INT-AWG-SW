@@ -86,17 +86,35 @@ G_STATUS poll_events(SDL_Event* e) {
         if((*e).type == SDL_KEYDOWN) {
             KeyEvtItem_TypeDef *ind = (KeyEvtItem_TypeDef*)get_event_by_hook(KEY_EVENT_FLAG, key_down_list, (*e).key.keysym.scancode);
             if(ind != NULL) {
-                ind->evt.update_cb.flag = true;
+                if(!ind->evt.use_keyhold_protection) {
+                    ind->evt.update_cb.flag = true;
+                }else {
+                    if((*e).key.repeat == 0) {
+                        ind->evt.update_cb.flag = true;
+                    }
+                }
             }
-        }else if((*e).type == SDL_KEYDOWN) {
+        }else if((*e).type == SDL_KEYUP) {
             KeyEvtItem_TypeDef *ind = (KeyEvtItem_TypeDef*)get_event_by_hook(KEY_EVENT_FLAG, key_up_list, (*e).key.keysym.scancode);
             if(ind != NULL) {
-                ind->evt.update_cb.flag = true;
+                if(!ind->evt.use_keyhold_protection) {
+                    ind->evt.update_cb.flag = true;
+                }else {
+                    if((*e).key.repeat == 0) {
+                        ind->evt.update_cb.flag = true;
+                    }
+                }
             }
         }else {
             SysEvtItem_TypeDef *ind = (SysEvtItem_TypeDef*)get_event_by_hook(SYS_EVENT_FLAG, sys_list, (*e).type);
             if(ind != NULL) {
-                ind->evt.update_cb.flag = true;
+                if(!ind->evt.use_keyhold_protection) {
+                    ind->evt.update_cb.flag = true;
+                }else {
+                    if((*e).key.repeat == 0) {
+                        ind->evt.update_cb.flag = true;
+                    }
+                }
             }
         }
     }

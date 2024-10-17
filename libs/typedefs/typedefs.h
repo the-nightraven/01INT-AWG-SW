@@ -24,15 +24,22 @@ typedef struct UpdateCallback_TypeDef{
     void (*obj_callback)(void*);
 };
 
+typedef struct KeyHoldProtection_TypeDef {
+    bool flag;
+    UpdateCallback_TypeDef keyup_update_cb;
+};
+
 typedef struct SysEvt_TypeDef {
     int SDL_Hook;
     UpdateCallback_TypeDef update_cb;
+    bool use_keyhold_protection;
 };
 
 typedef struct KeyEvt_TypeDef {
     int SDL_Hook;
     int Key;
     UpdateCallback_TypeDef update_cb;
+    bool use_keyhold_protection;
 };
 
 typedef struct SysEvtItem_TypeDef {
@@ -43,4 +50,10 @@ typedef struct SysEvtItem_TypeDef {
 typedef struct KeyEvtItem_TypeDef {
     KeyEvt_TypeDef evt;
     KeyEvtItem_TypeDef *next;
+};
+
+typedef struct UpdateComponent_Typedef {
+    void* value;
+    void (*comp_callback)(void*);
+    UpdateComponent_Typedef* next;
 };

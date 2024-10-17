@@ -23,6 +23,39 @@ and change, but not for commercial use
 uint32_t u_ticks_count = 0;
 float delta_time = 0;
 
+UpdateComponent_Typedef* update_comp_list = NULL;
+
+G_STATUS register_update_components(UpdateComponent_Typedef component) {
+    if(&component == NULL) {
+        return G_STATUS_FAIL;
+    }
+
+    if(update_comp_list == NULL) {
+        update_comp_list = updater_component_to_instance(component);
+        if(update_comp_list == NULL) {
+            return G_STATUS_FAIL;
+        }
+    }else {
+        UpdateComponent_Typedef* tmp = update_comp_list;
+
+        while(tmp->next != NULL) {
+            tmp = tmp->next;
+        }
+
+        tmp->next = updater_component_to_instance(component);
+    }
+    return G_STATUS_OK;
+}
+
+UpdateComponent_Typedef* updater_component_to_instance(UpdateComponent_Typedef item) {
+    UpdateComponent_Typedef* tmp = (UpdateComponent_Typedef*)malloc(sizeof(UpdateComponent_Typedef));
+    tmp->value = item.value;
+    tmp->comp_callback = item.comp_callback;
+    tmp->next = NULL;
+
+    return tmp;    
+}
+
 G_STATUS call_updater(UpdateCallback_TypeDef *target) {
     if(target == NULL) {
         return G_STATUS_FAIL;
@@ -38,8 +71,9 @@ G_STATUS call_updater(UpdateCallback_TypeDef *target) {
 G_STATUS updater_run_time_delta() {
     G_STATUS status;
 
-    while (!SDL_TICKS_PASSED(SDL_GetTicks(), u_ticks_count + 16))
-      ;
+    if(u_ticks_count != 0) {
+        while (!SDL_TICKS_PASSED(SDL_GetTicks(), u_ticks_count + 16));
+    }
 
     delta_time = (SDL_GetTicks() - u_ticks_count) / 1000.0f;
     u_ticks_count = SDL_GetTicks();
@@ -71,6 +105,15 @@ G_STATUS updater_run_time_delta() {
 
     if(status == G_STATUS_FAIL) {
         return status;
+    }
+
+    //get component updates
+    UpdateComponent_Typedef* tmp = update_comp_list;
+
+    //call them
+    while(tmp != NULL) {
+        tmp->comp_callback(tmp->value);
+        tmp = tmp->next;
     }
 
     return G_STATUS_OK;

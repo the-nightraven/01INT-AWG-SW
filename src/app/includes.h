@@ -26,6 +26,7 @@ and change, but not for commercial use
 #include <SDL2/SDL.h>
 #include <malloc.h>
 #include "typedefs/typedefs.h"
+#include <stdbool.h>
 
 //typedefs
 typedef uint8_t G_STATUS;
