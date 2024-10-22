@@ -57,3 +57,11 @@ typedef struct UpdateComponent_Typedef {
     void (*comp_callback)(void*);
     UpdateComponent_Typedef* next;
 };
+
+typedef struct RendererComponent_Typedef {
+    void* object;
+    int obj_type;
+    void (*obj_render)(void*);
+    RendererComponent_Typedef* next;
+};
+

@@ -24,4 +24,16 @@ and change, but not for commercial use
 #include "app/includes.h"
 
 
+//defines
+#define RENDERER_TAG        "RNDR"
+
+//methods
+G_STATUS renderer_init();
+G_STATUS renderer_deinit();
+G_STATUS renderer_register_component();
+G_STATUS renderer_remove_component();
+
+void renderer_create_frame();
+RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item);
+
 #endif
