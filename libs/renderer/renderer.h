@@ -30,7 +30,7 @@ and change, but not for commercial use
 //methods
 G_STATUS renderer_init();
 G_STATUS renderer_deinit();
-G_STATUS renderer_register_component();
+G_STATUS renderer_register_component(RendererComponent_Typedef item);
 G_STATUS renderer_remove_component();
 
 void renderer_create_frame();
