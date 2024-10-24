@@ -21,9 +21,16 @@ and change, but not for commercial use
 #include "renderer.h"
 
 RendererComponent_Typedef* renderer_visible_list;
+RendererComponentHandler obj_handler_counter;
 
 G_STATUS renderer_init() {
     renderer_visible_list = NULL;
+    obj_handler_counter = 0;
+
+    RenderEngine eng_check = renderer_get_engine();
+    if(eng_check != RENDERER_ENGINE_SDL2) {
+        return G_STATUS_FAIL;
+    }
 
     return G_STATUS_OK;
 }
@@ -40,8 +47,70 @@ G_STATUS renderer_deinit() {
 
     return G_STATUS_OK;
 }
-G_STATUS renderer_register_component();
-G_STATUS renderer_remove_component();
 
-void renderer_create_frame();
-RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item);
+RendererComponentHandler renderer_register_component(RendererComponent_Typedef item) {
+    RendererComponent_Typedef* tmp = renderer_to_instance(item);
+
+    if(tmp == NULL) {
+        return G_STATUS_FAIL;
+    }
+
+    tmp->handler = obj_handler_counter++;
+
+    if(renderer_visible_list == NULL) {
+        renderer_visible_list = tmp;
+    }else {
+        RendererComponent_Typedef* ind = renderer_visible_list;
+
+        while(ind->next != NULL) {
+            ind = ind->next;
+        }
+
+        ind->next = tmp;
+    }
+    return tmp->handler;
+}
+
+G_STATUS renderer_remove_component(RendererComponentHandler handler, bool mode) {
+    //for now set visibility variable false
+    //for now mode sets visibility
+    RendererComponent_Typedef* tmp = renderer_visible_list;
+
+    bool found = false;
+    while(tmp != NULL) {
+        if(tmp->handler == handler) {
+            tmp->visibility = mode;
+            found = true;
+        }
+        tmp = tmp->next;
+    }
+    if(found) {
+        return G_STATUS_OK;
+    }
+    return G_STATUS_FAIL;
+}
+
+void renderer_create_frame(SDL_Renderer** renderer) {
+    //for now render based on visibility
+    RendererComponent_Typedef* ind = renderer_visible_list;
+
+    while(ind != NULL) {
+        if(ind->visibility) {
+            ind->obj_render(ind->object, renderer);
+        }
+        ind = ind->next;
+    }
+    return;
+}
+
+RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item) {
+    RendererComponent_Typedef* tmp = (RendererComponent_Typedef*)malloc(sizeof(RendererComponent_Typedef));
+    tmp->visibility = item.visibility;
+    tmp->obj_type = item.obj_type;
+    tmp->object = item.object;
+    tmp->obj_render = item.obj_render;
+    tmp->handler = -1;
+    tmp->next = NULL;
+
+    return tmp;
+}

@@ -30,6 +30,7 @@ and change, but not for commercial use
 #include "event_reader/reader.h"
 #include "updater/updater.h"
 #include "player/player.h"
+#include "renderer/renderer.h"
 
 //fucntions
 G_STATUS app_init();

@@ -29,6 +29,11 @@ SDL_Window* mainFrame = NULL;
 SDL_Renderer* renderer = NULL;
 int is_running = 1;
 
+//externs
+RenderEngine renderer_get_engine() {
+    return RENDERER_ENGINE_SDL2;
+}
+
 //functions
 
 G_STATUS app_init() {
@@ -100,6 +105,23 @@ G_STATUS app_init() {
     // }
     // log_info("APP", "registered KEY event on: A");
 
+    //renderer init
+    status = renderer_init();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Renderer module cannot init", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Renderer module inited");
+
+    //register render components
+    RendererComponent_Typedef player_render = {0, true, get_player_instance(), 1, player_render_cb, NULL};
+    status = renderer_register_component(player_render);
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot set player render function", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Set player render function");
+
     status = init_window(&mainFrame, &renderer);
     if(status == G_STATUS_FAIL) {
         log_error(APP_TAG, "Cannot init window", G_STATUS_FAIL);
@@ -138,14 +160,8 @@ G_STATUS app_loop() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        //world
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderDrawLine(renderer, 0, 380, 640, 380);
+        renderer_create_frame(&renderer);
 
-        //player
-        Player_Typedef* pl = get_player_instance();
-        SDL_Rect player_rect = {pl->x, pl->y, pl->h, pl->w};
-        SDL_RenderDrawRect(renderer, &player_rect);
         SDL_RenderPresent( renderer );
     }
     status = deinit_window(&mainFrame, &renderer);

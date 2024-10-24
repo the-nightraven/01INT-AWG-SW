@@ -25,15 +25,19 @@ and change, but not for commercial use
 
 
 //defines
-#define RENDERER_TAG        "RNDR"
+#define RENDERER_TAG                   "RNDR"
+#define RENDERER_ENGINE_SDL2           1
 
 //methods
 G_STATUS renderer_init();
 G_STATUS renderer_deinit();
-G_STATUS renderer_register_component(RendererComponent_Typedef item);
-G_STATUS renderer_remove_component();
+RendererComponentHandler renderer_register_component(RendererComponent_Typedef item);
+G_STATUS renderer_remove_component(RendererComponentHandler handler, bool mode);
 
-void renderer_create_frame();
+void renderer_create_frame(SDL_Renderer** renderer);
 RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item);
+
+//externs
+extern RenderEngine renderer_get_engine();
 
 #endif

@@ -38,9 +38,6 @@ typedef struct Player_Typedef {
     float speed;
 };
 
-//extern functions like render
-extern void draw_player();
-
 //functions
 G_STATUS init_player();
 void player_move_left(void *val);
@@ -51,6 +48,9 @@ Player_Typedef* get_player_instance();
 
 //updater register callbacks
 void process_player_movement(void* player_instance);
+
+//renderer callback
+void player_render_cb(void* player_ins, SDL_Renderer** renderer);
 
 
 #endif
