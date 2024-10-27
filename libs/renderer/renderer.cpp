@@ -71,19 +71,21 @@ RendererComponentHandler renderer_register_component(RendererComponent_Typedef i
     return tmp->handler;
 }
 
-G_STATUS renderer_remove_component(RendererComponentHandler handler, bool mode) {
-    //for now set visibility variable false
-    //for now mode sets visibility
-    RendererComponent_Typedef* tmp = renderer_visible_list;
+G_STATUS renderer_remove_component(RendererComponentHandler handler) {
+    RendererComponent_Typedef* prev = renderer_visible_list;
+    RendererComponent_Typedef* curr = prev->next;
 
     bool found = false;
-    while(tmp != NULL) {
-        if(tmp->handler == handler) {
-            tmp->visibility = mode;
+    while(curr != NULL  && !found) {
+        if(curr->handler == handler) {
             found = true;
+            prev->next = curr->next;
+            free(curr);
         }
-        tmp = tmp->next;
+        prev = prev->next;
+        curr = prev->next;
     }
+    
     if(found) {
         return G_STATUS_OK;
     }
@@ -95,9 +97,7 @@ void renderer_create_frame(SDL_Renderer** renderer) {
     RendererComponent_Typedef* ind = renderer_visible_list;
 
     while(ind != NULL) {
-        if(ind->visibility) {
-            ind->obj_render(ind->object, renderer);
-        }
+        ind->obj_render(ind->object, renderer);
         ind = ind->next;
     }
     return;

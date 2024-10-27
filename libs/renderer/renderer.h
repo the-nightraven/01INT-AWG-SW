@@ -32,7 +32,7 @@ and change, but not for commercial use
 G_STATUS renderer_init();
 G_STATUS renderer_deinit();
 RendererComponentHandler renderer_register_component(RendererComponent_Typedef item);
-G_STATUS renderer_remove_component(RendererComponentHandler handler, bool mode);
+G_STATUS renderer_remove_component(RendererComponentHandler handler);
 
 void renderer_create_frame(SDL_Renderer** renderer);
 RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item);
