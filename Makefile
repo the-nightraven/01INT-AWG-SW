@@ -15,7 +15,14 @@ SRC_DIR = src/
 
 BIN_NAME = game
 CXX = g++
-FILES = $(BUILD_DIR)main.o $(BUILD_DIR)logger.o $(BUILD_DIR)app.o $(BUILD_DIR)window.o $(BUILD_DIR)reader.o $(BUILD_DIR)updater.o $(BUILD_DIR)player.o
+FILES = $(BUILD_DIR)main.o \
+		$(BUILD_DIR)logger.o \
+		$(BUILD_DIR)app.o \
+		$(BUILD_DIR)window.o \
+		$(BUILD_DIR)reader.o \
+		$(BUILD_DIR)updater.o \
+		$(BUILD_DIR)player.o \
+		$(BUILD_DIR)renderer.o
 
 CXXFLAGS = -w -lSDL2
 
@@ -55,3 +62,6 @@ $(BUILD_DIR)updater.o: $(LIBS_DIR)updater/updater.cpp
 
 $(BUILD_DIR)player.o: $(SRC_DIR)player/player.cpp
 	$(CXX) $(CXXFLAGS) $(INC) -c $(SRC_DIR)player/player.cpp -o $(BUILD_DIR)player.o
+
+$(BUILD_DIR)renderer.o: $(LIBS_DIR)renderer/renderer.cpp
+	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)renderer/renderer.cpp -o $(BUILD_DIR)renderer.o

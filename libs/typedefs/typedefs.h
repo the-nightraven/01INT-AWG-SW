@@ -17,6 +17,14 @@ and change, but not for commercial use
 
 ###########################################################
 */
+#ifndef TYPEDEFS_H
+#define TYPEDEFS_H
+
+//data types
+typedef int RendererComponentHandler;
+typedef int RenderEngine;
+
+//objects
 
 typedef struct UpdateCallback_TypeDef{
     bool flag;
@@ -57,3 +65,16 @@ typedef struct UpdateComponent_Typedef {
     void (*comp_callback)(void*);
     UpdateComponent_Typedef* next;
 };
+
+typedef struct RendererComponent_Typedef {
+    RendererComponentHandler handler;
+    bool visibility;
+    void* object;
+    int obj_type;
+    void (*obj_render)(void*, SDL_Renderer**);
+    RendererComponent_Typedef* next;
+};
+
+#endif
+
+

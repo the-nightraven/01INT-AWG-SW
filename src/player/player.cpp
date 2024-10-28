@@ -82,3 +82,14 @@ void process_player_movement(void* player_instance) {
     pl->x += pl->speed * updater_get_delta_time();
     return;
 }
+
+void player_render_cb(void* player_ins, SDL_Renderer** renderer) {
+    int status;
+    Player_Typedef* pl = (Player_Typedef*)player_ins;
+    SDL_Rect player_rect = {pl->x, pl->y, pl->h, pl->w};
+    status = SDL_SetRenderDrawColor(*renderer, 255, 255, 255, 255);
+    status = SDL_RenderDrawRect(*renderer, &player_rect);
+    //printf("status: %d\n", player.x);
+    //SDL_RenderPresent( renderer );
+    return;
+}

@@ -23,7 +23,6 @@ and change, but not for commercial use
 //@TODO: Mouse support                    WIP
 //@TODO: Xbox Controller support          WIP
 
-
 #include "reader.h"
 
 
