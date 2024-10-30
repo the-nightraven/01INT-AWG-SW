@@ -43,7 +43,7 @@ void player_move_left(void* val) {
     if(pu->speed > -1 * PLAYER_BASE_SPEED) {
         pu->speed -= PLAYER_BASE_SPEED;
     }
-    printf("Should move left\n");
+    //printf("Should move left\n");
     return;
 }
 
@@ -53,12 +53,12 @@ void player_move_right(void* val) {
     if(pu->speed < PLAYER_BASE_SPEED) {
         pu->speed += PLAYER_BASE_SPEED;
     }
-    printf("Should move right\n");
+    //printf("Should move right\n");
     return;
 }
 
 void player_stop_move(void *val) {
-    printf("Should stop movement\n");
+    //printf("Should stop movement\n");
     Player_Typedef* pu = (Player_Typedef*)val;
     pu->speed = 0;
     return;
