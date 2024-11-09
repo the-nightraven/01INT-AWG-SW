@@ -30,7 +30,11 @@ SysEvtItem_TypeDef *sys_list = NULL;
 KeyEvtItem_TypeDef *key_up_list = NULL;
 KeyEvtItem_TypeDef *key_down_list = NULL;
 
-G_STATUS init() {
+G_STATUS evt_init() {
+    return G_STATUS_OK;
+}
+
+G_STATUS evt_deinit() {
     return G_STATUS_OK;
 }
 

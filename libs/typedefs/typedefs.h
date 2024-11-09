@@ -17,6 +17,7 @@ and change, but not for commercial use
 
 ###########################################################
 */
+
 #ifndef TYPEDEFS_H
 #define TYPEDEFS_H
 
@@ -30,11 +31,6 @@ typedef struct UpdateCallback_TypeDef{
     bool flag;
     void* value;
     void (*obj_callback)(void*);
-};
-
-typedef struct KeyHoldProtection_TypeDef {
-    bool flag;
-    UpdateCallback_TypeDef keyup_update_cb;
 };
 
 typedef struct SysEvt_TypeDef {
@@ -75,6 +71,35 @@ typedef struct RendererComponent_Typedef {
     RendererComponent_Typedef* next;
 };
 
+
+//engine monitor
+typedef struct EvtModule_TypeDef {
+    bool status;
+};
+
+typedef struct UpdaterModule_TypeDef {
+    bool status;
+};
+
+typedef struct RendererModule_TypeDef {
+    bool status;
+};
+
+typedef struct DebugModule_TypeDef {
+    bool status;
+};
+
+typedef struct WindowModule_TypeDef {
+    bool status;
+};
+
+typedef struct MonitorComponents_TypeDef {
+    EvtModule_TypeDef event_module;
+    UpdaterModule_TypeDef updater_module;
+    RendererModule_TypeDef renderer_module;
+    DebugModule_TypeDef debug_module;
+    WindowModule_TypeDef window_module;
+    bool isRunning;
+};
+
 #endif
-
-

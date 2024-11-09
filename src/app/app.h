@@ -24,13 +24,8 @@ and change, but not for commercial use
 #define APP_TAG       "APP"
 
 //includes
-#include "includes.h"
-#include "logger/logger.h"
-#include "window/window.h"
-#include "event_reader/reader.h"
-#include "updater/updater.h"
+#include "monitor/engine_monitor.h"
 #include "player/player.h"
-#include "renderer/renderer.h"
 
 //fucntions
 G_STATUS app_init();

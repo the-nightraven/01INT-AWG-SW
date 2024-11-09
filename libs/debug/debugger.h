@@ -38,8 +38,8 @@ void* debugger_lifecycle(void* arg);
 
 //TODO: event callbacks
 void debugger_toggle_cb(void* value);
-void debugger_calc_fps_cb(void* value);
-void debugger_print_list(void* value);
+void debugger_print_evt(void* value);
+void debugger_print_rndr(void* value);
 
 //helpers
 //TODO: get fps

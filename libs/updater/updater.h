@@ -25,6 +25,9 @@ header
 #include "app/includes.h"
 #include "event_reader/reader.h"
 
+G_STATUS updater_init();
+G_STATUS updater_deinit();
+
 bool check_updater_flag(UpdateCallback_TypeDef target);
 G_STATUS updater_run_time_delta();
 G_STATUS call_updater(UpdateCallback_TypeDef *target);

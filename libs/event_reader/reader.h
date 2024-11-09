@@ -32,7 +32,8 @@ and change, but not for commercial use
 
 
 //reader utils
-G_STATUS init();
+G_STATUS evt_init();
+G_STATUS evt_deinit();
 G_STATUS register_sys_event(SysEvt_TypeDef* evt);
 G_STATUS register_key_event(KeyEvt_TypeDef* evt);
 

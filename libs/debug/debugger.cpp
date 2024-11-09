@@ -69,11 +69,26 @@ void* debugger_lifecycle(void* arg) {
     }
 
     while(debuggerIsRunning) {
-        //do stuff
+        //update fps
     }
 
     return NULL;
 }
+
+//callbacks
+void debugger_toggle_cb(void* value) {
+    return;
+}
+
+void debugger_print_evt(void* value) {
+    return;
+}
+
+void debugger_print_rndr(void* value) {
+    return;
+}
+
+
 
 //helpers
 bool debugger_is_running() {
