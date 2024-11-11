@@ -126,35 +126,14 @@ G_STATUS app_loop() {
     SDL_Renderer* eng_renderer = monitor_get_renderer_instance();
     SDL_Window* eng_display = monitor_get_display_instance();
 
-    //evt_process
     log_info(APP_TAG, "Loop Started!");
     while(monitor_get_run_cond()) {
-        SDL_Event e;
-        status = poll_events(&e);
-
+        status = monitor_process_loop();
         if(status == G_STATUS_FAIL) {
+            log_error(APP_TAG, "Monitor registered errors", -1);
             monitor_force_exit();
-            log_error(APP_TAG, "cannot poll event", G_STATUS_FAIL);
             return G_STATUS_FAIL;
         }
-
-
-        //update
-        status = updater_run_time_delta();
-
-        if(status == G_STATUS_FAIL) {
-            monitor_force_exit();
-            log_error(APP_TAG, "cannot update objects", G_STATUS_FAIL);
-            return G_STATUS_FAIL;
-        }
-
-        //render
-        SDL_SetRenderDrawColor(eng_renderer, 0, 0, 0, 255);
-        SDL_RenderClear(eng_renderer);
-
-        renderer_create_frame(&eng_renderer);
-
-        SDL_RenderPresent( eng_renderer );
     }
     status = deinit_window(&eng_display, &eng_renderer);
     return status;

@@ -141,8 +141,38 @@ G_STATUS monitor_register_comp() {
     return G_STATUS_OK;
 }
 
-void monitor_process_loop() {
-    return;
+G_STATUS monitor_process_loop() {
+    G_STATUS status;
+    SDL_Event e;
+    engine_components.engine_event_pool = e;
+    
+    status = poll_events(&engine_components.engine_event_pool);
+
+    if(status == G_STATUS_FAIL) {
+        engine_components.isRunning = false;
+        log_error(MON_TAG, "cannot poll event", G_STATUS_FAIL);
+        return G_STATUS_FAIL;
+    }
+
+
+    //update
+    status = updater_run_time_delta();
+
+    if(status == G_STATUS_FAIL) {
+        engine_components.isRunning = false;
+        log_error(MON_TAG, "cannot update objects", G_STATUS_FAIL);
+        return G_STATUS_FAIL;
+    }
+
+    //render
+    SDL_SetRenderDrawColor(engine_components.engine_renderer, 0, 0, 0, 255);
+    SDL_RenderClear(engine_components.engine_renderer);
+
+    renderer_create_frame(&engine_components.engine_renderer);
+
+    SDL_RenderPresent(engine_components.engine_renderer);
+
+    return G_STATUS_OK;
 }
 
 SDL_Renderer* monitor_get_renderer_instance() {

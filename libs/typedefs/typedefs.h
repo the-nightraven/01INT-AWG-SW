@@ -102,6 +102,7 @@ typedef struct MonitorComponents_TypeDef {
     bool isRunning;
     SDL_Window* engine_display;
     SDL_Renderer* engine_renderer;
+    SDL_Event engine_event_pool;
 };
 
 #endif

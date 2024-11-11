@@ -44,7 +44,7 @@ int monitor_audit_module(int wildcard);
 G_STATUS monitor_deinit_modules();
 G_STATUS monitor_register_comp();
 
-void monitor_process_loop();
+G_STATUS monitor_process_loop();
 G_STATUS monitor_check_env();
 SDL_Renderer* monitor_get_renderer_instance();
 SDL_Window* monitor_get_display_instance();
