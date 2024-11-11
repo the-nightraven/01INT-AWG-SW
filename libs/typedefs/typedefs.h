@@ -100,6 +100,8 @@ typedef struct MonitorComponents_TypeDef {
     DebugModule_TypeDef debug_module;
     WindowModule_TypeDef window_module;
     bool isRunning;
+    SDL_Window* engine_display;
+    SDL_Renderer* engine_renderer;
 };
 
 #endif

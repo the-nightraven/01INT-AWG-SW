@@ -22,7 +22,8 @@ FILES = $(BUILD_DIR)main.o \
 		$(BUILD_DIR)reader.o \
 		$(BUILD_DIR)updater.o \
 		$(BUILD_DIR)player.o \
-		$(BUILD_DIR)renderer.o
+		$(BUILD_DIR)renderer.o \
+		$(BUILD_DIR)engine_monitor.o
 
 CXXFLAGS = -w -lSDL2
 
@@ -65,3 +66,6 @@ $(BUILD_DIR)player.o: $(SRC_DIR)player/player.cpp
 
 $(BUILD_DIR)renderer.o: $(LIBS_DIR)renderer/renderer.cpp
 	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)renderer/renderer.cpp -o $(BUILD_DIR)renderer.o
+
+$(BUILD_DIR)engine_monitor.o: $(LIBS_DIR)monitor/engine_monitor.cpp
+	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)monitor/engine_monitor.cpp -o $(BUILD_DIR)engine_monitor.o

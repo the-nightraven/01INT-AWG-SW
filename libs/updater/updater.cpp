@@ -29,6 +29,7 @@ G_STATUS updater_init() {
     u_ticks_count = 0;
     delta_time = 0;
     update_comp_list = NULL;
+    return G_STATUS_OK;
 }
 
 G_STATUS updater_deinit() {
