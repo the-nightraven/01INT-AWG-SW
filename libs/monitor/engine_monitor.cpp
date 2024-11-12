@@ -151,6 +151,28 @@ int monitor_audit_module(int wildcard) {
 }
 
 G_STATUS monitor_deinit_modules() {
+    //thread joins
+    monitor_stop_updating();
+    log_info(MON_TAG, "Unforked updater thread safely");
+
+    //evt deinit
+    evt_deinit();
+    log_info(MON_TAG, "Event module deinited successfuly");
+
+    //updater
+    updater_deinit();
+    log_info(MON_TAG, "Updater module deinited successfuly");
+
+    //render deinit
+    renderer_deinit();
+    log_info(MON_TAG, "Render module deinited succesfully");
+
+    //debug deinit
+
+    //window deinit
+    deinit_window(&engine_components.engine_display, &engine_components.engine_renderer);
+    log_info(MON_TAG, "Window deinited successfully");
+
     return G_STATUS_OK;
 }
 
@@ -226,11 +248,17 @@ G_STATUS monitor_start_updating() {
 
 G_STATUS monitor_stop_updating() {
     if(!engine_components.updater_module.th_isRunning) {
+        log_error(MON_TAG, "Thread wasnt running", -1);
         return G_STATUS_FAIL;
     }
 
     engine_components.updater_module.th_isRunning = false;
-    pthread_join(engine_components.updater_module.upd_thread, NULL);
+    if(pthread_join(engine_components.updater_module.upd_thread, NULL) != 0) {
+        log_error(MON_TAG, "Thread exited unsfely", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(MON_TAG, "Thread joined safely");
+
     engine_components.updater_module.upd_thread = 0;
     return G_STATUS_OK;
 }

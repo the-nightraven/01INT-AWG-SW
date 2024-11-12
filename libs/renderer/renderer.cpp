@@ -42,7 +42,10 @@ G_STATUS renderer_deinit() {
     do{
         free(prev);
         prev = curr;
-        curr = curr->next;
+
+        if(curr != NULL) {
+            curr = curr->next;
+        }
     }while(curr != NULL);
 
     return G_STATUS_OK;

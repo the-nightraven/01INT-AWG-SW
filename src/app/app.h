@@ -31,6 +31,8 @@ and change, but not for commercial use
 G_STATUS app_init();
 G_STATUS app_loop();
 
+G_STATUS app_deinit();
+
 // void end_game(void *val);
 // void test(void* val);
 

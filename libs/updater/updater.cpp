@@ -33,6 +33,18 @@ G_STATUS updater_init() {
 }
 
 G_STATUS updater_deinit() {
+    UpdateComponent_Typedef* prev = update_comp_list;
+    UpdateComponent_Typedef* curr = update_comp_list->next;
+
+    do {
+        free(prev);
+        prev = curr;
+
+        if(curr != NULL) {
+            curr = curr->next;
+        }
+    }while(curr != NULL);
+
     return G_STATUS_OK;
 }
 

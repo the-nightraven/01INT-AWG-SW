@@ -35,20 +35,26 @@ and change, but not for commercial use
 #define WDW_WILDCARD     4
 #define DBG_WILDCARD     5
 
+//inits
 G_STATUS monitor_init();
 G_STATUS monitor_deinit();
-
 G_STATUS monitor_init_modules();
 G_STATUS monitor_init_window_module();
-int monitor_audit_module(int wildcard);
-G_STATUS monitor_deinit_modules();
 G_STATUS monitor_register_comp();
 
+//testing
+G_STATUS monitor_check_env();
+int monitor_audit_module(int wildcard);
+
+//deinit
+G_STATUS monitor_deinit_modules();
+
+//loop functions
 G_STATUS monitor_start_updating();
 G_STATUS monitor_stop_updating();
-
 G_STATUS monitor_process_loop();
-G_STATUS monitor_check_env();
+
+//getters and helpers
 SDL_Renderer* monitor_get_renderer_instance();
 SDL_Window* monitor_get_display_instance();
 bool monitor_get_run_cond();

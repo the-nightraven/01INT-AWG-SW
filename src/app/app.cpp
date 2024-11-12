@@ -141,6 +141,10 @@ G_STATUS app_loop() {
             return G_STATUS_FAIL;
         }
     }
-    status = deinit_window(&eng_display, &eng_renderer);
     return status;
+}
+
+G_STATUS app_deinit() {
+    monitor_deinit_modules();
+    return G_STATUS_OK;
 }
