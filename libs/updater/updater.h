@@ -40,5 +40,7 @@ UpdateComponent_Typedef* updater_component_to_instance(UpdateComponent_Typedef i
 //helpers
 float updater_get_delta_time();
 
+//externs
+extern void* updater_thread_lifecycle(void* arg);
 
 #endif

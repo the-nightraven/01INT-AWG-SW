@@ -19,6 +19,7 @@ and change, but not for commercial use
 */
 
 #include "engine_monitor.h"
+#include "pthread.h"
 
 //vars
 MonitorComponents_TypeDef engine_components;
@@ -28,21 +29,47 @@ RenderEngine renderer_get_engine() {
     return RENDERER_ENGINE_SDL2;
 }
 
+void* updater_thread_lifecycle(void* arg) {
+    int status;
+    while(engine_components.updater_module.th_isRunning) {
+        status = updater_run_time_delta();
+
+        if(status == G_STATUS_FAIL) {
+            log_error(MON_TAG, "Updater thread encountered problems", -1);
+            engine_components.updater_module.th_isRunning = false;
+            engine_components.updater_module.status = false;
+            engine_components.updater_module.upd_thread = 0;
+        }
+    }
+    return NULL;
+}
+
 //sys callbacks
 void end_game(void *val) {
     *((int*)(val)) = false;
 }
 
 G_STATUS monitor_init() {
+    //engine
     engine_components.engine_display = NULL;
     engine_components.engine_renderer = NULL;
-
-    engine_components.event_module.status = false;
-    engine_components.updater_module.status = false;
-    engine_components.renderer_module.status = false;
-    engine_components.debug_module.status = false;
-    engine_components.window_module.status = false;
     engine_components.isRunning = false;
+
+    //modules
+    engine_components.event_module.status = false;
+
+    engine_components.updater_module.status = false;
+    engine_components.updater_module.th_isRunning = false;
+    engine_components.updater_module.upd_thread = 0;
+
+    engine_components.renderer_module.status = false;
+
+    engine_components.debug_module.status = false;
+    engine_components.debug_module.th_isRunning = false;
+    engine_components.debug_module.dbg_thread = 0;
+
+    engine_components.window_module.status = false;
+
     return G_STATUS_OK;
 }
 
@@ -154,16 +181,6 @@ G_STATUS monitor_process_loop() {
         return G_STATUS_FAIL;
     }
 
-
-    //update
-    status = updater_run_time_delta();
-
-    if(status == G_STATUS_FAIL) {
-        engine_components.isRunning = false;
-        log_error(MON_TAG, "cannot update objects", G_STATUS_FAIL);
-        return G_STATUS_FAIL;
-    }
-
     //render
     SDL_SetRenderDrawColor(engine_components.engine_renderer, 0, 0, 0, 255);
     SDL_RenderClear(engine_components.engine_renderer);
@@ -189,4 +206,31 @@ bool monitor_get_run_cond() {
 
 void monitor_force_exit() {
     engine_components.isRunning = false;
+}
+
+G_STATUS monitor_start_updating() {
+    if(engine_components.updater_module.th_isRunning) {
+        return G_STATUS_FAIL;
+    }
+
+    engine_components.updater_module.th_isRunning = true;
+    if(pthread_create(&(engine_components.updater_module.upd_thread), NULL, updater_thread_lifecycle, NULL) == 0) {
+        return G_STATUS_OK;
+    }
+
+    engine_components.updater_module.upd_thread = 0;
+    engine_components.updater_module.th_isRunning = false;
+    engine_components.updater_module.status = false;
+    return G_STATUS_FAIL;
+}
+
+G_STATUS monitor_stop_updating() {
+    if(!engine_components.updater_module.th_isRunning) {
+        return G_STATUS_FAIL;
+    }
+
+    engine_components.updater_module.th_isRunning = false;
+    pthread_join(engine_components.updater_module.upd_thread, NULL);
+    engine_components.updater_module.upd_thread = 0;
+    return G_STATUS_OK;
 }

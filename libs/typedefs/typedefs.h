@@ -78,6 +78,8 @@ typedef struct EvtModule_TypeDef {
 };
 
 typedef struct UpdaterModule_TypeDef {
+    pthread_t upd_thread;
+    bool th_isRunning;
     bool status;
 };
 
@@ -86,6 +88,8 @@ typedef struct RendererModule_TypeDef {
 };
 
 typedef struct DebugModule_TypeDef {
+    pthread_t dbg_thread;
+    bool th_isRunning;
     bool status;
 };
 

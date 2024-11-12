@@ -93,14 +93,6 @@ G_STATUS app_init() {
     }
     log_info(APP_TAG, "Registered player movement callback");
 
-    // UpdateCallback_TypeDef keyExit = {false, NULL, test};
-    // KeyEvt_TypeDef close = {SDL_KEYDOWN, SDL_SCANCODE_A, keyExit};
-    // status = register_key_event(&close);
-    // if(status == G_STATUS_FAIL) {
-    //     log_error(APP_TAG, "Cannot register event", G_STATUS_FAIL);
-    //     return G_STATUS_FAIL;
-    // }
-    // log_info("APP", "registered KEY event on: A");
 
     //register render components
     RendererComponent_Typedef player_render = {0, true, get_player_instance(), 1, player_render_cb, NULL};
@@ -118,7 +110,21 @@ G_STATUS app_init() {
     }
     log_info(APP_TAG, "Inited engine display module");
 
-    return monitor_check_env();
+    status = monitor_check_env();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Engine modules not inited successfuly", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Engine modules inited successfully");
+
+    status = monitor_start_updating();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Rendering did not start", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Renderer forked successfuly");
+
+    return G_STATUS_OK;
 }
 
 G_STATUS app_loop() {
@@ -138,13 +144,3 @@ G_STATUS app_loop() {
     status = deinit_window(&eng_display, &eng_renderer);
     return status;
 }
-
-// void end_game(void *val) {
-//     *((int*)(val)) = 0;
-// }
-
-// void test(void* val) {
-//     SDL_Event e;
-//     e.type = SDL_QUIT;
-//     SDL_PushEvent(&e);
-// }

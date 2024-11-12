@@ -37,5 +37,8 @@ int main(int argc, char* args[]) {
 
     status = app_loop();
 
+    //TODO: verbose deinit
+    status = monitor_stop_updating();
+
     return status;
 }

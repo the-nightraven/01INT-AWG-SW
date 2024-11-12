@@ -97,6 +97,7 @@ void renderer_create_frame(SDL_Renderer** renderer) {
     RendererComponent_Typedef* ind = renderer_visible_list;
 
     while(ind != NULL) {
+        //printf("HI3\n");
         ind->obj_render(ind->object, renderer);
         ind = ind->next;
     }
