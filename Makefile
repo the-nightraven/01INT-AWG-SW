@@ -23,7 +23,8 @@ FILES = $(BUILD_DIR)main.o \
 		$(BUILD_DIR)updater.o \
 		$(BUILD_DIR)player.o \
 		$(BUILD_DIR)renderer.o \
-		$(BUILD_DIR)engine_monitor.o
+		$(BUILD_DIR)engine_monitor.o \
+		$(BUILD_DIR)debugger.o
 
 CXXFLAGS = -w -lSDL2
 
@@ -69,3 +70,6 @@ $(BUILD_DIR)renderer.o: $(LIBS_DIR)renderer/renderer.cpp
 
 $(BUILD_DIR)engine_monitor.o: $(LIBS_DIR)monitor/engine_monitor.cpp
 	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)monitor/engine_monitor.cpp -o $(BUILD_DIR)engine_monitor.o
+
+$(BUILD_DIR)debugger.o: $(LIBS_DIR)debug/debugger.cpp
+	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)debug/debugger.cpp -o $(BUILD_DIR)debugger.o

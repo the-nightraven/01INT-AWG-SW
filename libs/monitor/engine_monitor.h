@@ -27,6 +27,7 @@ and change, but not for commercial use
 #include "event_reader/reader.h"
 #include "updater/updater.h"
 #include "renderer/renderer.h"
+#include "debug/debugger.h"
 
 #define MON_TAG          "ENG"
 #define EVT_WILDCARD     1
@@ -50,6 +51,8 @@ int monitor_audit_module(int wildcard);
 G_STATUS monitor_deinit_modules();
 
 //loop functions
+G_STATUS monitor_start_debug();
+G_STATUS monitor_stop_debug();
 G_STATUS monitor_start_updating();
 G_STATUS monitor_stop_updating();
 G_STATUS monitor_process_loop();

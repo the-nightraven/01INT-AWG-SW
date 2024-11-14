@@ -24,17 +24,21 @@ and change, but not for commercial use
 
 #include "app/includes.h"
 
+#define DBG_TAG                    "DBG"
+
 #define DEBUGGER_KEY               SDL_SCANCODE_F3
 #define DEBUGGER_EVT_KEY           SDL_SCANCODE_F
 #define DEBUGGER_RND_KEY           SDL_SCANCODE_R
 
-G_STATUS debugger_init();
+G_STATUS debugger_init(DebugModule_TypeDef* dbg);
 G_STATUS debugger_deinit();
 
+G_STATUS debugger_register_events();
+
 //thread lifecycle
-G_STATUS debugger_start();
-G_STATUS debugger_end();
 void* debugger_lifecycle(void* arg);
+extern G_STATUS debugger_start_th();
+extern G_STATUS debugger_stop_th();
 
 //TODO: event callbacks
 void debugger_toggle_cb(void* value);
@@ -48,7 +52,6 @@ int debugger_get_fps();
 void* debugger_get_list(int wildcard);
 //TODO: display functions
 void debugger_show_list(int wildcard);
-bool debugger_is_running();
 
 
 

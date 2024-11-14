@@ -29,6 +29,25 @@ RenderEngine renderer_get_engine() {
     return RENDERER_ENGINE_SDL2;
 }
 
+void* debugger_thread_lifecycle(void* args) {
+    while(engine_components.debug_module.th_isRunning) {
+        printf("AA\n");
+    }
+    return NULL;
+}
+
+G_STATUS debugger_start_th() {
+    log_info(MON_TAG, "Got command to start debug");
+    return monitor_start_debug();
+    
+}
+extern G_STATUS debugger_stop_th() {
+    log_info(MON_TAG, "Got command to stop debug");
+    return monitor_stop_debug();
+}
+
+
+
 void* updater_thread_lifecycle(void* arg) {
     int status;
     while(engine_components.updater_module.th_isRunning) {
@@ -109,6 +128,15 @@ G_STATUS monitor_init_modules() {
     engine_components.renderer_module.status = true;
 
     //init debug
+    status = debugger_init(&engine_components.debug_module);
+    if(status == G_STATUS_FAIL) {
+        return status;
+    }
+    status = debugger_register_events();
+    if(status == G_STATUS_FAIL) {
+        return status;
+    }
+    engine_components.debug_module.status = true;
     return G_STATUS_OK;
 }
 
@@ -168,6 +196,8 @@ G_STATUS monitor_deinit_modules() {
     log_info(MON_TAG, "Render module deinited succesfully");
 
     //debug deinit
+    debugger_deinit();
+    log_info(MON_TAG, "Debugger module deinited successfully");
 
     //window deinit
     deinit_window(&engine_components.engine_display, &engine_components.engine_renderer);
@@ -228,6 +258,39 @@ bool monitor_get_run_cond() {
 
 void monitor_force_exit() {
     engine_components.isRunning = false;
+}
+
+G_STATUS monitor_start_debug() {
+    if(engine_components.debug_module.th_isRunning) {
+        return G_STATUS_FAIL;
+    }
+
+    engine_components.debug_module.th_isRunning = true;
+    if(pthread_create(&engine_components.debug_module.dbg_thread, NULL, debugger_thread_lifecycle, NULL) == 0) {
+        return G_STATUS_OK;
+    }
+
+    engine_components.debug_module.dbg_thread = 0;
+    engine_components.debug_module.th_isRunning = false;
+    engine_components.debug_module.status = false;
+    return G_STATUS_FAIL;
+}
+
+G_STATUS monitor_stop_debug() {
+    if(!engine_components.debug_module.th_isRunning) {
+        log_error(MON_TAG, "Thread wasnt running", -1);
+        return G_STATUS_FAIL;
+    }
+
+    engine_components.debug_module.th_isRunning = false;
+    if(pthread_join(engine_components.debug_module.dbg_thread, NULL) != 0) {
+        log_error(MON_TAG, "Thread exited unsfely", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(MON_TAG, "Thread joined safely");
+
+    engine_components.debug_module.dbg_thread = 0;
+    return G_STATUS_OK;
 }
 
 G_STATUS monitor_start_updating() {

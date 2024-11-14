@@ -20,63 +20,62 @@ and change, but not for commercial use
 
 #include "debugger.h"
 #include "pthread.h"
+#include "event_reader/reader.h"
+#include "logger/logger.h"
 
-pthread_t debugger_th = 0;
-bool debuggerIsRunning = false;
+DebugModule_TypeDef* self_module;
 
-G_STATUS debugger_init() {
-    if(debuggerIsRunning || debugger_th != 0) {
+G_STATUS debugger_init(DebugModule_TypeDef* dbg) {
+    if(dbg == NULL) {
         return G_STATUS_FAIL;
     }
 
-    debuggerIsRunning = false;
-    debugger_th = 0;
+    self_module = dbg;
     return G_STATUS_OK;
 }
 
 G_STATUS debugger_deinit() {
-    if(debuggerIsRunning) {
+    if(self_module->th_isRunning) {
         return G_STATUS_FAIL;
     }
 
-    debugger_th = 0;
-    debuggerIsRunning = false;
+    return G_STATUS_OK;
+}
+
+G_STATUS debugger_register_events() {
+    G_STATUS status;
+
+    UpdateCallback_TypeDef toggle_debug = {false, &self_module->th_isRunning, debugger_toggle_cb};
+    UpdateCallback_TypeDef evt_upd_stack;
+    UpdateCallback_TypeDef rnd_stack;
+
+    KeyEvt_TypeDef toggle_debug_evt = {SDL_KEYDOWN, DEBUGGER_KEY, toggle_debug, false};
+
+    status = register_key_event(&toggle_debug_evt);
+    if(status == G_STATUS_FAIL) {
+        log_error(DBG_TAG, "Cannot register key event", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(DBG_TAG, "Registered key event for DEBUG on F3");
+
     return G_STATUS_OK;
 }
 
 //thread lifecycle
-G_STATUS debugger_start() {
-    if(debuggerIsRunning) {
-        return G_STATUS_FAIL;
-    }
-    debuggerIsRunning = true;
-    pthread_create(&debugger_th, NULL, debugger_lifecycle, NULL);
-    return G_STATUS_OK;
-}
-
-G_STATUS debugger_end() {
-    if(!debuggerIsRunning) {
-        return G_STATUS_FAIL;
-    }
-    debuggerIsRunning = false;
-    pthread_join(debugger_th, NULL);
-    return G_STATUS_OK;
-}
-
 void* debugger_lifecycle(void* arg) {
-    if(!debuggerIsRunning) {
-        return NULL;
-    }
-
-    while(debuggerIsRunning) {
-        //update fps
-    }
 
     return NULL;
 }
 
 //callbacks
 void debugger_toggle_cb(void* value) {
+    bool state = *(bool*)value;
+
+    if(state) {
+        debugger_stop_th();
+        return;
+    }
+    debugger_start_th();
     return;
 }
 
@@ -86,11 +85,4 @@ void debugger_print_evt(void* value) {
 
 void debugger_print_rndr(void* value) {
     return;
-}
-
-
-
-//helpers
-bool debugger_is_running() {
-    return debuggerIsRunning;
 }
