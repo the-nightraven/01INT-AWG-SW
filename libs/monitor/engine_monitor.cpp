@@ -30,9 +30,16 @@ RenderEngine renderer_get_engine() {
 }
 
 void* debugger_thread_lifecycle(void* args) {
+    //push to visible stack
+    engine_components.debug_module.rnd_handler = renderer_register_component(engine_components.debug_module.rnd_comp);
     while(engine_components.debug_module.th_isRunning) {
-        printf("AA\n");
+        //get fps
+        
+        //update fps struct
     }
+    //pop from visible stack
+    renderer_remove_component(engine_components.debug_module.rnd_handler);
+    engine_components.debug_module.rnd_handler = 0;
     return NULL;
 }
 
@@ -41,11 +48,19 @@ G_STATUS debugger_start_th() {
     return monitor_start_debug();
     
 }
-extern G_STATUS debugger_stop_th() {
+G_STATUS debugger_stop_th() {
     log_info(MON_TAG, "Got command to stop debug");
     return monitor_stop_debug();
 }
 
+G_STATUS debugger_register_event(void* evt, int wildcard) {
+    if(wildcard == DEBUGGER_KEY_EVT) {
+        return register_key_event((KeyEvt_TypeDef*)evt);
+    }else if(wildcard == DEBUGGER_SYS_EVT) {
+        return register_sys_event((SysEvt_TypeDef*)evt);
+    }
+    return G_STATUS_FAIL;
+}
 
 
 void* updater_thread_lifecycle(void* arg) {
@@ -86,6 +101,8 @@ G_STATUS monitor_init() {
     engine_components.debug_module.status = false;
     engine_components.debug_module.th_isRunning = false;
     engine_components.debug_module.dbg_thread = 0;
+    //somehow init rnd component
+    engine_components.debug_module.rnd_handler = 0;
 
     engine_components.window_module.status = false;
 

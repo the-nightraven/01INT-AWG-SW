@@ -76,7 +76,7 @@ RendererComponentHandler renderer_register_component(RendererComponent_Typedef i
 
 G_STATUS renderer_remove_component(RendererComponentHandler handler) {
     RendererComponent_Typedef* prev = renderer_visible_list;
-    RendererComponent_Typedef* curr = prev->next;
+    RendererComponent_Typedef* curr = renderer_visible_list;
 
     bool found = false;
     while(curr != NULL  && !found) {
@@ -85,8 +85,10 @@ G_STATUS renderer_remove_component(RendererComponentHandler handler) {
             prev->next = curr->next;
             free(curr);
         }
-        prev = prev->next;
-        curr = prev->next;
+        if(!found) {
+            prev = curr;
+            curr = curr->next;
+        }
     }
     
     if(found) {

@@ -30,6 +30,9 @@ and change, but not for commercial use
 #define DEBUGGER_EVT_KEY           SDL_SCANCODE_F
 #define DEBUGGER_RND_KEY           SDL_SCANCODE_R
 
+#define DEBUGGER_KEY_EVT           1
+#define DEBUGGER_SYS_EVT           2
+
 G_STATUS debugger_init(DebugModule_TypeDef* dbg);
 G_STATUS debugger_deinit();
 
@@ -52,6 +55,11 @@ int debugger_get_fps();
 void* debugger_get_list(int wildcard);
 //TODO: display functions
 void debugger_show_list(int wildcard);
+
+extern G_STATUS debugger_register_event(void* evt, int wildcard);
+
+//render
+void dbg_render(void* obj, SDL_Renderer** renderer);
 
 
 

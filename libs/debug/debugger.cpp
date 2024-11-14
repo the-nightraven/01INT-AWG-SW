@@ -22,6 +22,7 @@ and change, but not for commercial use
 #include "pthread.h"
 #include "event_reader/reader.h"
 #include "logger/logger.h"
+#include "font_cache/font_cache.h"
 
 DebugModule_TypeDef* self_module;
 
@@ -31,6 +32,8 @@ G_STATUS debugger_init(DebugModule_TypeDef* dbg) {
     }
 
     self_module = dbg;
+    self_module->rnd_comp = (RendererComponent_Typedef){0, true, self_module, 1, dbg_render, NULL};
+    self_module->fps = 0;
     return G_STATUS_OK;
 }
 
@@ -51,7 +54,7 @@ G_STATUS debugger_register_events() {
 
     KeyEvt_TypeDef toggle_debug_evt = {SDL_KEYDOWN, DEBUGGER_KEY, toggle_debug, false};
 
-    status = register_key_event(&toggle_debug_evt);
+    status = debugger_register_event((void*)&toggle_debug_evt, DEBUGGER_KEY_EVT);
     if(status == G_STATUS_FAIL) {
         log_error(DBG_TAG, "Cannot register key event", -1);
         return G_STATUS_FAIL;
@@ -84,5 +87,13 @@ void debugger_print_evt(void* value) {
 }
 
 void debugger_print_rndr(void* value) {
+    return;
+}
+
+void dbg_render(void* obj, SDL_Renderer** renderer) {
+    FC_Font* font = FC_CreateFont();
+    FC_LoadFont(font, *renderer, "assets/fonts/Lato-Regular.ttf", 20, FC_MakeColor(0,255,0, 255), TTF_STYLE_NORMAL);
+    FC_Draw(font, *renderer, 0, 0, "%d FPS\n", self_module->fps);
+    FC_FreeFont(font);
     return;
 }

@@ -91,6 +91,9 @@ typedef struct DebugModule_TypeDef {
     pthread_t dbg_thread;
     bool th_isRunning;
     bool status;
+    RendererComponent_Typedef rnd_comp;
+    RendererComponentHandler rnd_handler;
+    int fps;
 };
 
 typedef struct WindowModule_TypeDef {

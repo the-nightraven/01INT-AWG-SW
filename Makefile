@@ -24,9 +24,10 @@ FILES = $(BUILD_DIR)main.o \
 		$(BUILD_DIR)player.o \
 		$(BUILD_DIR)renderer.o \
 		$(BUILD_DIR)engine_monitor.o \
+		$(BUILD_DIR)font_cache.o \
 		$(BUILD_DIR)debugger.o
 
-CXXFLAGS = -w -lSDL2
+CXXFLAGS = -w -lSDL2 -lSDL2_ttf
 
 INC = -Ilibs/ \
       -Isrc/
@@ -73,3 +74,6 @@ $(BUILD_DIR)engine_monitor.o: $(LIBS_DIR)monitor/engine_monitor.cpp
 
 $(BUILD_DIR)debugger.o: $(LIBS_DIR)debug/debugger.cpp
 	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)debug/debugger.cpp -o $(BUILD_DIR)debugger.o
+
+$(BUILD_DIR)font_cache.o: $(LIBS_DIR)font_cache/font_cache.cpp
+	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)font_cache/font_cache.cpp -o $(BUILD_DIR)font_cache.o
