@@ -65,7 +65,15 @@ G_STATUS debugger_register_events() {
 
 //thread lifecycle
 void* debugger_lifecycle(void* arg) {
-
+    //push to visible stack
+    self_module->rnd_handler = debugger_register_to_renderer(self_module);
+    while(self_module->th_isRunning) {
+        //calculate fps and update
+        self_module->fps = debugger_calc_fps();
+    }
+    //pop from visible stack
+    debugger_unregister_to_renderer(self_module);
+    self_module->rnd_handler = 0;
     return nullptr;
 }
 

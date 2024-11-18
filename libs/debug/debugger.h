@@ -56,7 +56,11 @@ void* debugger_get_list(int wildcard);
 //TODO: display functions
 void debugger_show_list(int wildcard);
 
+//externs
 extern G_STATUS debugger_register_event(void* evt, int wildcard);
+extern int debugger_register_to_renderer(void* obj);
+extern G_STATUS debugger_unregister_to_renderer(void* obj);
+extern int debugger_calc_fps();
 
 //render
 void dbg_render(void* obj, SDL_Renderer** renderer);

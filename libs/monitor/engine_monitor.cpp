@@ -30,17 +30,16 @@ RenderEngine renderer_get_engine() {
     return RENDERER_ENGINE_SDL2;
 }
 
-void* debugger_thread_lifecycle(void* args) {
-    //push to visible stack
-    engine_components.debug_module.rnd_handler = renderer_register_component(engine_components.debug_module.rnd_comp);
-    while(engine_components.debug_module.th_isRunning) {
-        //calculate fps and update
-        engine_components.debug_module.fps = monitor_micros_to_fps(engine_components.frameTime);
-    }
-    //pop from visible stack
-    renderer_remove_component(engine_components.debug_module.rnd_handler);
-    engine_components.debug_module.rnd_handler = 0;
-    return nullptr;
+extern int debugger_register_to_renderer(void* obj) {
+    return renderer_register_component(static_cast<DebugModule_TypeDef *>(obj)->rnd_comp);
+}
+
+extern G_STATUS debugger_unregister_to_renderer(void* obj) {
+    return renderer_remove_component(static_cast<DebugModule_TypeDef *>(obj)->rnd_handler);
+}
+
+extern int debugger_calc_fps() {
+    return monitor_micros_to_fps(engine_components.frameTime);
 }
 
 G_STATUS debugger_start_th() {
@@ -293,7 +292,7 @@ G_STATUS monitor_start_debug() {
     }
 
     engine_components.debug_module.th_isRunning = true;
-    if(pthread_create(&engine_components.debug_module.dbg_thread, nullptr, debugger_thread_lifecycle, nullptr) == 0) {
+    if(pthread_create(&engine_components.debug_module.dbg_thread, nullptr, debugger_lifecycle, nullptr) == 0) {
         return G_STATUS_OK;
     }
 
