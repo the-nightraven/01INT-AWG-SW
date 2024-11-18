@@ -21,8 +21,8 @@ and change, but not for commercial use
 #ifndef READER_H
 #define READER_H
 
-#include "app/includes.h"
-#include "updater/updater.h"
+#include "includes.h"
+#include "updater.h"
 
 #define SYS_EVENT_FLAG             0x03
 #define KEY_EVENT_FLAG             0x04

@@ -20,9 +20,15 @@ and change, but not for commercial use
 
 #include "debugger.h"
 #include "pthread.h"
+<<<<<<< Updated upstream
 #include "event_reader/reader.h"
 #include "logger/logger.h"
 #include "font_cache/font_cache.h"
+=======
+#include "reader.h"
+#include "logger.h"
+#include "font_cache.h"
+>>>>>>> Stashed changes
 
 DebugModule_TypeDef* self_module;
 
@@ -92,7 +98,11 @@ void debugger_print_rndr(void* value) {
 
 void dbg_render(void* obj, SDL_Renderer** renderer) {
     FC_Font* font = FC_CreateFont();
+<<<<<<< Updated upstream
     FC_LoadFont(font, *renderer, "assets/fonts/Lato-Regular.ttf", 20, FC_MakeColor(0,255,0, 255), TTF_STYLE_NORMAL);
+=======
+    FC_LoadFont(font, *renderer, "../assets/fonts/Lato-Regular.ttf", 20, FC_MakeColor(0,255,0, 255), TTF_STYLE_NORMAL);
+>>>>>>> Stashed changes
     FC_Draw(font, *renderer, 0, 0, "%d FPS\n", self_module->fps);
     FC_FreeFont(font);
     return;

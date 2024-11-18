@@ -24,8 +24,13 @@ and change, but not for commercial use
 #define APP_TAG       "APP"
 
 //includes
+<<<<<<< Updated upstream
 #include "monitor/engine_monitor.h"
 #include "player/player.h"
+=======
+#include "engine_monitor.h"
+#include "player.h"
+>>>>>>> Stashed changes
 
 //fucntions
 G_STATUS app_init();

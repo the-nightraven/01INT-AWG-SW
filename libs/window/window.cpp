@@ -19,7 +19,11 @@ and change, but not for commercial use
 */
 
 #include "window.h"
+<<<<<<< Updated upstream
 #include "logger/logger.h"
+=======
+#include "logger.h"
+>>>>>>> Stashed changes
 
 
 

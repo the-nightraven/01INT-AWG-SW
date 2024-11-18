@@ -21,6 +21,8 @@ and change, but not for commercial use
 #ifndef TYPEDEFS_H
 #define TYPEDEFS_H
 
+#include "pthread.h"
+
 //data types
 typedef int RendererComponentHandler;
 typedef int RenderEngine;

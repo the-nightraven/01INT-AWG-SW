@@ -18,9 +18,9 @@ and change, but not for commercial use
 ###########################################################
 */
 
-#include "app/includes.h"
+#include "includes.h"
 #include "player.h"
-#include "updater/updater.h"
+#include "updater.h"
 
 Player_Typedef player;
 bool is_init = false;

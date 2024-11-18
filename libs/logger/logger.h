@@ -29,6 +29,8 @@ and change, but not for commercial use
 #define DEBUG_TAG               "DEBUG"
 #define ERROR_TAG               "ERROR"
 
+#include "includes.h"
+
 extern void system_print(char* str);
 
 void log_info(char* local_tag, char* str);

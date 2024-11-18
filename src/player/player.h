@@ -21,7 +21,7 @@ and change, but not for commercial use
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "app/includes.h"
+#include "includes.h"
 
 //defines
 #define PLAYER_SIZE_W          50

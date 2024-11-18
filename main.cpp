@@ -18,7 +18,7 @@ and change, but not for commercial use
 ###########################################################
 */
 
-#include "app/app.h"
+#include "app.h"
 #define MAIN_TAG       "MAIN"
 
 //external definitions

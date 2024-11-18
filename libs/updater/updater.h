@@ -22,8 +22,11 @@ header
 #ifndef UPDATER_H
 #define UPDATER_H
 
-#include "app/includes.h"
-#include "event_reader/reader.h"
+#include "includes.h"
+#include "reader.h"
+
+G_STATUS updater_init();
+G_STATUS updater_deinit();
 
 G_STATUS updater_init();
 G_STATUS updater_deinit();

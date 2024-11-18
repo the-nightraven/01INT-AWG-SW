@@ -21,12 +21,17 @@ and change, but not for commercial use
 #ifndef INCLUDES_H
 #define INCLUDES_H
 
-#include <inttypes.h>
-#include <stdio.h>
+#include <cinttypes>
+#include <cstdio>
 #include <SDL2/SDL.h>
 #include <malloc.h>
+<<<<<<< Updated upstream
 #include "typedefs/typedefs.h"
 #include <stdbool.h>
+=======
+#include "typedefs.h"
+#include <cstdbool>
+>>>>>>> Stashed changes
 #include <SDL2/SDL_ttf.h>
 
 //typedefs
