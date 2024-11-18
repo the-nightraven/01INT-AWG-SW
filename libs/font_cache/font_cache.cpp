@@ -7,9 +7,9 @@ See SDL_FontCache.h for license info.
 
 #include "font_cache.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 // Visual C does not support static inline
 #ifndef static_inline

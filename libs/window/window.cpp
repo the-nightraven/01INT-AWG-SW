@@ -19,12 +19,7 @@ and change, but not for commercial use
 */
 
 #include "window.h"
-<<<<<<< Updated upstream
-#include "logger/logger.h"
-=======
 #include "logger.h"
->>>>>>> Stashed changes
-
 
 
 G_STATUS init_window(SDL_Window **mainFrame, SDL_Renderer **renderer) {

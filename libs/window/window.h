@@ -21,11 +21,8 @@ and change, but not for commercial use
 #ifndef WINDOW_H
 #define WINDOW_H
 
-<<<<<<< Updated upstream
-#include "app/includes.h"
-=======
 #include "includes.h"
->>>>>>> Stashed changes
+
 //defines
 #define WINDOW_TAG              "WNDW"
 

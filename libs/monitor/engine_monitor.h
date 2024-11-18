@@ -21,15 +21,6 @@ and change, but not for commercial use
 #ifndef ENGINE_MONITOR_H
 #define ENGINE_MONITOR_H
 
-<<<<<<< Updated upstream
-#include "app/includes.h"
-#include "logger/logger.h"
-#include "window/window.h"
-#include "event_reader/reader.h"
-#include "updater/updater.h"
-#include "renderer/renderer.h"
-#include "debug/debugger.h"
-=======
 #include "includes.h"
 #include "logger.h"
 #include "window.h"
@@ -37,7 +28,6 @@ and change, but not for commercial use
 #include "updater.h"
 #include "renderer.h"
 #include "debugger.h"
->>>>>>> Stashed changes
 
 #define MON_TAG          "ENG"
 #define EVT_WILDCARD     1

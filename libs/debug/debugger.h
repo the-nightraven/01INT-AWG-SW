@@ -22,11 +22,7 @@ and change, but not for commercial use
 #define DEBUGGER_H
 
 
-<<<<<<< Updated upstream
-#include "app/includes.h"
-=======
 #include "includes.h"
->>>>>>> Stashed changes
 
 #define DBG_TAG                    "DBG"
 
