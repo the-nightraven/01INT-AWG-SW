@@ -24,32 +24,29 @@ and change, but not for commercial use
 
 #include "app.h"
 
-//variables
-SDL_Window* mainFrame = NULL;
-SDL_Renderer* renderer = NULL;
-int is_running = 1;
-
-//externs
-RenderEngine renderer_get_engine() {
-    return RENDERER_ENGINE_SDL2;
-}
-
-//functions
-
 G_STATUS app_init() {
     G_STATUS status;
 
-    init_player();
-
-    UpdateCallback_TypeDef sysExit = {false, &is_running, end_game};
-    SysEvt_TypeDef sysExit_evt = {SDL_QUIT, sysExit};
-    status = register_sys_event(&sysExit_evt);
-
+    status = monitor_init();
     if(status == G_STATUS_FAIL) {
-        log_error(APP_TAG, "Cannot register event", G_STATUS_FAIL);
+        log_error(APP_TAG, "Cannot init engine monitor module", -1);
         return G_STATUS_FAIL;
     }
-    log_info("APP", "registered QUIT event");
+    log_info(APP_TAG, "Inited engine monitor module");
+
+    status = monitor_init_modules();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot init engine modules", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Inited engine modules");
+
+    status = init_player();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot init player", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Inited player");
 
     UpdateCallback_TypeDef pl_move_r = {false, get_player_instance(), player_move_right};
     UpdateCallback_TypeDef pl_move_l = {false, get_player_instance(), player_move_left};
@@ -96,22 +93,6 @@ G_STATUS app_init() {
     }
     log_info(APP_TAG, "Registered player movement callback");
 
-    // UpdateCallback_TypeDef keyExit = {false, NULL, test};
-    // KeyEvt_TypeDef close = {SDL_KEYDOWN, SDL_SCANCODE_A, keyExit};
-    // status = register_key_event(&close);
-    // if(status == G_STATUS_FAIL) {
-    //     log_error(APP_TAG, "Cannot register event", G_STATUS_FAIL);
-    //     return G_STATUS_FAIL;
-    // }
-    // log_info("APP", "registered KEY event on: A");
-
-    //renderer init
-    status = renderer_init();
-    if(status == G_STATUS_FAIL) {
-        log_error(APP_TAG, "Renderer module cannot init", -1);
-        return G_STATUS_FAIL;
-    }
-    log_info(APP_TAG, "Renderer module inited");
 
     //register render components
     RendererComponent_Typedef player_render = {0, true, get_player_instance(), 1, player_render_cb, NULL};
@@ -122,58 +103,48 @@ G_STATUS app_init() {
     }
     log_info(APP_TAG, "Set player render function");
 
-    status = init_window(&mainFrame, &renderer);
+    status = monitor_init_window_module();
     if(status == G_STATUS_FAIL) {
-        log_error(APP_TAG, "Cannot init window", G_STATUS_FAIL);
+        log_error(APP_TAG, "Cannot init engine display module", -1);
         return G_STATUS_FAIL;
     }
-    log_info("APP", "window initialized");
+    log_info(APP_TAG, "Inited engine display module");
+
+    status = monitor_check_env();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Engine modules not inited successfuly", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Engine modules inited successfully");
+
+    status = monitor_start_updating();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Rendering did not start", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Renderer forked successfuly");
+
     return G_STATUS_OK;
 }
 
 G_STATUS app_loop() {
     G_STATUS status;
+    SDL_Renderer* eng_renderer = monitor_get_renderer_instance();
+    SDL_Window* eng_display = monitor_get_display_instance();
 
-    //evt_process
     log_info(APP_TAG, "Loop Started!");
-    while(is_running) {
-        SDL_Event e;
-        status = poll_events(&e);
-
+    while(monitor_get_run_cond()) {
+        status = monitor_process_loop();
         if(status == G_STATUS_FAIL) {
-            is_running = 0;
-            log_error(APP_TAG, "cannot poll event", G_STATUS_FAIL);
+            log_error(APP_TAG, "Monitor registered errors", -1);
+            monitor_force_exit();
             return G_STATUS_FAIL;
         }
-
-
-        //update
-        status = updater_run_time_delta();
-
-        if(status == G_STATUS_FAIL) {
-            is_running = 0;
-            log_error(APP_TAG, "cannot update objects", G_STATUS_FAIL);
-            return G_STATUS_FAIL;
-        }
-
-        //render
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-
-        renderer_create_frame(&renderer);
-
-        SDL_RenderPresent( renderer );
     }
-    status = deinit_window(&mainFrame, &renderer);
     return status;
 }
 
-void end_game(void *val) {
-    *((int*)(val)) = 0;
-}
-
-void test(void* val) {
-    SDL_Event e;
-    e.type = SDL_QUIT;
-    SDL_PushEvent(&e);
+G_STATUS app_deinit() {
+    monitor_deinit_modules();
+    return G_STATUS_OK;
 }

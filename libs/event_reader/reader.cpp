@@ -26,11 +26,56 @@ and change, but not for commercial use
 #include "reader.h"
 
 
-SysEvtItem_TypeDef *sys_list = NULL;
-KeyEvtItem_TypeDef *key_up_list = NULL;
-KeyEvtItem_TypeDef *key_down_list = NULL;
+SysEvtItem_TypeDef *sys_list;
+KeyEvtItem_TypeDef *key_up_list;
+KeyEvtItem_TypeDef *key_down_list;
 
-G_STATUS init() {
+G_STATUS evt_init() {
+    sys_list = NULL;
+    key_down_list = NULL;
+    key_up_list = NULL;
+    return G_STATUS_OK;
+}
+
+G_STATUS evt_deinit() {
+    //sys
+    SysEvtItem_TypeDef* prev = sys_list;
+    SysEvtItem_TypeDef* curr = sys_list->next;
+
+    do{
+        free(prev);
+        prev = curr;
+
+        if(curr != NULL) {
+            curr = curr->next;
+        }
+    }while(curr != NULL);
+    //keyup
+    KeyEvtItem_TypeDef* prevk = key_up_list;
+    KeyEvtItem_TypeDef* currk = key_up_list->next;
+
+    do {
+        free(prevk);
+        prevk = currk;
+
+        if(currk != NULL) {
+            currk = currk->next;
+        }
+    }while(currk != NULL);
+
+    //keydown
+    prevk = key_down_list;
+    currk = key_down_list->next;
+
+    do {
+        free(prevk);
+        prevk = currk;
+
+        if(currk != NULL) {
+            currk = currk->next;
+        }
+    }while(currk != NULL);
+
     return G_STATUS_OK;
 }
 

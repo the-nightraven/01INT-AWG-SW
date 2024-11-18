@@ -18,7 +18,7 @@ and change, but not for commercial use
 ###########################################################
 */
 
-#include "app/app.h"
+#include "app.h"
 #define MAIN_TAG       "MAIN"
 
 //external definitions
@@ -36,6 +36,17 @@ int main(int argc, char* args[]) {
     }
 
     status = app_loop();
+    if(status == G_STATUS_FAIL) {
+        log_error(MAIN_TAG, "Loop returned errors", -1);
+    }
+    log_info(MAIN_TAG, "Successful loop exit");
+
+    //TODO: verbose deinit
+    status = app_deinit();
+    if(status == G_STATUS_FAIL) {
+        log_error(MAIN_TAG, "Error on deinit", -1);
+    }
+    log_info(MAIN_TAG, "Successful deinit");
 
     return status;
 }

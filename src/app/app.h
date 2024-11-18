@@ -24,19 +24,21 @@ and change, but not for commercial use
 #define APP_TAG       "APP"
 
 //includes
-#include "includes.h"
-#include "logger/logger.h"
-#include "window/window.h"
-#include "event_reader/reader.h"
-#include "updater/updater.h"
+<<<<<<< Updated upstream
+#include "monitor/engine_monitor.h"
 #include "player/player.h"
-#include "renderer/renderer.h"
+=======
+#include "engine_monitor.h"
+#include "player.h"
+>>>>>>> Stashed changes
 
 //fucntions
 G_STATUS app_init();
 G_STATUS app_loop();
 
-void end_game(void *val);
-void test(void* val);
+G_STATUS app_deinit();
+
+// void end_game(void *val);
+// void test(void* val);
 
 #endif

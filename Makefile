@@ -22,9 +22,12 @@ FILES = $(BUILD_DIR)main.o \
 		$(BUILD_DIR)reader.o \
 		$(BUILD_DIR)updater.o \
 		$(BUILD_DIR)player.o \
-		$(BUILD_DIR)renderer.o
+		$(BUILD_DIR)renderer.o \
+		$(BUILD_DIR)engine_monitor.o \
+		$(BUILD_DIR)font_cache.o \
+		$(BUILD_DIR)debugger.o
 
-CXXFLAGS = -w -lSDL2
+CXXFLAGS = -w -lSDL2 -lSDL2_ttf
 
 INC = -Ilibs/ \
       -Isrc/
@@ -51,8 +54,8 @@ $(BUILD_DIR)logger.o: $(LIBS_DIR)logger/logger.cpp
 $(BUILD_DIR)app.o: $(SRC_DIR)app/app.cpp
 	$(CXX) $(CXXFLAGS) $(INC) -c $(SRC_DIR)app/app.cpp -o $(BUILD_DIR)app.o
 
-$(BUILD_DIR)window.o: $(SRC_DIR)window/window.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(SRC_DIR)window/window.cpp -o $(BUILD_DIR)window.o
+$(BUILD_DIR)window.o: $(LIBS_DIR)window/window.cpp
+	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)window/window.cpp -o $(BUILD_DIR)window.o
 
 $(BUILD_DIR)reader.o: $(LIBS_DIR)event_reader/reader.cpp
 	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)event_reader/reader.cpp -o $(BUILD_DIR)reader.o
@@ -65,3 +68,12 @@ $(BUILD_DIR)player.o: $(SRC_DIR)player/player.cpp
 
 $(BUILD_DIR)renderer.o: $(LIBS_DIR)renderer/renderer.cpp
 	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)renderer/renderer.cpp -o $(BUILD_DIR)renderer.o
+
+$(BUILD_DIR)engine_monitor.o: $(LIBS_DIR)monitor/engine_monitor.cpp
+	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)monitor/engine_monitor.cpp -o $(BUILD_DIR)engine_monitor.o
+
+$(BUILD_DIR)debugger.o: $(LIBS_DIR)debug/debugger.cpp
+	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)debug/debugger.cpp -o $(BUILD_DIR)debugger.o
+
+$(BUILD_DIR)font_cache.o: $(LIBS_DIR)font_cache/font_cache.cpp
+	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)font_cache/font_cache.cpp -o $(BUILD_DIR)font_cache.o

@@ -20,10 +20,33 @@ and change, but not for commercial use
 
 #include "updater.h"
 
-uint32_t u_ticks_count = 0;
-float delta_time = 0;
+uint32_t u_ticks_count;
+float delta_time;
 
-UpdateComponent_Typedef* update_comp_list = NULL;
+UpdateComponent_Typedef* update_comp_list;
+
+G_STATUS updater_init() {
+    u_ticks_count = 0;
+    delta_time = 0;
+    update_comp_list = NULL;
+    return G_STATUS_OK;
+}
+
+G_STATUS updater_deinit() {
+    UpdateComponent_Typedef* prev = update_comp_list;
+    UpdateComponent_Typedef* curr = update_comp_list->next;
+
+    do {
+        free(prev);
+        prev = curr;
+
+        if(curr != NULL) {
+            curr = curr->next;
+        }
+    }while(curr != NULL);
+
+    return G_STATUS_OK;
+}
 
 G_STATUS register_update_components(UpdateComponent_Typedef component) {
     if(&component == NULL) {

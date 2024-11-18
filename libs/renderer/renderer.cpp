@@ -42,7 +42,10 @@ G_STATUS renderer_deinit() {
     do{
         free(prev);
         prev = curr;
-        curr = curr->next;
+
+        if(curr != NULL) {
+            curr = curr->next;
+        }
     }while(curr != NULL);
 
     return G_STATUS_OK;
@@ -73,7 +76,7 @@ RendererComponentHandler renderer_register_component(RendererComponent_Typedef i
 
 G_STATUS renderer_remove_component(RendererComponentHandler handler) {
     RendererComponent_Typedef* prev = renderer_visible_list;
-    RendererComponent_Typedef* curr = prev->next;
+    RendererComponent_Typedef* curr = renderer_visible_list;
 
     bool found = false;
     while(curr != NULL  && !found) {
@@ -82,8 +85,10 @@ G_STATUS renderer_remove_component(RendererComponentHandler handler) {
             prev->next = curr->next;
             free(curr);
         }
-        prev = prev->next;
-        curr = prev->next;
+        if(!found) {
+            prev = curr;
+            curr = curr->next;
+        }
     }
     
     if(found) {
@@ -97,6 +102,7 @@ void renderer_create_frame(SDL_Renderer** renderer) {
     RendererComponent_Typedef* ind = renderer_visible_list;
 
     while(ind != NULL) {
+        //printf("HI3\n");
         ind->obj_render(ind->object, renderer);
         ind = ind->next;
     }

@@ -20,7 +20,7 @@ and change, but not for commercial use
 
 #include "logger.h"
 #include <malloc.h>
-#include <string.h>
+#include <cstring>
 
 void log_info(char* local_tag, char* str) {
     char* buffer = (char*)malloc(100 * sizeof(char));

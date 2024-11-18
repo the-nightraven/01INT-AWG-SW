@@ -22,8 +22,14 @@ header
 #ifndef UPDATER_H
 #define UPDATER_H
 
-#include "app/includes.h"
-#include "event_reader/reader.h"
+#include "includes.h"
+#include "reader.h"
+
+G_STATUS updater_init();
+G_STATUS updater_deinit();
+
+G_STATUS updater_init();
+G_STATUS updater_deinit();
 
 bool check_updater_flag(UpdateCallback_TypeDef target);
 G_STATUS updater_run_time_delta();
@@ -37,5 +43,7 @@ UpdateComponent_Typedef* updater_component_to_instance(UpdateComponent_Typedef i
 //helpers
 float updater_get_delta_time();
 
+//externs
+extern void* updater_thread_lifecycle(void* arg);
 
 #endif
