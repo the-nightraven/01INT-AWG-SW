@@ -33,11 +33,7 @@ THE SOFTWARE.
 #ifndef _SDL_FONTCACHE_H__
 #define _SDL_FONTCACHE_H__
 
-<<<<<<< Updated upstream
-#include "app/includes.h"
-=======
 #include "includes.h"
->>>>>>> Stashed changes
 
 #ifdef FC_USE_SDL_GPU
     #include "SDL_gpu.h"

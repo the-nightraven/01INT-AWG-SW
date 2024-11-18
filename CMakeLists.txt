@@ -3,6 +3,10 @@ project(01INT_AWG_SW)
 
 set(CMAKE_CXX_FLAGS "-Wall -std=c++17 -pthread ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_STANDARD 17)
+set(SDL2_PATH "C:/mingw64/x86_64-w64-mingw32")
+set(SDL2_ttf_PATH "C:/mingw64/x86_64-w64-mingw32")
+list(APPEND CMAKE_PREFIX_PATH ${SDL2_ttf_PATH})
+
 
 include(FetchContent)
 
@@ -111,12 +115,12 @@ target_link_libraries(
         SDL2_ttf::SDL2_ttf
 )
 
-#if (WIN32)
-#    add_custom_command(
-#            TARGET hello_sdl2_with_cmake POST_BUILD
-#            COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL2::SDL2>" "$<TARGET_FILE_DIR:hello_sdl2_with_cmake>"
-#            COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL2_image::SDL2_image>" "$<TARGET_FILE_DIR:hello_sdl2_with_cmake>"
-#            COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL2_ttf::SDL2_ttf>" "$<TARGET_FILE_DIR:hello_sdl2_with_cmake>"
-#            VERBATIM
-#    )
-#endif()
+if (WIN32)
+    add_custom_command(
+            TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL2::SDL2>" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL2_image::SDL2_image>" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL2_ttf::SDL2_ttf>" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+            VERBATIM
+    )
+endif()

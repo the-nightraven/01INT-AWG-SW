@@ -19,32 +19,27 @@ and change, but not for commercial use
 */
 
 #include "window.h"
-<<<<<<< Updated upstream
-#include "logger/logger.h"
-=======
 #include "logger.h"
->>>>>>> Stashed changes
-
 
 
 G_STATUS init_window(SDL_Window **mainFrame, SDL_Renderer **renderer) {
-    *mainFrame = NULL;
-    if(SDL_Init(SDL_INIT_VIDEO) < 0) {
+    *mainFrame = nullptr;
+    if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         log_error("SDL", "Could not init video, code: ", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
     log_info(WINDOW_TAG, "SDL Inited");
 
-    *mainFrame = SDL_CreateWindow("Animals War", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+    *mainFrame = SDL_CreateWindow("AWG", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 
-    if(*mainFrame == NULL) {
+    if(*mainFrame == nullptr) {
         log_error(WINDOW_TAG, "Could not create window", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
     log_info(WINDOW_TAG, "Created window");
     *renderer = SDL_CreateRenderer(*mainFrame, -1, 0);
 
-    if(*renderer == NULL) {
+    if(*renderer == nullptr) {
         log_error(WINDOW_TAG, "Could not init renderer", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
@@ -53,12 +48,12 @@ G_STATUS init_window(SDL_Window **mainFrame, SDL_Renderer **renderer) {
 }
 
 G_STATUS deinit_window(SDL_Window **mainFrame, SDL_Renderer **renderer) {
-    if(*mainFrame == NULL) {
+    if(*mainFrame == nullptr) {
         log_error(WINDOW_TAG, "Screen doesnt exist", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
 
-    if(*renderer == NULL) {
+    if(*renderer == nullptr) {
         log_error(WINDOW_TAG, "Renderer doesnt exist", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }

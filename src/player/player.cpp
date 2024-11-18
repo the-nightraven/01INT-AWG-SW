@@ -38,30 +38,27 @@ G_STATUS init_player() {
 }
 
 void player_move_left(void* val) {
-    Player_Typedef *pu = (Player_Typedef*)val;
+    Player_Typedef *pu = static_cast<Player_Typedef *>(val);
     //pu->x -= pu->speed * updater_get_delta_time();
     if(pu->speed > -1 * PLAYER_BASE_SPEED) {
         pu->speed -= PLAYER_BASE_SPEED;
     }
     //printf("Should move left\n");
-    return;
 }
 
 void player_move_right(void* val) {
-    Player_Typedef *pu = (Player_Typedef*)val;
+    Player_Typedef *pu = static_cast<Player_Typedef *>(val);
     //pu->x += pu->speed * updater_get_delta_time();
     if(pu->speed < PLAYER_BASE_SPEED) {
         pu->speed += PLAYER_BASE_SPEED;
     }
     //printf("Should move right\n");
-    return;
 }
 
 void player_stop_move(void *val) {
     //printf("Should stop movement\n");
-    Player_Typedef* pu = (Player_Typedef*)val;
+    Player_Typedef* pu = static_cast<Player_Typedef *>(val);
     pu->speed = 0;
-    return;
 }
 
 void player_render_cb() {
@@ -77,19 +74,15 @@ Player_Typedef* get_player_instance() {
 }
 
 void process_player_movement(void* player_instance) {
-    Player_Typedef* pl = (Player_Typedef*) player_instance;
-
+    Player_Typedef* pl = static_cast<Player_Typedef *>(player_instance);
     pl->x += pl->speed * updater_get_delta_time();
-    return;
+    //pl->x += (pl->x * updater_get_delta_time())/pl->speed;
 }
 
 void player_render_cb(void* player_ins, SDL_Renderer** renderer) {
     int status;
-    Player_Typedef* pl = (Player_Typedef*)player_ins;
-    SDL_Rect player_rect = {pl->x, pl->y, pl->h, pl->w};
+    Player_Typedef* pl = static_cast<Player_Typedef *>(player_ins);
+    SDL_FRect player_rect = {pl->x, pl->y, pl->h, pl->w};
     status = SDL_SetRenderDrawColor(*renderer, 255, 255, 255, 255);
-    status = SDL_RenderDrawRect(*renderer, &player_rect);
-    //printf("status: %d\n", player.x);
-    //SDL_RenderPresent( renderer );
-    return;
+    status = SDL_RenderDrawRectF(*renderer, &player_rect);
 }

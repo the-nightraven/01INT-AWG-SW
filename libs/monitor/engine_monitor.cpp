@@ -20,6 +20,7 @@ and change, but not for commercial use
 
 #include "engine_monitor.h"
 #include "pthread.h"
+#include <chrono>
 
 //vars
 MonitorComponents_TypeDef engine_components;
@@ -29,18 +30,16 @@ RenderEngine renderer_get_engine() {
     return RENDERER_ENGINE_SDL2;
 }
 
-void* debugger_thread_lifecycle(void* args) {
-    //push to visible stack
-    engine_components.debug_module.rnd_handler = renderer_register_component(engine_components.debug_module.rnd_comp);
-    while(engine_components.debug_module.th_isRunning) {
-        //get fps
-        
-        //update fps struct
-    }
-    //pop from visible stack
-    renderer_remove_component(engine_components.debug_module.rnd_handler);
-    engine_components.debug_module.rnd_handler = 0;
-    return NULL;
+extern int debugger_register_to_renderer(void* obj) {
+    return renderer_register_component(static_cast<DebugModule_TypeDef *>(obj)->rnd_comp);
+}
+
+extern G_STATUS debugger_unregister_to_renderer(void* obj) {
+    return renderer_remove_component(static_cast<DebugModule_TypeDef *>(obj)->rnd_handler);
+}
+
+extern int debugger_calc_fps() {
+    return monitor_micros_to_fps(engine_components.frameTime);
 }
 
 G_STATUS debugger_start_th() {
@@ -55,12 +54,31 @@ G_STATUS debugger_stop_th() {
 
 G_STATUS debugger_register_event(void* evt, int wildcard) {
     if(wildcard == DEBUGGER_KEY_EVT) {
-        return register_key_event((KeyEvt_TypeDef*)evt);
+        return register_key_event(static_cast<KeyEvt_TypeDef *>(evt));
     }else if(wildcard == DEBUGGER_SYS_EVT) {
-        return register_sys_event((SysEvt_TypeDef*)evt);
+        return register_sys_event(static_cast<SysEvt_TypeDef *>(evt));
     }
     return G_STATUS_FAIL;
 }
+
+extern void* debugger_get_evtstack_instance(int wildcard) {
+    if(wildcard == DEBUGGER_SYS_EVT_WILDCARD) {
+        return get_event_list(SYS_EVENT_FLAG, 0);
+    }
+    if(wildcard == DEBUGGER_KEYUP_EVT_WILDCARD) {
+        return get_event_list(KEY_EVENT_FLAG, KEYUP_SUBFLAG);
+    }
+    if(wildcard == DEBUGGER_KEYDOWN_EVT_WILDCARD) {
+        return get_event_list(KEY_EVENT_FLAG, KEYDOWN_SUBFLAG);
+    }
+    return nullptr;
+}
+
+extern void* debugger_get_rndrstack_instance() {
+    return renderer_get_list();
+}
+
+
 
 
 void* updater_thread_lifecycle(void* arg) {
@@ -75,19 +93,20 @@ void* updater_thread_lifecycle(void* arg) {
             engine_components.updater_module.upd_thread = 0;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 //sys callbacks
 void end_game(void *val) {
-    *((int*)(val)) = false;
+    *static_cast<int *>(val) = false;
 }
 
 G_STATUS monitor_init() {
     //engine
-    engine_components.engine_display = NULL;
-    engine_components.engine_renderer = NULL;
+    engine_components.engine_display = nullptr;
+    engine_components.engine_renderer = nullptr;
     engine_components.isRunning = false;
+    engine_components.frameTime = 0;
 
     //modules
     engine_components.event_module.status = false;
@@ -114,9 +133,8 @@ G_STATUS monitor_deinit() {
 }
 
 G_STATUS monitor_init_modules() {
-    G_STATUS status;
     //init updater
-    status = updater_init();
+    G_STATUS status = updater_init();
     if(status != G_STATUS_OK) {
         return status;
     }
@@ -158,10 +176,8 @@ G_STATUS monitor_init_modules() {
 }
 
 G_STATUS monitor_init_window_module() {
-    G_STATUS status;
     //init window
-    status = init_window(&(engine_components.engine_display), &(engine_components.engine_renderer));
-    if(status == G_STATUS_FAIL) {
+    if(const G_STATUS status = init_window(&(engine_components.engine_display), &(engine_components.engine_renderer)); status == G_STATUS_FAIL) {
         return G_STATUS_FAIL;
     }
     //feed into component list
@@ -238,6 +254,10 @@ G_STATUS monitor_register_comp() {
 }
 
 G_STATUS monitor_process_loop() {
+
+    //chrono start
+    const std::chrono::time_point start_timer = std::chrono::high_resolution_clock::now();
+
     G_STATUS status;
     SDL_Event e;
     engine_components.engine_event_pool = e;
@@ -257,6 +277,14 @@ G_STATUS monitor_process_loop() {
     renderer_create_frame(&engine_components.engine_renderer);
 
     SDL_RenderPresent(engine_components.engine_renderer);
+
+    //chrono end
+    const std::chrono::time_point stop_timer = std::chrono::high_resolution_clock::now();
+
+    //calc frametime
+    const int exec_micros = std::chrono::duration_cast<std::chrono::microseconds>(stop_timer - start_timer).count();
+    //printf("Time elapsed: %dms\n", exec_micros);
+    engine_components.frameTime = exec_micros;
 
     return G_STATUS_OK;
 }
@@ -283,7 +311,7 @@ G_STATUS monitor_start_debug() {
     }
 
     engine_components.debug_module.th_isRunning = true;
-    if(pthread_create(&engine_components.debug_module.dbg_thread, NULL, debugger_thread_lifecycle, NULL) == 0) {
+    if(pthread_create(&engine_components.debug_module.dbg_thread, nullptr, debugger_lifecycle, nullptr) == 0) {
         return G_STATUS_OK;
     }
 
@@ -341,4 +369,8 @@ G_STATUS monitor_stop_updating() {
 
     engine_components.updater_module.upd_thread = 0;
     return G_STATUS_OK;
+}
+
+int monitor_micros_to_fps(int micros) {
+    return 1000000 / micros;
 }

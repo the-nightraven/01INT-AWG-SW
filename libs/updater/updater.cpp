@@ -107,9 +107,9 @@ G_STATUS updater_run_time_delta() {
    }
 
     //get events
-    SysEvtItem_TypeDef *sys_evt = (SysEvtItem_TypeDef*)get_event_list(SYS_EVENT_FLAG, 0);
-    KeyEvtItem_TypeDef *key_up_evt = (KeyEvtItem_TypeDef*)get_event_list(KEY_EVENT_FLAG, KEYUP_SUBFLAG);
-    KeyEvtItem_TypeDef *key_down_evt = (KeyEvtItem_TypeDef*)get_event_list(KEY_EVENT_FLAG, KEYDOWN_SUBFLAG);
+    SysEvtItem_TypeDef *sys_evt = static_cast<SysEvtItem_TypeDef *>(get_event_list(SYS_EVENT_FLAG, 0));
+    KeyEvtItem_TypeDef *key_up_evt = static_cast<KeyEvtItem_TypeDef *>(get_event_list(KEY_EVENT_FLAG, KEYUP_SUBFLAG));
+    KeyEvtItem_TypeDef *key_down_evt = static_cast<KeyEvtItem_TypeDef *>(get_event_list(KEY_EVENT_FLAG, KEYDOWN_SUBFLAG));
 
     //call them
     status = update_sys_events(sys_evt);
@@ -134,7 +134,7 @@ G_STATUS updater_run_time_delta() {
     UpdateComponent_Typedef* tmp = update_comp_list;
 
     //call them
-    while(tmp != NULL) {
+    while(tmp != nullptr) {
         tmp->comp_callback(tmp->value);
         tmp = tmp->next;
     }
