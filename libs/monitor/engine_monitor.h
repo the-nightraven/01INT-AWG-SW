@@ -62,5 +62,6 @@ SDL_Renderer* monitor_get_renderer_instance();
 SDL_Window* monitor_get_display_instance();
 bool monitor_get_run_cond();
 void monitor_force_exit();
+int monitor_micros_to_fps(int micros);
 
 #endif

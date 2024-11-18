@@ -26,7 +26,7 @@ and change, but not for commercial use
 DebugModule_TypeDef* self_module;
 
 G_STATUS debugger_init(DebugModule_TypeDef* dbg) {
-    if(dbg == NULL) {
+    if(dbg == nullptr) {
         return G_STATUS_FAIL;
     }
 
@@ -66,19 +66,16 @@ G_STATUS debugger_register_events() {
 //thread lifecycle
 void* debugger_lifecycle(void* arg) {
 
-    return NULL;
+    return nullptr;
 }
 
 //callbacks
 void debugger_toggle_cb(void* value) {
-    bool state = *(bool*)value;
-
-    if(state) {
+    if(bool state = *static_cast<bool *>(value)) {
         debugger_stop_th();
         return;
     }
     debugger_start_th();
-    return;
 }
 
 void debugger_print_evt(void* value) {
@@ -94,5 +91,4 @@ void dbg_render(void* obj, SDL_Renderer** renderer) {
     FC_LoadFont(font, *renderer, "../assets/fonts/Lato-Regular.ttf", 20, FC_MakeColor(0,255,0, 255), TTF_STYLE_NORMAL);
     FC_Draw(font, *renderer, 0, 0, "%d FPS\n", self_module->fps);
     FC_FreeFont(font);
-    return;
 }

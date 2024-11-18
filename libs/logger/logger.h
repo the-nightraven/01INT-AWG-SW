@@ -33,8 +33,8 @@ and change, but not for commercial use
 
 extern void system_print(char* str);
 
-void log_info(char* local_tag, char* str);
-void log_debug(char* local_tag, char* str, int value);
-void log_error(char* local_tag, char* str, int value);
+void log_info(const char* local_tag, const char* str);
+void log_debug(const char* local_tag, const char* str, int value);
+void log_error(const char* local_tag, const char* str, int value);
 
 #endif //LOGGER_HEADER
