@@ -66,6 +66,7 @@ typedef struct UpdateComponent_Typedef {
 
 typedef struct RendererComponent_Typedef {
     RendererComponentHandler handler;
+    char* name;
     bool visibility;
     void* object;
     int obj_type;

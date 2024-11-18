@@ -95,7 +95,9 @@ G_STATUS app_init() {
 
 
     //register render components
-    RendererComponent_Typedef player_render = {0, true, get_player_instance(), 1, player_render_cb, NULL};
+    RendererComponent_Typedef player_render = {0, "Player", true, get_player_instance(), 1, player_render_cb, nullptr};
+    // player_render.name = static_cast<char*>(malloc(sizeof(char) * 50));
+    //strcpy(player_render.name, "Player");
     status = renderer_register_component(player_render);
     if(status == G_STATUS_FAIL) {
         log_error(APP_TAG, "Cannot set player render function", -1);

@@ -28,6 +28,7 @@ and change, but not for commercial use
 #include <cstdbool>
 #include "typedefs.h"
 #include <SDL2/SDL_ttf.h>
+#include <cstring>
 
 //typedefs
 typedef uint8_t G_STATUS;

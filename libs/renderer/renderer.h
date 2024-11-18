@@ -40,4 +40,7 @@ RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item);
 //externs
 extern RenderEngine renderer_get_engine();
 
+//helpers
+RendererComponent_Typedef* renderer_get_list();
+
 #endif

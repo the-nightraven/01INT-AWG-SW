@@ -61,6 +61,25 @@ G_STATUS debugger_register_event(void* evt, int wildcard) {
     return G_STATUS_FAIL;
 }
 
+extern void* debugger_get_evtstack_instance(int wildcard) {
+    if(wildcard == DEBUGGER_SYS_EVT_WILDCARD) {
+        return get_event_list(SYS_EVENT_FLAG, 0);
+    }
+    if(wildcard == DEBUGGER_KEYUP_EVT_WILDCARD) {
+        return get_event_list(KEY_EVENT_FLAG, KEYUP_SUBFLAG);
+    }
+    if(wildcard == DEBUGGER_KEYDOWN_EVT_WILDCARD) {
+        return get_event_list(KEY_EVENT_FLAG, KEYDOWN_SUBFLAG);
+    }
+    return nullptr;
+}
+
+extern void* debugger_get_rndrstack_instance() {
+    return renderer_get_list();
+}
+
+
+
 
 void* updater_thread_lifecycle(void* arg) {
     int status;
