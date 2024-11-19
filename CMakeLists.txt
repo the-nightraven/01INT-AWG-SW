@@ -75,6 +75,7 @@ include_directories(libs/updater)
 include_directories(libs/window)
 include_directories(src/app)
 include_directories(src/player)
+include_directories(libs)
 
 add_executable(01INT_AWG_SW
     libs/debug/debugger.cpp
@@ -100,10 +101,10 @@ add_executable(01INT_AWG_SW
     libs/window/window.h
     src/app/app.cpp
     src/app/app.h
-    src/app/includes.h
     src/player/player.cpp
     src/player/player.h
-    main.cpp)
+    main.cpp
+    libs/includes.h)
 
 target_link_libraries(
         ${PROJECT_NAME}
