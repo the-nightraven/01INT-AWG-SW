@@ -93,7 +93,6 @@ DWORD WINAPI debugger_lifecycle(LPVOID lpParam) {
     while(self_module->th_isRunning) {
         //calculate fps and update
         self_module->fps = debugger_calc_fps();
-        //printf("FPS: %d\n", self_module->fps);
         Sleep(500);
     }
     //pop from visible stack

@@ -288,7 +288,6 @@ G_STATUS monitor_process_loop() {
 
     //calc frametime
     const int exec_micros = std::chrono::duration_cast<std::chrono::microseconds>(stop_timer - start_timer).count();
-    //printf("Time elapsed: %dus\n", exec_micros);
     engine_components.frameTime = exec_micros;
 
     return G_STATUS_OK;
