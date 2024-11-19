@@ -54,11 +54,6 @@ G_STATUS renderer_deinit() {
 
 RendererComponentHandler renderer_register_component(RendererComponent_Typedef item) {
     RendererComponent_Typedef* tmp = renderer_to_instance(item);
-
-    if(tmp == nullptr) {
-        return G_STATUS_FAIL;
-    }
-
     tmp->handler = obj_handler_counter++;
 
     if(renderer_visible_list == nullptr) {
@@ -104,7 +99,6 @@ void renderer_create_frame(SDL_Renderer** renderer) {
     RendererComponent_Typedef* ind = renderer_visible_list;
 
     while(ind != nullptr) {
-        //printf("HI3\n");
         ind->obj_render(ind->object, renderer);
         ind = ind->next;
     }
