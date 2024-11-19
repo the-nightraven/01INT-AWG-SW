@@ -21,7 +21,7 @@ and change, but not for commercial use
 #ifndef TYPEDEFS_H
 #define TYPEDEFS_H
 
-#include "pthread.h"
+#include "includes.h"
 
 //data types
 typedef int RendererComponentHandler;
@@ -81,7 +81,7 @@ typedef struct EvtModule_TypeDef {
 } EvtModule_TypeDef;
 
 typedef struct UpdaterModule_TypeDef {
-    pthread_t upd_thread;
+    HANDLE upd_thread;
     bool th_isRunning;
     bool status;
 } UpdaterModule_TypeDef;
@@ -91,7 +91,7 @@ typedef struct RendererModule_TypeDef {
 } RendererModule_TypeDef;
 
 typedef struct DebugModule_TypeDef {
-    pthread_t dbg_thread;
+    HANDLE dbg_thread;
     bool th_isRunning;
     bool status;
     RendererComponent_Typedef rnd_comp;

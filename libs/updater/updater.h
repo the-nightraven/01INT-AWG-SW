@@ -44,6 +44,6 @@ UpdateComponent_Typedef* updater_component_to_instance(UpdateComponent_Typedef i
 float updater_get_delta_time();
 
 //externs
-extern void* updater_thread_lifecycle(void* arg);
+extern DWORD WINAPI updater_thread_lifecycle(LPVOID lpParam);
 
 #endif

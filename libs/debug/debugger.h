@@ -43,7 +43,7 @@ G_STATUS debugger_deinit();
 G_STATUS debugger_register_events();
 
 //thread lifecycle
-void* debugger_lifecycle(void* arg);
+DWORD WINAPI debugger_lifecycle(LPVOID lpParam);
 extern G_STATUS debugger_start_th();
 extern G_STATUS debugger_stop_th();
 
@@ -67,6 +67,7 @@ extern G_STATUS debugger_unregister_to_renderer(void* obj);
 extern int debugger_calc_fps();
 extern void* debugger_get_evtstack_instance(int wildcard);
 extern void* debugger_get_rndrstack_instance();
+extern SDL_Renderer* debugger_get_renderer_instance();
 
 //render
 void dbg_render(void* obj, SDL_Renderer** renderer);

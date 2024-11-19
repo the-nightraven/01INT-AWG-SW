@@ -28,7 +28,7 @@ UpdateComponent_Typedef* update_comp_list;
 G_STATUS updater_init() {
     u_ticks_count = 0;
     delta_time = 0;
-    update_comp_list = NULL;
+    update_comp_list = nullptr;
     return G_STATUS_OK;
 }
 
@@ -40,28 +40,22 @@ G_STATUS updater_deinit() {
         free(prev);
         prev = curr;
 
-        if(curr != NULL) {
+        if(curr != nullptr) {
             curr = curr->next;
         }
-    }while(curr != NULL);
+    }while(curr != nullptr);
 
     return G_STATUS_OK;
 }
 
 G_STATUS register_update_components(UpdateComponent_Typedef component) {
-    if(&component == NULL) {
-        return G_STATUS_FAIL;
-    }
 
-    if(update_comp_list == NULL) {
+    if(update_comp_list == nullptr) {
         update_comp_list = updater_component_to_instance(component);
-        if(update_comp_list == NULL) {
-            return G_STATUS_FAIL;
-        }
     }else {
         UpdateComponent_Typedef* tmp = update_comp_list;
 
-        while(tmp->next != NULL) {
+        while(tmp->next != nullptr) {
             tmp = tmp->next;
         }
 
@@ -71,16 +65,16 @@ G_STATUS register_update_components(UpdateComponent_Typedef component) {
 }
 
 UpdateComponent_Typedef* updater_component_to_instance(UpdateComponent_Typedef item) {
-    UpdateComponent_Typedef* tmp = (UpdateComponent_Typedef*)malloc(sizeof(UpdateComponent_Typedef));
+    auto* tmp = static_cast<UpdateComponent_Typedef *>(malloc(sizeof(UpdateComponent_Typedef)));
     tmp->value = item.value;
     tmp->comp_callback = item.comp_callback;
-    tmp->next = NULL;
+    tmp->next = nullptr;
 
     return tmp;    
 }
 
 G_STATUS call_updater(UpdateCallback_TypeDef *target) {
-    if(target == NULL) {
+    if(target == nullptr) {
         return G_STATUS_FAIL;
     }
 
@@ -107,9 +101,9 @@ G_STATUS updater_run_time_delta() {
    }
 
     //get events
-    SysEvtItem_TypeDef *sys_evt = static_cast<SysEvtItem_TypeDef *>(get_event_list(SYS_EVENT_FLAG, 0));
-    KeyEvtItem_TypeDef *key_up_evt = static_cast<KeyEvtItem_TypeDef *>(get_event_list(KEY_EVENT_FLAG, KEYUP_SUBFLAG));
-    KeyEvtItem_TypeDef *key_down_evt = static_cast<KeyEvtItem_TypeDef *>(get_event_list(KEY_EVENT_FLAG, KEYDOWN_SUBFLAG));
+    auto *sys_evt = static_cast<SysEvtItem_TypeDef *>(get_event_list(SYS_EVENT_FLAG, 0));
+    auto *key_up_evt = static_cast<KeyEvtItem_TypeDef *>(get_event_list(KEY_EVENT_FLAG, KEYUP_SUBFLAG));
+    auto *key_down_evt = static_cast<KeyEvtItem_TypeDef *>(get_event_list(KEY_EVENT_FLAG, KEYDOWN_SUBFLAG));
 
     //call them
     status = update_sys_events(sys_evt);
@@ -151,7 +145,7 @@ G_STATUS update_sys_events(SysEvtItem_TypeDef *list) {
 
     SysEvtItem_TypeDef *ind = list;
 
-    while(ind != NULL) {
+    while(ind != nullptr) {
         if(check_updater_flag(ind->evt.update_cb)) {
             status = call_updater(&ind->evt.update_cb);
 
@@ -169,7 +163,7 @@ G_STATUS update_key_events(KeyEvtItem_TypeDef *list) {
     
     KeyEvtItem_TypeDef *ind = list;
 
-    while(ind != NULL) {
+    while(ind != nullptr) {
         if(check_updater_flag(ind->evt.update_cb)) {
             status = call_updater(&ind->evt.update_cb);
             if(status == G_STATUS_FAIL) {

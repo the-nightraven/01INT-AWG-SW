@@ -21,6 +21,7 @@ and change, but not for commercial use
 #ifndef INCLUDES_H
 #define INCLUDES_H
 
+#include <windows.h>
 #include <cinttypes>
 #include <cstdio>
 #include <SDL2/SDL.h>

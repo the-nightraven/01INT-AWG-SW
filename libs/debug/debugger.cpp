@@ -24,6 +24,7 @@ and change, but not for commercial use
 #include "font_cache.h"
 
 DebugModule_TypeDef* self_module;
+FC_Font* dbg_font;
 
 G_STATUS debugger_init(DebugModule_TypeDef* dbg) {
     if(dbg == nullptr) {
@@ -35,6 +36,9 @@ G_STATUS debugger_init(DebugModule_TypeDef* dbg) {
     // self_module->rnd_comp.name = static_cast<char *>(malloc(sizeof(char) * 50));
     // strcpy(self_module->rnd_comp.name, "Debugger");
     self_module->fps = 0;
+    dbg_font = FC_CreateFont();
+    FC_LoadFont(dbg_font, debugger_get_renderer_instance(), "../assets/fonts/Lato-Regular.ttf", 20,
+                FC_MakeColor(0, 255, 0, 255), TTF_STYLE_NORMAL);
     return G_STATUS_OK;
 }
 
@@ -42,6 +46,7 @@ G_STATUS debugger_deinit() {
     if(self_module->th_isRunning) {
         return G_STATUS_FAIL;
     }
+    FC_FreeFont(dbg_font);
 
     return G_STATUS_OK;
 }
@@ -82,17 +87,19 @@ G_STATUS debugger_register_events() {
 }
 
 //thread lifecycle
-void* debugger_lifecycle(void* arg) {
+DWORD WINAPI debugger_lifecycle(LPVOID lpParam) {
     //push to visible stack
     self_module->rnd_handler = debugger_register_to_renderer(self_module);
     while(self_module->th_isRunning) {
         //calculate fps and update
         self_module->fps = debugger_calc_fps();
+        //printf("FPS: %d\n", self_module->fps);
+        Sleep(500);
     }
     //pop from visible stack
     debugger_unregister_to_renderer(self_module);
     self_module->rnd_handler = 0;
-    return nullptr;
+    return 0;
 }
 
 //callbacks
@@ -129,8 +136,5 @@ void debugger_print_rndr(void* value) {
 }
 
 void dbg_render(void* obj, SDL_Renderer** renderer) {
-    FC_Font* font = FC_CreateFont();
-    FC_LoadFont(font, *renderer, "../assets/fonts/Lato-Regular.ttf", 20, FC_MakeColor(0,255,0, 255), TTF_STYLE_NORMAL);
-    FC_Draw(font, *renderer, 0, 0, "%d FPS\n", self_module->fps);
-    FC_FreeFont(font);
+    FC_Draw(dbg_font, *renderer, 0, 0, "%d FPS\n", self_module->fps);
 }
