@@ -23,6 +23,8 @@ and change, but not for commercial use
 
 #include "includes.h"
 
+#define DEFAULT_UPDATER_CB         (UpdateCallback_TypeDef){false, nullptr, nullptr}
+
 //data types
 typedef int RendererComponentHandler;
 typedef int RenderEngine;
@@ -42,9 +44,9 @@ typedef struct SysEvt_TypeDef {
 
 //@TODO: get rid of SDL_HOOK and instead have 2 functions for keyup and keydown
 typedef struct KeyEvt_TypeDef {
-    int SDL_Hook;
-    int Key;
-    UpdateCallback_TypeDef update_cb;
+    SDL_Scancode Key;
+    UpdateCallback_TypeDef kdown_update_cb;
+    UpdateCallback_TypeDef kup_update_cb;
     bool use_keyhold_protection;
 } KeyEvt_TypeDef;
 

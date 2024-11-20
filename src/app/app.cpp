@@ -52,38 +52,22 @@ G_STATUS app_init() {
     UpdateCallback_TypeDef pl_move_l = {false, get_player_instance(), player_move_left};
     UpdateCallback_TypeDef pl_move_stop = {false, get_player_instance(), player_stop_move};
 
-    KeyEvt_TypeDef pl_move_r_evt = {SDL_KEYDOWN, SDL_SCANCODE_D, pl_move_r, true};
-    KeyEvt_TypeDef pl_move_l_evt = {SDL_KEYDOWN, SDL_SCANCODE_A, pl_move_l, true};
-    KeyEvt_TypeDef pl_move_stop_r_evt = {SDL_KEYUP, SDL_SCANCODE_D, pl_move_stop, false};
-    KeyEvt_TypeDef pl_move_stop_l_evt = {SDL_KEYUP, SDL_SCANCODE_A, pl_move_stop, false};
+    KeyEvt_TypeDef pl_move_r_evt = {SDL_SCANCODE_D, pl_move_r, pl_move_stop, true};
+    KeyEvt_TypeDef pl_move_l_evt = {SDL_SCANCODE_A, pl_move_l, pl_move_stop, true};
 
     status = register_key_event(&pl_move_l_evt);
     if(status == G_STATUS_FAIL) {
         log_error(APP_TAG, "Cannot regsiter key event", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
-    log_info(APP_TAG, "Registered keydown event on A");
-
-    status = register_key_event(&pl_move_stop_l_evt);
-    if(status == G_STATUS_FAIL) {
-        log_error(APP_TAG, "Cannot register keyup event on A", G_STATUS_FAIL);
-        return G_STATUS_FAIL;
-    }
-    log_info(APP_TAG, "Registered keyup event on A");
+    log_info(APP_TAG, "Registered key event on A");
 
     status = register_key_event(&pl_move_r_evt);
     if(status == G_STATUS_FAIL) {
         log_error(APP_TAG, "Cannot regsiter key event", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
-    log_info(APP_TAG, "Registered keydown event on D");
-
-    status = register_key_event(&pl_move_stop_r_evt);
-    if(status == G_STATUS_FAIL) {
-        log_error(APP_TAG, "Cannot register keyup event on D", G_STATUS_FAIL);
-        return G_STATUS_FAIL;
-    }
-    log_info(APP_TAG, "Registered keyup event on D");
+    log_info(APP_TAG, "Registered key event on D");
 
     UpdateComponent_Typedef player_movement = {get_player_instance(), process_player_movement};
     status = register_update_components(player_movement);

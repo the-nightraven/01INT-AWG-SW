@@ -23,7 +23,7 @@ header
 #define UPDATER_H
 
 #include "includes.h"
-#include "reader.h"
+
 
 G_STATUS updater_init();
 G_STATUS updater_deinit();

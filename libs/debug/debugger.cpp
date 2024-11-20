@@ -56,9 +56,9 @@ G_STATUS debugger_register_events() {
     UpdateCallback_TypeDef evt_upd_stack = {false, nullptr, debugger_print_evt};
     UpdateCallback_TypeDef rnd_stack = {false, nullptr, debugger_print_rndr};
 
-    KeyEvt_TypeDef toggle_debug_evt = {SDL_KEYDOWN, DEBUGGER_KEY, toggle_debug, false};
-    KeyEvt_TypeDef print_evt_upd_stack_evt = {SDL_KEYDOWN, DEBUGGER_EVT_KEY, evt_upd_stack, false};
-    KeyEvt_TypeDef print_rndr_stack_evt = {SDL_KEYDOWN, DEBUGGER_RND_KEY, rnd_stack, false};
+    KeyEvt_TypeDef toggle_debug_evt = {DEBUGGER_KEY, toggle_debug, DEFAULT_UPDATER_CB, false};
+    KeyEvt_TypeDef print_evt_upd_stack_evt = {DEBUGGER_EVT_KEY, evt_upd_stack, DEFAULT_UPDATER_CB, false};
+    KeyEvt_TypeDef print_rndr_stack_evt = {DEBUGGER_RND_KEY, rnd_stack, DEFAULT_UPDATER_CB, false};
 
     status = debugger_register_event((void*)&toggle_debug_evt, DEBUGGER_KEY_EVT);
     if(status == G_STATUS_FAIL) {

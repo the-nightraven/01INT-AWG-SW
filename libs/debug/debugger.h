@@ -34,8 +34,7 @@ and change, but not for commercial use
 #define DEBUGGER_SYS_EVT                  2
 
 #define DEBUGGER_SYS_EVT_WILDCARD         10
-#define DEBUGGER_KEYUP_EVT_WILDCARD       11
-#define DEBUGGER_KEYDOWN_EVT_WILDCARD     12
+#define DEBUGGER_KEY_EVT_WILDCARD         11
 
 G_STATUS debugger_init(DebugModule_TypeDef* dbg);
 G_STATUS debugger_deinit();

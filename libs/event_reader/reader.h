@@ -22,14 +22,12 @@ and change, but not for commercial use
 #define READER_H
 
 #include "includes.h"
-#include "updater.h"
 
 #define SYS_EVENT_FLAG             0x03
 #define KEY_EVENT_FLAG             0x04
 
 #define KEYUP_SUBFLAG              0x05
 #define KEYDOWN_SUBFLAG            0x06
-
 
 //reader utils
 G_STATUS evt_init();
@@ -43,7 +41,7 @@ G_STATUS poll_events(SDL_Event *e);
 G_STATUS add_event_item(uint8_t type_flag, void *list, void *item);
 void* get_event_by_hook(uint8_t type_flag, void *list, int hook);
 void* init_event_list(uint8_t type_flag, void *item);
-void* get_event_list(uint8_t type_flag, uint8_t subflag);
+void* get_event_list(uint8_t type_flag);
 
 //event control
 G_STATUS evt_push_event(int sdl_hook, SDL_Scancode sdl_key);

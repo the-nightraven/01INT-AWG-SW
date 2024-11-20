@@ -66,13 +66,10 @@ G_STATUS debugger_register_event(void* evt, int wildcard) {
 
 extern void* debugger_get_evtstack_instance(int wildcard) {
     if(wildcard == DEBUGGER_SYS_EVT_WILDCARD) {
-        return get_event_list(SYS_EVENT_FLAG, 0);
+        return get_event_list(SYS_EVENT_FLAG);
     }
-    if(wildcard == DEBUGGER_KEYUP_EVT_WILDCARD) {
-        return get_event_list(KEY_EVENT_FLAG, KEYUP_SUBFLAG);
-    }
-    if(wildcard == DEBUGGER_KEYDOWN_EVT_WILDCARD) {
-        return get_event_list(KEY_EVENT_FLAG, KEYDOWN_SUBFLAG);
+    if(wildcard == DEBUGGER_KEY_EVT_WILDCARD) {
+        return get_event_list(KEY_EVENT_FLAG);
     }
     return nullptr;
 }
@@ -272,7 +269,7 @@ G_STATUS monitor_register_comp() {
     log_info(MON_TAG, "registered QUIT event");
 
     UpdateCallback_TypeDef forcedSysExit = {false, nullptr, force_end_game};
-    KeyEvt_TypeDef forcedSysExit_evt = {SDL_KEYDOWN, FORCE_QUIT_KEY, forcedSysExit, false};
+    KeyEvt_TypeDef forcedSysExit_evt = {FORCE_QUIT_KEY, forcedSysExit, DEFAULT_UPDATER_CB, false};
     status = register_key_event(&forcedSysExit_evt);
 
     if(status == G_STATUS_FAIL) {
@@ -282,7 +279,7 @@ G_STATUS monitor_register_comp() {
     log_info(MON_TAG, "registered FORCE_QUIT key event on Q");
 
     UpdateCallback_TypeDef fullscreen_t = {false, &engine_components.fullScreen, toggle_fullscreen};
-    KeyEvt_TypeDef fullscreen_t_evt = {SDL_KEYDOWN, FULLSCREEN_KEY, fullscreen_t, false};
+    KeyEvt_TypeDef fullscreen_t_evt = {FULLSCREEN_KEY, fullscreen_t, DEFAULT_UPDATER_CB, false};
     status = register_key_event(&fullscreen_t_evt);
 
     if(status == G_STATUS_FAIL) {
