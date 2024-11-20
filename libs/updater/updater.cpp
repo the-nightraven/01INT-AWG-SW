@@ -99,11 +99,12 @@ G_STATUS updater_run_time_delta() {
 
     if (delta_time > 0.05f) {
       delta_time = 0.05f;
-   }
+    }
 
     //get events
     auto *sys_evt = static_cast<SysEvtItem_TypeDef *>(get_event_list(SYS_EVENT_FLAG));
     auto *key_evt = static_cast<KeyEvtItem_TypeDef *>(get_event_list(KEY_EVENT_FLAG));
+    auto *mouse_evt = static_cast<MouseEvtItem_TypeDef *>(get_event_list(MOUSE_EVENT_FLAG));
 
     //call them
     status = update_sys_events(sys_evt);
@@ -113,6 +114,12 @@ G_STATUS updater_run_time_delta() {
     }
 
     status = update_key_events(key_evt);
+
+    if(status == G_STATUS_FAIL) {
+        return status;
+    }
+
+    status = update_mouse_events(mouse_evt);
 
     if(status == G_STATUS_FAIL) {
         return status;
@@ -152,6 +159,7 @@ G_STATUS update_sys_events(SysEvtItem_TypeDef *list) {
     return G_STATUS_OK;
 }
 
+//@TODO: may cause segfault because some functions are actually nullptr
 G_STATUS update_key_events(KeyEvtItem_TypeDef *list) {
     G_STATUS status;
     
@@ -169,6 +177,40 @@ G_STATUS update_key_events(KeyEvtItem_TypeDef *list) {
         //kdown
         if(check_updater_flag(ind->evt.kdown_update_cb)) {
             status = call_updater(&ind->evt.kdown_update_cb);
+            if(status == G_STATUS_FAIL) {
+                return status;
+            }
+        }
+        ind = ind->next;
+    }
+    return G_STATUS_OK;
+}
+
+G_STATUS update_mouse_events(MouseEvtItem_TypeDef *list) {
+    G_STATUS status;
+
+    MouseEvtItem_TypeDef *ind = list;
+
+    while(ind != nullptr) {
+        //click
+        if(check_updater_flag(ind->evt.click_cb)) {
+            status = call_updater(&ind->evt.click_cb);
+            if(status == G_STATUS_FAIL) {
+                return status;
+            }
+        }
+
+        //hover
+        if(check_updater_flag(ind->evt.hover_in_cb)) {
+            status = call_updater(&ind->evt.hover_in_cb);
+            if(status == G_STATUS_FAIL) {
+                return status;
+            }
+        }
+
+        //unhover
+        if(check_updater_flag(ind->evt.hover_out_cb)) {
+            status = call_updater(&ind->evt.hover_out_cb);
             if(status == G_STATUS_FAIL) {
                 return status;
             }

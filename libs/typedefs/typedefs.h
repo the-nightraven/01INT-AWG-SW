@@ -31,6 +31,13 @@ typedef int RenderEngine;
 
 //objects
 
+typedef struct AWG_Rect {
+    int x;
+    int y;
+    int w;
+    int h;
+} AWG_Rect;
+
 typedef struct UpdateCallback_TypeDef{
     bool flag;
     void* value;
@@ -49,6 +56,13 @@ typedef struct KeyEvt_TypeDef {
     bool use_keyhold_protection;
 } KeyEvt_TypeDef;
 
+typedef struct MouseEvt_TypeDef {
+    AWG_Rect dim;
+    UpdateCallback_TypeDef hover_in_cb;
+    UpdateCallback_TypeDef hover_out_cb;
+    UpdateCallback_TypeDef click_cb;
+} MouseEvt_TypeDef;
+
 typedef struct SysEvtItem_TypeDef {
     SysEvt_TypeDef evt;
     SysEvtItem_TypeDef *next;
@@ -58,6 +72,11 @@ typedef struct KeyEvtItem_TypeDef {
     KeyEvt_TypeDef evt;
     KeyEvtItem_TypeDef *next;
 } KeyEvtItem_TypeDef;
+
+typedef struct MouseEvtItem_TypeDef {
+    MouseEvt_TypeDef evt;
+    MouseEvtItem_TypeDef *next;
+} MouseEvtItem_TypeDef;
 
 typedef struct UpdateComponent_Typedef {
     void* value;

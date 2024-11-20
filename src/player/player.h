@@ -40,6 +40,7 @@ typedef struct Player_Typedef {
 
 //functions
 G_STATUS init_player();
+Player_Typedef* get_player_instance();
 
 //player movement
 void player_move_left(void *val);
@@ -47,14 +48,13 @@ void player_move_right(void *val);
 void player_stop_move_left(void *val);
 void player_stop_move_right(void *val);
 
-
-Player_Typedef* get_player_instance();
-
 //updater register callbacks
 void process_player_movement(void* player_instance);
 
 //renderer callback
 void player_render_cb(void* player_ins, SDL_Renderer** renderer);
 
+//test
+void player_click_cb(void* val);
 
 #endif
