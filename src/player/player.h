@@ -24,11 +24,11 @@ and change, but not for commercial use
 #include "includes.h"
 
 //defines
-#define PLAYER_SIZE_W          50
-#define PLAYER_SIZE_H          50
-#define PLAYER_BASE_SPEED      300 //arbitrary value
-#define PLAYER_START_X         WINDOW_WIDTH / 2 - PLAYER_SIZE_W / 2
-#define PLAYER_START_Y         WINDOW_HEIGHT / 2 - PLAYER_SIZE_H / 2
+#define PLAYER_SIZE_W          (float)50
+#define PLAYER_SIZE_H          (float)50
+#define PLAYER_BASE_SPEED      (float)300 //arbitrary value
+#define PLAYER_START_X         (float)WINDOW_WIDTH / 2 - PLAYER_SIZE_W / 2
+#define PLAYER_START_Y         (float)WINDOW_HEIGHT / 2 - PLAYER_SIZE_H / 2
 
 typedef struct Player_Typedef {
     float x;
@@ -36,14 +36,18 @@ typedef struct Player_Typedef {
     float w;
     float h;
     float speed;
-};
+} Player_Typedef;
 
 //functions
 G_STATUS init_player();
+
+//player movement
 void player_move_left(void *val);
 void player_move_right(void *val);
-void player_stop_move(void *val);
-void player_render_cb();
+void player_stop_move_left(void *val);
+void player_stop_move_right(void *val);
+
+
 Player_Typedef* get_player_instance();
 
 //updater register callbacks

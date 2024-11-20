@@ -38,50 +38,46 @@ G_STATUS init_player() {
 }
 
 void player_move_left(void* val) {
-    Player_Typedef *pu = static_cast<Player_Typedef *>(val);
-    //pu->x -= pu->speed * updater_get_delta_time();
+    auto *pu = static_cast<Player_Typedef *>(val);
     if(pu->speed > -1 * PLAYER_BASE_SPEED) {
         pu->speed -= PLAYER_BASE_SPEED;
     }
-    //printf("Should move left\n");
 }
 
 void player_move_right(void* val) {
-    Player_Typedef *pu = static_cast<Player_Typedef *>(val);
-    //pu->x += pu->speed * updater_get_delta_time();
+    auto *pu = static_cast<Player_Typedef *>(val);
     if(pu->speed < PLAYER_BASE_SPEED) {
         pu->speed += PLAYER_BASE_SPEED;
     }
-    //printf("Should move right\n");
 }
 
-void player_stop_move(void *val) {
-    //printf("Should stop movement\n");
-    Player_Typedef* pu = static_cast<Player_Typedef *>(val);
-    pu->speed = 0;
+void player_stop_move_left(void *val) {
+    auto* pu = static_cast<Player_Typedef *>(val);
+    pu->speed += PLAYER_BASE_SPEED;
 }
 
-void player_render_cb() {
-    return;
+void player_stop_move_right(void *val) {
+    auto* pu = static_cast<Player_Typedef *>(val);
+    pu->speed -= PLAYER_BASE_SPEED;
 }
 
 Player_Typedef* get_player_instance() {
     if(!is_init) {
-        return NULL;
+        return nullptr;
     }
 
     return &player;
 }
 
 void process_player_movement(void* player_instance) {
-    Player_Typedef* pl = static_cast<Player_Typedef *>(player_instance);
+    auto* pl = static_cast<Player_Typedef *>(player_instance);
     pl->x += pl->speed * updater_get_delta_time();
     //pl->x += (pl->x * updater_get_delta_time())/pl->speed;
 }
 
 void player_render_cb(void* player_ins, SDL_Renderer** renderer) {
     int status;
-    Player_Typedef* pl = static_cast<Player_Typedef *>(player_ins);
+    auto* pl = static_cast<Player_Typedef *>(player_ins);
     SDL_FRect player_rect = {pl->x, pl->y, pl->h, pl->w};
     status = SDL_SetRenderDrawColor(*renderer, 255, 255, 255, 255);
     status = SDL_RenderDrawRectF(*renderer, &player_rect);

@@ -50,10 +50,11 @@ G_STATUS app_init() {
 
     UpdateCallback_TypeDef pl_move_r = {false, get_player_instance(), player_move_right};
     UpdateCallback_TypeDef pl_move_l = {false, get_player_instance(), player_move_left};
-    UpdateCallback_TypeDef pl_move_stop = {false, get_player_instance(), player_stop_move};
+    UpdateCallback_TypeDef pl_move_r_stop = {false, get_player_instance(), player_stop_move_right};
+    UpdateCallback_TypeDef pl_move_l_stop = {false, get_player_instance(), player_stop_move_left};
 
-    KeyEvt_TypeDef pl_move_r_evt = {SDL_SCANCODE_D, pl_move_r, pl_move_stop, true};
-    KeyEvt_TypeDef pl_move_l_evt = {SDL_SCANCODE_A, pl_move_l, pl_move_stop, true};
+    KeyEvt_TypeDef pl_move_r_evt = {SDL_SCANCODE_D, pl_move_r, pl_move_r_stop, true};
+    KeyEvt_TypeDef pl_move_l_evt = {SDL_SCANCODE_A, pl_move_l, pl_move_l_stop, true};
 
     status = register_key_event(&pl_move_l_evt);
     if(status == G_STATUS_FAIL) {
