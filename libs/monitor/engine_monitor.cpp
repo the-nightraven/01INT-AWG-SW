@@ -64,17 +64,20 @@ G_STATUS debugger_register_event(void* evt, int wildcard) {
     return G_STATUS_FAIL;
 }
 
-extern void* debugger_get_evtstack_instance(int wildcard) {
+void* debugger_get_evtstack_instance(int wildcard) {
     if(wildcard == DEBUGGER_SYS_EVT_WILDCARD) {
         return get_event_list(SYS_EVENT_FLAG);
     }
     if(wildcard == DEBUGGER_KEY_EVT_WILDCARD) {
         return get_event_list(KEY_EVENT_FLAG);
     }
+    if(wildcard == DEBUGGER_MOUSE_EVT_WILDCARD) {
+        return get_event_list(MOUSE_EVENT_FLAG);
+    }
     return nullptr;
 }
 
-extern void* debugger_get_rndrstack_instance() {
+void* debugger_get_rndrstack_instance() {
     return renderer_get_list();
 }
 
@@ -137,6 +140,7 @@ G_STATUS monitor_init() {
     engine_components.debug_module.dbg_thread = nullptr;
     //somehow init rnd component
     engine_components.debug_module.rnd_handler = 0;
+    engine_components.debug_module.mouseStackVisible = false;
 
     engine_components.window_module.status = false;
 

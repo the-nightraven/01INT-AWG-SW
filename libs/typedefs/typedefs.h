@@ -118,6 +118,7 @@ typedef struct DebugModule_TypeDef {
     RendererComponent_Typedef rnd_comp;
     RendererComponentHandler rnd_handler;
     int fps;
+    bool mouseStackVisible;
 } DebugModule_TypeDef;
 
 typedef struct WindowModule_TypeDef {

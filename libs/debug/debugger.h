@@ -26,15 +26,31 @@ and change, but not for commercial use
 
 #define DBG_TAG                           "DBG"
 
+//debug mouse stack colors
+#define DBG_MOUSE_ALL_R                   255
+#define DBG_MOUSE_ALL_G                   0
+#define DBG_MOUSE_ALL_B                   255
+
+#define DBG_MOUSE_HOVER_R                 0
+#define DBG_MOUSE_HOVER_G                 0
+#define DBG_MOUSE_HOVER_B                 255
+
+#define DBG_MOUSE_CLICK_R                 255
+#define DBG_MOUSE_CLICK_G                 0
+#define DBG_MOUSE_CLICK_B                 0
+
+
 #define DEBUGGER_KEY                      SDL_SCANCODE_F3
 #define DEBUGGER_EVT_KEY                  SDL_SCANCODE_E
 #define DEBUGGER_RND_KEY                  SDL_SCANCODE_R
 
 #define DEBUGGER_KEY_EVT                  1
 #define DEBUGGER_SYS_EVT                  2
+#define DEBUGGER_MOUSE_EVT                3
 
 #define DEBUGGER_SYS_EVT_WILDCARD         10
 #define DEBUGGER_KEY_EVT_WILDCARD         11
+#define DEBUGGER_MOUSE_EVT_WILDCARD       12
 
 G_STATUS debugger_init(DebugModule_TypeDef* dbg);
 G_STATUS debugger_deinit();
