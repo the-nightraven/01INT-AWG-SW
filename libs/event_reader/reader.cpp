@@ -152,13 +152,7 @@ G_STATUS poll_events(SDL_Event* e) {
         }else {
             auto *ind = static_cast<SysEvtItem_TypeDef *>(get_event_by_hook(SYS_EVENT_FLAG, sys_list, e->type));
             if(ind != nullptr) {
-                if(!ind->evt.use_keyhold_protection) {
-                    ind->evt.update_cb.flag = true;
-                }else {
-                    if(e->key.repeat == 0) {
-                        ind->evt.update_cb.flag = true;
-                    }
-                }
+                ind->evt.update_cb.flag = true;
             }
         }
     }

@@ -38,9 +38,9 @@ typedef struct UpdateCallback_TypeDef{
 typedef struct SysEvt_TypeDef {
     int SDL_Hook;
     UpdateCallback_TypeDef update_cb;
-    bool use_keyhold_protection;
 } SysEvt_TypeDef;
 
+//@TODO: get rid of SDL_HOOK and instead have 2 functions for keyup and keydown
 typedef struct KeyEvt_TypeDef {
     int SDL_Hook;
     int Key;
