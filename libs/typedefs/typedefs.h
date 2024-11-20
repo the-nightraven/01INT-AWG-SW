@@ -23,11 +23,20 @@ and change, but not for commercial use
 
 #include "includes.h"
 
+#define DEFAULT_UPDATER_CB         (UpdateCallback_TypeDef){false, nullptr, nullptr}
+
 //data types
 typedef int RendererComponentHandler;
 typedef int RenderEngine;
 
 //objects
+
+typedef struct AWG_Rect {
+    float x;
+    float y;
+    float w;
+    float h;
+} AWG_Rect;
 
 typedef struct UpdateCallback_TypeDef{
     bool flag;
@@ -38,15 +47,22 @@ typedef struct UpdateCallback_TypeDef{
 typedef struct SysEvt_TypeDef {
     int SDL_Hook;
     UpdateCallback_TypeDef update_cb;
-    bool use_keyhold_protection;
 } SysEvt_TypeDef;
 
 typedef struct KeyEvt_TypeDef {
-    int SDL_Hook;
-    int Key;
-    UpdateCallback_TypeDef update_cb;
+    SDL_Scancode Key;
+    UpdateCallback_TypeDef kdown_update_cb;
+    UpdateCallback_TypeDef kup_update_cb;
     bool use_keyhold_protection;
 } KeyEvt_TypeDef;
+
+typedef struct MouseEvt_TypeDef {
+    AWG_Rect* dim;
+    bool isHovering;
+    UpdateCallback_TypeDef hover_in_cb;
+    UpdateCallback_TypeDef hover_out_cb;
+    UpdateCallback_TypeDef click_cb;
+} MouseEvt_TypeDef;
 
 typedef struct SysEvtItem_TypeDef {
     SysEvt_TypeDef evt;
@@ -57,6 +73,11 @@ typedef struct KeyEvtItem_TypeDef {
     KeyEvt_TypeDef evt;
     KeyEvtItem_TypeDef *next;
 } KeyEvtItem_TypeDef;
+
+typedef struct MouseEvtItem_TypeDef {
+    MouseEvt_TypeDef evt;
+    MouseEvtItem_TypeDef *next;
+} MouseEvtItem_TypeDef;
 
 typedef struct UpdateComponent_Typedef {
     void* value;
@@ -114,6 +135,7 @@ typedef struct MonitorComponents_TypeDef {
     SDL_Renderer* engine_renderer;
     SDL_Event engine_event_pool;
     int frameTime;
+    bool fullScreen;
 } MonitorComponents_TypeDef;
 
 #endif

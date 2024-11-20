@@ -37,7 +37,7 @@ G_STATUS init_window(SDL_Window **mainFrame, SDL_Renderer **renderer) {
         return G_STATUS_FAIL;
     }
     log_info(WINDOW_TAG, "Created window");
-    *renderer = SDL_CreateRenderer(*mainFrame, -1, 0);
+    *renderer = SDL_CreateRenderer(*mainFrame, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     if(*renderer == nullptr) {
         log_error(WINDOW_TAG, "Could not init renderer", G_STATUS_FAIL);

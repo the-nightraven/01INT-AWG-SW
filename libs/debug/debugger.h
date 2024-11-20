@@ -27,15 +27,14 @@ and change, but not for commercial use
 #define DBG_TAG                           "DBG"
 
 #define DEBUGGER_KEY                      SDL_SCANCODE_F3
-#define DEBUGGER_EVT_KEY                  SDL_SCANCODE_F
+#define DEBUGGER_EVT_KEY                  SDL_SCANCODE_E
 #define DEBUGGER_RND_KEY                  SDL_SCANCODE_R
 
 #define DEBUGGER_KEY_EVT                  1
 #define DEBUGGER_SYS_EVT                  2
 
 #define DEBUGGER_SYS_EVT_WILDCARD         10
-#define DEBUGGER_KEYUP_EVT_WILDCARD       11
-#define DEBUGGER_KEYDOWN_EVT_WILDCARD     12
+#define DEBUGGER_KEY_EVT_WILDCARD         11
 
 G_STATUS debugger_init(DebugModule_TypeDef* dbg);
 G_STATUS debugger_deinit();

@@ -20,23 +20,25 @@ and change, but not for commercial use
 
 //@TODO: System events support            DONE
 //@TODO: Keyboard support                 DONE
-//@TODO: Mouse support                    WIP
+//@TODO: Mouse support                    DONE
 //@TODO: Xbox Controller support          WIP
 
 #include "reader.h"
+#include "updater.h"
 
 
 SysEvtItem_TypeDef *sys_list;
-KeyEvtItem_TypeDef *key_up_list;
-KeyEvtItem_TypeDef *key_down_list;
+KeyEvtItem_TypeDef *key_list;
+MouseEvtItem_TypeDef *mouse_list;
 
 G_STATUS evt_init() {
     sys_list = nullptr;
-    key_down_list = nullptr;
-    key_up_list = nullptr;
+    key_list = nullptr;
+    mouse_list = nullptr;
     return G_STATUS_OK;
 }
 
+//@TODO: Possible memory leak if updatecallback is allocated with malloc
 G_STATUS evt_deinit() {
     //sys
     SysEvtItem_TypeDef* prev = sys_list;
@@ -50,9 +52,10 @@ G_STATUS evt_deinit() {
             curr = curr->next;
         }
     }while(curr != nullptr);
-    //keyup
-    KeyEvtItem_TypeDef* prevk = key_up_list;
-    KeyEvtItem_TypeDef* currk = key_up_list->next;
+
+    //key
+    KeyEvtItem_TypeDef* prevk = key_list;
+    KeyEvtItem_TypeDef* currk = key_list->next;
 
     do {
         free(prevk);
@@ -63,18 +66,18 @@ G_STATUS evt_deinit() {
         }
     }while(currk != nullptr);
 
-    //keydown
-    prevk = key_down_list;
-    currk = key_down_list->next;
+    //mouse
+    MouseEvtItem_TypeDef* prevm = mouse_list;
+    MouseEvtItem_TypeDef* currm = mouse_list->next;
 
     do {
-        free(prevk);
-        prevk = currk;
+        free(prevm);
+        prevm = currm;
 
-        if(currk != nullptr) {
-            currk = currk->next;
+        if(currm != nullptr) {
+            currm = currm->next;
         }
-    }while(currk != nullptr);
+    }while(currm != nullptr);
 
     return G_STATUS_OK;
 }
@@ -90,9 +93,9 @@ G_STATUS register_sys_event(SysEvt_TypeDef* evt) {
                 return G_STATUS_FAIL;
             }
             return G_STATUS_OK;
-    }else {
-        return add_event_item(SYS_EVENT_FLAG, (void*)sys_list, (void*)evt);
     }
+
+    return add_event_item(SYS_EVENT_FLAG, (void*)sys_list, (void*)evt);
 }
 
 G_STATUS register_key_event(KeyEvt_TypeDef* evt){
@@ -100,65 +103,94 @@ G_STATUS register_key_event(KeyEvt_TypeDef* evt){
         return G_STATUS_FAIL;
     }
 
-    if(evt->SDL_Hook == SDL_KEYDOWN) {
-        if(key_down_list == nullptr) {
-            key_down_list = static_cast<KeyEvtItem_TypeDef *>(init_event_list(KEY_EVENT_FLAG, (void *) evt));
-            if(key_down_list == nullptr) {
-                return G_STATUS_FAIL;
-            }
-            return G_STATUS_OK;
-        }else {
-            return add_event_item(KEY_EVENT_FLAG, (void*)key_down_list, (void*)evt);
+
+    if(key_list == nullptr) {
+        key_list = static_cast<KeyEvtItem_TypeDef *>(init_event_list(KEY_EVENT_FLAG, (void *) evt));
+        if(key_list == nullptr) {
+            return G_STATUS_FAIL;
         }
-    }else if(evt->SDL_Hook == SDL_KEYUP) {
-        if(key_up_list == nullptr) {
-            key_up_list = static_cast<KeyEvtItem_TypeDef *>(init_event_list(KEY_EVENT_FLAG, (void *) evt));
-            if(key_up_list == nullptr) {
-                return G_STATUS_FAIL;
-            }
-            return G_STATUS_OK;
-        }else {
-            return add_event_item(KEY_EVENT_FLAG, (void*)key_up_list, (void*)evt);
-        }
-    }else {
+        return G_STATUS_OK;
+    }
+
+    return add_event_item(KEY_EVENT_FLAG, (void*)key_list, (void*)evt);
+}
+
+G_STATUS register_mouse_event(MouseEvt_TypeDef* evt) {
+    if(evt == nullptr) {
         return G_STATUS_FAIL;
     }
+
+    if(mouse_list == nullptr) {
+        mouse_list = static_cast<MouseEvtItem_TypeDef *>(init_event_list(MOUSE_EVENT_FLAG, (void*)evt));
+        if(mouse_list == nullptr) {
+            return G_STATUS_FAIL;
+        }
+        return G_STATUS_OK;
+    }
+
+    return add_event_item(MOUSE_EVENT_FLAG, (void*)mouse_list, (void*)evt);
 }
 
 G_STATUS poll_events(SDL_Event* e) {
     while(SDL_PollEvent(e)) {
         if(e->type == SDL_KEYDOWN) {
-            auto *ind = static_cast<KeyEvtItem_TypeDef *>(get_event_by_hook(KEY_EVENT_FLAG, key_down_list, e->key.keysym.scancode));
+            auto *ind = static_cast<KeyEvtItem_TypeDef *>(get_event_by_hook(KEY_EVENT_FLAG, key_list, e->key.keysym.scancode));
             if(ind != nullptr) {
-                if(!ind->evt.use_keyhold_protection) {
-                    ind->evt.update_cb.flag = true;
-                }else {
-                    if(e->key.repeat == 0) {
-                        ind->evt.update_cb.flag = true;
+                if(ind->evt.kdown_update_cb.obj_callback != nullptr) {
+                    if(!ind->evt.use_keyhold_protection) {
+                        ind->evt.kdown_update_cb.flag = true;
+                    }else {
+                        if(e->key.repeat == 0) {
+                            ind->evt.kdown_update_cb.flag = true;
+                        }
                     }
                 }
             }
         }else if(e->type == SDL_KEYUP) {
-            auto *ind = static_cast<KeyEvtItem_TypeDef *>(get_event_by_hook(KEY_EVENT_FLAG, key_up_list, e->key.keysym.scancode));
+            auto *ind = static_cast<KeyEvtItem_TypeDef *>(get_event_by_hook(KEY_EVENT_FLAG, key_list, e->key.keysym.scancode));
             if(ind != nullptr) {
-                if(!ind->evt.use_keyhold_protection) {
-                    ind->evt.update_cb.flag = true;
-                }else {
-                    if(e->key.repeat == 0) {
-                        ind->evt.update_cb.flag = true;
+                if(ind->evt.kup_update_cb.obj_callback != nullptr) {
+                    if(!ind->evt.use_keyhold_protection) {
+                        ind->evt.kup_update_cb.flag = true;
+                    }else {
+                        if(e->key.repeat == 0) {
+                            ind->evt.kup_update_cb.flag = true;
+                        }
                     }
                 }
             }
+        }else if(e->type == SDL_MOUSEBUTTONDOWN) {
+            int x,y;
+            SDL_GetMouseState(&x,&y);
+            auto *ind = static_cast<MouseEvtItem_TypeDef *>(get_event_by_mpos(x, y));
+
+            if(ind != nullptr) {
+                if(ind->evt.click_cb.obj_callback != nullptr) {
+                    ind->evt.click_cb.flag = true;
+                }
+            }
+        }else if(e->type == SDL_MOUSEMOTION) {
+            int x, y;
+            SDL_GetMouseState(&x,&y);
+            auto *ind = mouse_list;
+
+            while(ind != nullptr) {
+                bool cond = evt_fits_in_rect(x, y, *ind->evt.dim);
+                if(ind->evt.isHovering ^ cond) {
+                    if(cond && ind->evt.hover_in_cb.obj_callback != nullptr) {
+                        ind->evt.hover_in_cb.flag = true;
+                    }else if(!cond && ind->evt.hover_out_cb.obj_callback != nullptr) {
+                        ind->evt.hover_out_cb.flag = true;
+                    }
+                    ind->evt.isHovering = cond;
+                }
+                ind = ind->next;
+            }
+
         }else {
             auto *ind = static_cast<SysEvtItem_TypeDef *>(get_event_by_hook(SYS_EVENT_FLAG, sys_list, e->type));
             if(ind != nullptr) {
-                if(!ind->evt.use_keyhold_protection) {
-                    ind->evt.update_cb.flag = true;
-                }else {
-                    if(e->key.repeat == 0) {
-                        ind->evt.update_cb.flag = true;
-                    }
-                }
+                ind->evt.update_cb.flag = true;
             }
         }
     }
@@ -186,7 +218,9 @@ G_STATUS add_event_item(uint8_t type_flag, void *list, void *item) {
         ind->next = static_cast<SysEvtItem_TypeDef *>(tmp);
         return G_STATUS_OK;
 
-    }else if(type_flag == KEY_EVENT_FLAG) {
+    }
+
+    if(type_flag == KEY_EVENT_FLAG) {
         auto *ind = static_cast<KeyEvtItem_TypeDef *>(list);
 
         while(ind->next != nullptr) {
@@ -195,13 +229,25 @@ G_STATUS add_event_item(uint8_t type_flag, void *list, void *item) {
 
         ind->next = static_cast<KeyEvtItem_TypeDef *>(tmp);
         return G_STATUS_OK;
-    }else {
-        return G_STATUS_FAIL;
     }
+
+    if(type_flag == MOUSE_EVENT_FLAG) {
+        auto *ind = static_cast<MouseEvtItem_TypeDef *>(list);
+
+        while(ind->next != nullptr) {
+            ind = ind->next;
+        }
+
+        ind->next = static_cast<MouseEvtItem_TypeDef *>(tmp);
+        return G_STATUS_OK;
+    }
+
+    return G_STATUS_FAIL;
 }
 
 void* init_event_list(uint8_t type_flag, void *item) {
     void* status;
+
     if(type_flag == SYS_EVENT_FLAG) {
         auto *tmp = static_cast<SysEvtItem_TypeDef *>(malloc(sizeof(SysEvtItem_TypeDef)));
         status = memcpy(&(tmp->evt), item, sizeof(SysEvt_TypeDef));
@@ -212,7 +258,9 @@ void* init_event_list(uint8_t type_flag, void *item) {
 
         tmp->next = nullptr;
         return tmp;
-    }else if(type_flag == KEY_EVENT_FLAG) {
+    }
+
+    if(type_flag == KEY_EVENT_FLAG) {
         auto *tmp = static_cast<KeyEvtItem_TypeDef *>(malloc(sizeof(KeyEvtItem_TypeDef)));
         status = memcpy(&(tmp->evt), item, sizeof(KeyEvt_TypeDef));
 
@@ -222,9 +270,21 @@ void* init_event_list(uint8_t type_flag, void *item) {
 
         tmp->next = nullptr;
         return tmp;
-    }else {
-        return nullptr;
     }
+
+    if(type_flag == MOUSE_EVENT_FLAG) {
+        auto *tmp = static_cast<MouseEvtItem_TypeDef *>(malloc(sizeof(MouseEvtItem_TypeDef)));
+        status = memcpy(&(tmp->evt), item, sizeof(MouseEvt_TypeDef));
+
+        if(status == nullptr) {
+            return nullptr;
+        }
+
+        tmp->next = nullptr;
+        return tmp;
+    }
+
+    return nullptr;
 }
 
 void* get_event_by_hook(uint8_t type_flag, void *list, int hook) {
@@ -253,23 +313,56 @@ void* get_event_by_hook(uint8_t type_flag, void *list, int hook) {
             ind = ind->next;
         }
         return nullptr;
-    }else {
-        return nullptr;
     }
+
+    return nullptr;
 }
 
-void* get_event_list(uint8_t type_flag, uint8_t subflag) {
+void* get_event_by_mpos(int x, int y) {
+    MouseEvtItem_TypeDef *ind = mouse_list;
+
+    while(ind != nullptr) {
+        if(evt_fits_in_rect(x, y, *ind->evt.dim)) {
+            return ind;
+        }
+        ind = ind->next;
+    }
+
+    return nullptr;
+}
+
+void* get_event_list(uint8_t type_flag) {
     if(type_flag == SYS_EVENT_FLAG) {
         return (void*)sys_list;
-    }else if(type_flag == KEY_EVENT_FLAG) {
-        if(subflag == KEYDOWN_SUBFLAG) {
-            return (void*)key_down_list;
-        }else if(subflag == KEYUP_SUBFLAG) {
-            return (void*)key_up_list;
-        }else {
-            return nullptr;
-        }
-    }else {
-        return nullptr;
     }
+
+    if(type_flag == KEY_EVENT_FLAG) {
+        return (void*)key_list;
+    }
+
+    if(type_flag == MOUSE_EVENT_FLAG) {
+        return (void*)mouse_list;
+    }
+
+    return nullptr;
+}
+
+G_STATUS evt_push_event(int sdl_hook, SDL_Scancode sdl_key) {
+    SDL_Event push_evt;
+    push_evt.type = sdl_hook;
+    push_evt.key.keysym.scancode = sdl_key;
+    push_evt.key.keysym.mod = KMOD_NONE;
+    push_evt.key.repeat = 0;
+
+    if(SDL_PushEvent(&push_evt) != 0) {
+        return G_STATUS_FAIL;
+    }
+    return G_STATUS_OK;
+}
+
+bool evt_fits_in_rect(int x, int y, AWG_Rect dim) {
+    return x > static_cast<int>(dim.x)
+        && x < static_cast<int>(dim.x + dim.w)
+        && y > static_cast<int>(dim.y)
+        && y < static_cast<int>(dim.y + dim.h);
 }

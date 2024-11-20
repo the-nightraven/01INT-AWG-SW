@@ -33,8 +33,6 @@ G_STATUS debugger_init(DebugModule_TypeDef* dbg) {
 
     self_module = dbg;
     self_module->rnd_comp = (RendererComponent_Typedef){0, "Debugger", true, self_module, 1, dbg_render, nullptr};
-    // self_module->rnd_comp.name = static_cast<char *>(malloc(sizeof(char) * 50));
-    // strcpy(self_module->rnd_comp.name, "Debugger");
     self_module->fps = 0;
     dbg_font = FC_CreateFont();
     FC_LoadFont(dbg_font, debugger_get_renderer_instance(), "../assets/fonts/Lato-Regular.ttf", 20,
@@ -58,9 +56,9 @@ G_STATUS debugger_register_events() {
     UpdateCallback_TypeDef evt_upd_stack = {false, nullptr, debugger_print_evt};
     UpdateCallback_TypeDef rnd_stack = {false, nullptr, debugger_print_rndr};
 
-    KeyEvt_TypeDef toggle_debug_evt = {SDL_KEYDOWN, DEBUGGER_KEY, toggle_debug, false};
-    KeyEvt_TypeDef print_evt_upd_stack_evt = {SDL_KEYDOWN, DEBUGGER_EVT_KEY, evt_upd_stack, false};
-    KeyEvt_TypeDef print_rndr_stack_evt = {SDL_KEYDOWN, DEBUGGER_RND_KEY, rnd_stack, false};
+    KeyEvt_TypeDef toggle_debug_evt = {DEBUGGER_KEY, toggle_debug, DEFAULT_UPDATER_CB, false};
+    KeyEvt_TypeDef print_evt_upd_stack_evt = {DEBUGGER_EVT_KEY, evt_upd_stack, DEFAULT_UPDATER_CB, false};
+    KeyEvt_TypeDef print_rndr_stack_evt = {DEBUGGER_RND_KEY, rnd_stack, DEFAULT_UPDATER_CB, false};
 
     status = debugger_register_event((void*)&toggle_debug_evt, DEBUGGER_KEY_EVT);
     if(status == G_STATUS_FAIL) {

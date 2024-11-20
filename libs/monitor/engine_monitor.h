@@ -36,6 +36,9 @@ and change, but not for commercial use
 #define WDW_WILDCARD     4
 #define DBG_WILDCARD     5
 
+#define FORCE_QUIT_KEY   SDL_SCANCODE_Q
+#define FULLSCREEN_KEY   SDL_SCANCODE_F
+
 //inits
 G_STATUS monitor_init();
 G_STATUS monitor_deinit();
