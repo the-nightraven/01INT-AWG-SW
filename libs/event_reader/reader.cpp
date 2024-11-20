@@ -170,7 +170,23 @@ G_STATUS poll_events(SDL_Event* e) {
                 }
             }
         }else if(e->type == SDL_MOUSEMOTION) {
-            //mouse hover
+            int x, y;
+            SDL_GetMouseState(&x,&y);
+            auto *ind = mouse_list;
+
+            while(ind != nullptr) {
+                bool cond = evt_fits_in_rect(x, y, *ind->evt.dim);
+                if(ind->evt.isHovering ^ cond) {
+                    if(cond && ind->evt.hover_in_cb.obj_callback != nullptr) {
+                        ind->evt.hover_in_cb.flag = true;
+                    }else if(!cond && ind->evt.hover_out_cb.obj_callback != nullptr) {
+                        ind->evt.hover_out_cb.flag = true;
+                    }
+                    ind->evt.isHovering = cond;
+                }
+                ind = ind->next;
+            }
+
         }else {
             auto *ind = static_cast<SysEvtItem_TypeDef *>(get_event_by_hook(SYS_EVENT_FLAG, sys_list, e->type));
             if(ind != nullptr) {

@@ -74,7 +74,9 @@ G_STATUS player_register_events() {
 
     //test click
     UpdateCallback_TypeDef pl_click = {false, nullptr, player_click_cb};
-    MouseEvt_TypeDef pl_click_evt = {&player.dimensions, DEFAULT_UPDATER_CB, DEFAULT_UPDATER_CB, pl_click};
+    UpdateCallback_TypeDef pl_hov_in = {false, nullptr, player_hover_in_cb};
+    UpdateCallback_TypeDef pl_hov_out = {false, nullptr, player_hover_out_cb};
+    MouseEvt_TypeDef pl_click_evt = {&player.dimensions, false, pl_hov_in, pl_hov_out, pl_click};
     status = register_mouse_event(&pl_click_evt);
     if(status == G_STATUS_FAIL) {
         log_error(PLAYER_TAG, "Cannot register mouse event", G_STATUS_FAIL);
@@ -131,6 +133,15 @@ void player_render_cb(void* player_ins, SDL_Renderer** renderer) {
     status = SDL_RenderDrawRectF(*renderer, &player_rect);
 }
 
+//testing
 void player_click_cb(void* val) {
-    printf("Clicked player\n");
+    log_info(PLAYER_TAG, "Player clicked");
+}
+
+void player_hover_in_cb(void* val) {
+    log_info(PLAYER_TAG, "Player hover in");
+}
+
+void player_hover_out_cb(void* val) {
+    log_info(PLAYER_TAG, "Player hover out");
 }

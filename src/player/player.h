@@ -55,5 +55,7 @@ void player_render_cb(void* player_ins, SDL_Renderer** renderer);
 
 //test
 void player_click_cb(void* val);
+void player_hover_in_cb(void* val);
+void player_hover_out_cb(void* val);
 
 #endif

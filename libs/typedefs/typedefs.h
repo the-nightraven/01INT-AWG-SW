@@ -58,6 +58,7 @@ typedef struct KeyEvt_TypeDef {
 
 typedef struct MouseEvt_TypeDef {
     AWG_Rect* dim;
+    bool isHovering;
     UpdateCallback_TypeDef hover_in_cb;
     UpdateCallback_TypeDef hover_out_cb;
     UpdateCallback_TypeDef click_cb;
