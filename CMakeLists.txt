@@ -67,8 +67,7 @@ include_directories(libs/event_reader)
 include_directories(libs/font_cache)
 include_directories(libs/logger)
 include_directories(libs/monitor)
-include_directories(libs/physics/collisions)
-include_directories(libs/physics/rigidbody)
+include_directories(libs/physics)
 include_directories(libs/renderer)
 include_directories(libs/typedefs)
 include_directories(libs/updater)
@@ -76,6 +75,7 @@ include_directories(libs/window)
 include_directories(src/app)
 include_directories(src/player)
 include_directories(libs)
+include_directories(libs/ui_elements)
 
 add_executable(01INT_AWG_SW
     libs/debug/debugger.cpp
@@ -104,7 +104,9 @@ add_executable(01INT_AWG_SW
     src/player/player.cpp
     src/player/player.h
     main.cpp
-    libs/includes.h)
+    libs/includes.h
+    libs/ui_elements/touchable/touchable.cpp
+    libs/ui_elements/touchable/touchable.h)
 
 target_link_libraries(
         ${PROJECT_NAME}
