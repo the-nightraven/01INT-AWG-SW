@@ -42,7 +42,6 @@ typedef struct SysEvt_TypeDef {
     UpdateCallback_TypeDef update_cb;
 } SysEvt_TypeDef;
 
-//@TODO: get rid of SDL_HOOK and instead have 2 functions for keyup and keydown
 typedef struct KeyEvt_TypeDef {
     SDL_Scancode Key;
     UpdateCallback_TypeDef kdown_update_cb;
