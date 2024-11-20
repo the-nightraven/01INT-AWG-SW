@@ -20,7 +20,7 @@ and change, but not for commercial use
 
 //@TODO: System events support            DONE
 //@TODO: Keyboard support                 DONE
-//@TODO: Mouse support                    WIP
+//@TODO: Mouse support                    CURRENTLY WIP
 //@TODO: Xbox Controller support          WIP
 
 #include "reader.h"
