@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.30)
 project(01INT_AWG_SW)
 
-set(CMAKE_CXX_FLAGS "-Wall -std=c++17 -pthread ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++17 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_STANDARD 17)
 set(SDL2_PATH "C:/mingw64/x86_64-w64-mingw32")
 set(SDL2_ttf_PATH "C:/mingw64/x86_64-w64-mingw32")
@@ -49,14 +49,6 @@ if (NOT SDL2_ttf_FOUND)
 else()
     message(STATUS "Using local SDL2_ttf")
 endif()
-
-#set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
-#set(SDL2_PATH "C:/mingw64/x86_64-w64-mingw32")
-#set(SDL2_ttf_PATH "C:/mingw64/x86_64-w64-mingw32")
-#list(APPEND CMAKE_PREFIX_PATH ${SDL2_ttf_PATH})
-#
-#find_package(SDL2 REQUIRED)
-#find_package(SDL2_ttf REQUIRED)
 
 include_directories(${FREETYPE_INCLUDE_DIRS})
 include_directories(${SDL2_INCLUDE_DIR})
