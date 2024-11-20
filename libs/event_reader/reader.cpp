@@ -273,3 +273,16 @@ void* get_event_list(uint8_t type_flag, uint8_t subflag) {
         return nullptr;
     }
 }
+
+G_STATUS evt_push_event(int sdl_hook, SDL_Scancode sdl_key) {
+    SDL_Event push_evt;
+    push_evt.type = sdl_hook;
+    push_evt.key.keysym.scancode = sdl_key;
+    push_evt.key.keysym.mod = KMOD_NONE;
+    push_evt.key.repeat = 0;
+
+    if(SDL_PushEvent(&push_evt) != 0) {
+        return G_STATUS_FAIL;
+    }
+    return G_STATUS_OK;
+}

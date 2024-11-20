@@ -114,6 +114,7 @@ typedef struct MonitorComponents_TypeDef {
     SDL_Renderer* engine_renderer;
     SDL_Event engine_event_pool;
     int frameTime;
+    bool fullScreen;
 } MonitorComponents_TypeDef;
 
 #endif

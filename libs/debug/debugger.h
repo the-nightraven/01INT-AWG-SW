@@ -27,7 +27,7 @@ and change, but not for commercial use
 #define DBG_TAG                           "DBG"
 
 #define DEBUGGER_KEY                      SDL_SCANCODE_F3
-#define DEBUGGER_EVT_KEY                  SDL_SCANCODE_F
+#define DEBUGGER_EVT_KEY                  SDL_SCANCODE_E
 #define DEBUGGER_RND_KEY                  SDL_SCANCODE_R
 
 #define DEBUGGER_KEY_EVT                  1

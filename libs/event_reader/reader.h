@@ -46,6 +46,6 @@ void* init_event_list(uint8_t type_flag, void *item);
 void* get_event_list(uint8_t type_flag, uint8_t subflag);
 
 //event control
-G_STATUS evt_push_event(int wildcard, int sdl_hook, int sdk_key);
+G_STATUS evt_push_event(int sdl_hook, SDL_Scancode sdl_key);
 
 #endif
