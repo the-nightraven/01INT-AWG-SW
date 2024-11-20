@@ -44,6 +44,8 @@ G_STATUS init_window(SDL_Window **mainFrame, SDL_Renderer **renderer) {
         return G_STATUS_FAIL;
     }
 
+    SDL_SetRenderDrawBlendMode(*renderer, SDL_BLENDMODE_BLEND);
+
     return G_STATUS_OK;
 }
 
