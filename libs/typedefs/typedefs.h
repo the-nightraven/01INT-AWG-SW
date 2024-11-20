@@ -32,10 +32,10 @@ typedef int RenderEngine;
 //objects
 
 typedef struct AWG_Rect {
-    int x;
-    int y;
-    int w;
-    int h;
+    float x;
+    float y;
+    float w;
+    float h;
 } AWG_Rect;
 
 typedef struct UpdateCallback_TypeDef{
@@ -57,7 +57,7 @@ typedef struct KeyEvt_TypeDef {
 } KeyEvt_TypeDef;
 
 typedef struct MouseEvt_TypeDef {
-    AWG_Rect dim;
+    AWG_Rect* dim;
     UpdateCallback_TypeDef hover_in_cb;
     UpdateCallback_TypeDef hover_out_cb;
     UpdateCallback_TypeDef click_cb;

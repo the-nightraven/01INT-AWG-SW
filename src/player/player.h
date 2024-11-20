@@ -24,6 +24,7 @@ and change, but not for commercial use
 #include "includes.h"
 
 //defines
+#define PLAYER_TAG             "PLYR"
 #define PLAYER_SIZE_W          (float)50
 #define PLAYER_SIZE_H          (float)50
 #define PLAYER_BASE_SPEED      (float)300 //arbitrary value
@@ -31,10 +32,7 @@ and change, but not for commercial use
 #define PLAYER_START_Y         (float)WINDOW_HEIGHT / 2 - PLAYER_SIZE_H / 2
 
 typedef struct Player_Typedef {
-    float x;
-    float y;
-    float w;
-    float h;
+    AWG_Rect dimensions;
     float speed;
 } Player_Typedef;
 
@@ -47,6 +45,7 @@ void player_move_left(void *val);
 void player_move_right(void *val);
 void player_stop_move_left(void *val);
 void player_stop_move_right(void *val);
+G_STATUS player_register_events();
 
 //updater register callbacks
 void process_player_movement(void* player_instance);

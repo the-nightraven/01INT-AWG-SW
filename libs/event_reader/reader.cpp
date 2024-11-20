@@ -306,9 +306,10 @@ void* get_event_by_mpos(int x, int y) {
     MouseEvtItem_TypeDef *ind = mouse_list;
 
     while(ind != nullptr) {
-        if(evt_fits_in_rect(x, y, ind->evt.dim)) {
+        if(evt_fits_in_rect(x, y, *ind->evt.dim)) {
             return ind;
         }
+        ind = ind->next;
     }
 
     return nullptr;
@@ -344,5 +345,8 @@ G_STATUS evt_push_event(int sdl_hook, SDL_Scancode sdl_key) {
 }
 
 bool evt_fits_in_rect(int x, int y, AWG_Rect dim) {
-    return (x > dim.x && x < dim.x + dim.w && y > dim.y && y < dim.y + dim.h);
+    return x > static_cast<int>(dim.x)
+        && x < static_cast<int>(dim.x + dim.w)
+        && y > static_cast<int>(dim.y)
+        && y < static_cast<int>(dim.y + dim.h);
 }
