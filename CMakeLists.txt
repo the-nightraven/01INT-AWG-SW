@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.30)
 project(01INT_AWG_SW)
 
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-DDEBUG=1)
+endif()
+
 set(CMAKE_CXX_FLAGS "-Wall -std=c++17 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_STANDARD 17)
 set(SDL2_PATH "C:/mingw64/x86_64-w64-mingw32")
@@ -68,6 +72,7 @@ include_directories(src/app)
 include_directories(src/player)
 include_directories(libs)
 include_directories(libs/ui_elements)
+include_directories(libs/tiny_xml)
 
 add_executable(01INT_AWG_SW
     libs/debug/debugger.cpp
@@ -98,7 +103,9 @@ add_executable(01INT_AWG_SW
     main.cpp
     libs/includes.h
     libs/ui_elements/touchable/touchable.cpp
-    libs/ui_elements/touchable/touchable.h)
+    libs/ui_elements/touchable/touchable.h
+    libs/tiny_xml/tinyxml2.cpp
+    libs/tiny_xml/tinyxml2.h)
 
 target_link_libraries(
         ${PROJECT_NAME}
