@@ -96,6 +96,27 @@ typedef struct RendererComponent_Typedef {
 } RendererComponent_Typedef;
 
 
+//scenes
+typedef struct SceneComponent_TypeDef {
+    bool continuous_update;
+    bool evt_type;
+    void* update_cb;
+    void* evt_def;
+    RendererComponent_Typedef rnd_component;
+} SceneComponent_TypeDef;
+
+typedef struct Scene_TypeDef {
+    SceneComponent_TypeDef* components;
+} Scene_TypeDef;
+
+typedef struct SceneItem_TypeDef {
+    int type;
+    int scene_id;
+    Scene_TypeDef scene;
+    SceneItem_TypeDef *next;
+} SceneItem_TypeDef;
+
+
 //engine monitor
 typedef struct EvtModule_TypeDef {
     bool status;

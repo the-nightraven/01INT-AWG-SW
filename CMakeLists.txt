@@ -105,7 +105,9 @@ add_executable(01INT_AWG_SW
     libs/ui_elements/touchable/touchable.cpp
     libs/ui_elements/touchable/touchable.h
     libs/tiny_xml/tinyxml2.cpp
-    libs/tiny_xml/tinyxml2.h)
+    libs/tiny_xml/tinyxml2.h
+        libs/ui_elements/scene/scene.cpp
+        libs/ui_elements/scene/scene.h)
 
 target_link_libraries(
         ${PROJECT_NAME}
