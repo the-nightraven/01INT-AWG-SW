@@ -38,6 +38,8 @@ typedef struct AWG_Rect {
     float h;
 } AWG_Rect;
 
+//maybe add control stacks
+
 typedef struct UpdateCallback_TypeDef{
     bool flag;
     void* value;
@@ -97,22 +99,23 @@ typedef struct RendererComponent_Typedef {
 
 
 //scenes
+//event stack
+//updatestack
+
 typedef struct SceneComponent_TypeDef {
     bool continuous_update;
     bool evt_type;
-    void* update_cb;
+    void* update_def;
     void* evt_def;
     RendererComponent_Typedef rnd_component;
+    SceneComponent_TypeDef* next;
 } SceneComponent_TypeDef;
-
-typedef struct Scene_TypeDef {
-    SceneComponent_TypeDef* components;
-} Scene_TypeDef;
 
 typedef struct SceneItem_TypeDef {
     int type;
     int scene_id;
-    Scene_TypeDef scene;
+    char* name;
+    SceneComponent_TypeDef* scene_comp_list;
     SceneItem_TypeDef *next;
 } SceneItem_TypeDef;
 

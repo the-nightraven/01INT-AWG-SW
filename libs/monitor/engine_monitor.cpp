@@ -82,8 +82,6 @@ void* debugger_get_rndrstack_instance() {
 }
 
 
-
-
 DWORD WINAPI updater_thread_lifecycle(LPVOID lpParam) {
     int status;
     while(engine_components.updater_module.th_isRunning) {

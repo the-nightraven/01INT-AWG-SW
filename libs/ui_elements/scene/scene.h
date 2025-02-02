@@ -21,6 +21,8 @@ and change, but not for commercial use
 #ifndef SCENE_H
 #define SCENE_H
 
+#define SCENES_TAG       "SCEN"
+
 #include "includes.h"
 
 G_STATUS scenes_init();
@@ -28,10 +30,20 @@ G_STATUS scenes_deinit();
 
 G_STATUS scene_load(int scene_id);
 
+G_STATUS scene_add(SceneItem_TypeDef scene);
+G_STATUS scene_remove(const char* name, int id);
 
 //helpers
-G_STATUS scene_clear(int scene_id);
+G_STATUS scene_init_comp_list();
+G_STATUS scene_deinit_comp_list();
+G_STATUS scene_add_comp(SceneComponent_TypeDef comp);
+SceneComponent_TypeDef* scene_get_comp_list();
+SceneComponent_TypeDef* scene_comp_to_obj(SceneComponent_TypeDef comp);
+
+
+SceneItem_TypeDef* scene_item_to_obj(SceneItem_TypeDef scene);
+G_STATUS scene_clear();
 G_STATUS scene_load_components(int scene_id);
-SceneItem_TypeDef* scene_get_scene_item(int scene_id);
+SceneItem_TypeDef* scene_get_scene_item(const char* name, int scene_id);
 
 #endif //SCENE_H
