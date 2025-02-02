@@ -28,6 +28,7 @@ and change, but not for commercial use
 #include "updater.h"
 #include "renderer.h"
 #include "debugger.h"
+#include "ui_elements/scene/scene.h"
 
 #define MON_TAG          "ENG"
 #define EVT_WILDCARD     1

@@ -57,9 +57,10 @@ G_STATUS debugger_stop_th() {
 
 G_STATUS debugger_register_event(void* evt, int wildcard) {
     if(wildcard == DEBUGGER_KEY_EVT) {
-        return register_key_event(static_cast<KeyEvt_TypeDef *>(evt));
-    }else if(wildcard == DEBUGGER_SYS_EVT) {
-        return register_sys_event(static_cast<SysEvt_TypeDef *>(evt));
+        return register_key_event(ENGINE_ESSENTIAL_COMPONENT, static_cast<KeyEvt_TypeDef *>(evt));
+    }
+    if(wildcard == DEBUGGER_SYS_EVT) {
+        return register_sys_event(ENGINE_ESSENTIAL_COMPONENT, static_cast<SysEvt_TypeDef *>(evt));
     }
     return G_STATUS_FAIL;
 }
@@ -80,6 +81,16 @@ void* debugger_get_evtstack_instance(int wildcard) {
 void* debugger_get_rndrstack_instance() {
     return renderer_get_list();
 }
+
+//add scenes module typedef
+G_STATUS scene_sys_clear_components() {
+    return G_STATUS_OK;
+}
+
+G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list) {
+    return G_STATUS_OK;
+}
+
 
 
 DWORD WINAPI updater_thread_lifecycle(LPVOID lpParam) {
@@ -262,7 +273,7 @@ G_STATUS monitor_register_comp() {
     G_STATUS status;
     UpdateCallback_TypeDef sysExit = {false, &engine_components.isRunning, end_game};
     SysEvt_TypeDef sysExit_evt = {SDL_QUIT, sysExit};
-    status = register_sys_event(&sysExit_evt);
+    status = register_sys_event(ENGINE_ESSENTIAL_COMPONENT, &sysExit_evt);
 
     if(status == G_STATUS_FAIL) {
         log_error(MON_TAG, "Cannot register QUIT event", G_STATUS_FAIL);
@@ -272,7 +283,7 @@ G_STATUS monitor_register_comp() {
 
     UpdateCallback_TypeDef forcedSysExit = {false, nullptr, force_end_game};
     KeyEvt_TypeDef forcedSysExit_evt = {FORCE_QUIT_KEY, forcedSysExit, DEFAULT_UPDATER_CB, false};
-    status = register_key_event(&forcedSysExit_evt);
+    status = register_key_event(ENGINE_ESSENTIAL_COMPONENT, &forcedSysExit_evt);
 
     if(status == G_STATUS_FAIL) {
         log_error(MON_TAG, "Cannot register FORCE_QUIT key event", G_STATUS_FAIL);
@@ -282,7 +293,7 @@ G_STATUS monitor_register_comp() {
 
     UpdateCallback_TypeDef fullscreen_t = {false, &engine_components.fullScreen, toggle_fullscreen};
     KeyEvt_TypeDef fullscreen_t_evt = {FULLSCREEN_KEY, fullscreen_t, DEFAULT_UPDATER_CB, false};
-    status = register_key_event(&fullscreen_t_evt);
+    status = register_key_event(ENGINE_ESSENTIAL_COMPONENT, &fullscreen_t_evt);
 
     if(status == G_STATUS_FAIL) {
         log_error(MON_TAG, "Cannot register FULLSCREEN key event", G_STATUS_FAIL);

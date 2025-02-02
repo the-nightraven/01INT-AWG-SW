@@ -23,7 +23,9 @@ and change, but not for commercial use
 
 #include "includes.h"
 
-#define DEFAULT_UPDATER_CB         (UpdateCallback_TypeDef){false, nullptr, nullptr}
+#define DEFAULT_UPDATER_CB             (UpdateCallback_TypeDef){false, nullptr, nullptr}
+#define ENGINE_ESSENTIAL_COMPONENT     true
+#define ENGINE_NONESSENTIAL_COMPONENT  false
 
 //data types
 typedef int RendererComponentHandler;
@@ -67,21 +69,25 @@ typedef struct MouseEvt_TypeDef {
 } MouseEvt_TypeDef;
 
 typedef struct SysEvtItem_TypeDef {
+    bool essential;
     SysEvt_TypeDef evt;
     SysEvtItem_TypeDef *next;
 } SysEvtItem_TypeDef;
 
 typedef struct KeyEvtItem_TypeDef {
+    bool essential;
     KeyEvt_TypeDef evt;
     KeyEvtItem_TypeDef *next;
 } KeyEvtItem_TypeDef;
 
 typedef struct MouseEvtItem_TypeDef {
+    bool essential;
     MouseEvt_TypeDef evt;
     MouseEvtItem_TypeDef *next;
 } MouseEvtItem_TypeDef;
 
 typedef struct UpdateComponent_Typedef {
+    bool essential;
     void* value;
     void (*comp_callback)(void*);
     UpdateComponent_Typedef* next;

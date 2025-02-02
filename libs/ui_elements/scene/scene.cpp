@@ -45,6 +45,18 @@ G_STATUS scenes_deinit() {
         return G_STATUS_FAIL;
     }
     //free list
+    SceneItem_TypeDef* head = scenes_list;
+    SceneItem_TypeDef* curr;
+
+    while(head != nullptr) {
+        curr = head;
+        head = curr->next;
+        free(curr->name);
+        //comp free workaround
+        temp_comp_list = curr->scene_comp_list;
+        scene_deinit_comp_list();
+        free(curr);
+    }
 
     len = 0;
     mod_init = 0;
@@ -85,7 +97,7 @@ G_STATUS scene_remove(const char* name, int id) {
     return G_STATUS_OK;
 }
 
-G_STATUS scene_load(int scene_id) {
+G_STATUS scene_load(const char* name, int scene_id) {
     if(mod_init == 0) {
         log_error(SCENES_TAG, "Module not inited", -1);
         return G_STATUS_FAIL;
@@ -96,7 +108,7 @@ G_STATUS scene_load(int scene_id) {
         return G_STATUS_FAIL;
     }
 
-    if(scene_load_components(scene_id) == G_STATUS_FAIL) {
+    if(scene_load_components(name, scene_id) == G_STATUS_FAIL) {
         log_error(SCENES_TAG, "Cannot load scene", -1);
         return G_STATUS_FAIL;
     }
@@ -124,7 +136,15 @@ G_STATUS scene_deinit_comp_list() {
         return G_STATUS_FAIL;
     }
 
-    //free list
+
+    SceneComponent_TypeDef* head = temp_comp_list;
+    SceneComponent_TypeDef* curr;
+
+    while(head != nullptr) {
+        curr = head;
+        head = head->next;
+        free(curr);
+    }
 
     comp_init = 0;
     log_info(SCENES_TAG, "Deinited component list");
@@ -206,13 +226,29 @@ SceneItem_TypeDef* scene_item_to_obj(SceneItem_TypeDef scene) {
 }
 
 G_STATUS scene_clear() {
+    if(mod_init == 0) {
+        log_error(SCENES_TAG, "Module not inited", -1);
+        return G_STATUS_FAIL;
+    }
     //clear evt, upd, rnd components via extern function
-    return G_STATUS_OK;
+    return scene_sys_clear_components();
 }
 
-G_STATUS scene_load_components(int scene_id) {
+G_STATUS scene_load_components(const char* name, int scene_id) {
+    if(mod_init == 0) {
+        log_error(SCENES_TAG, "Module not inited", -1);
+        return G_STATUS_FAIL;
+    }
+
     //load evt, updt, rnd components via extern funtion
-    return G_STATUS_OK;
+
+    SceneItem_TypeDef* item = scene_get_scene_item(name, scene_id);
+    if(item == nullptr) {
+        log_error(SCENES_TAG, "Cannot find scene", -1);
+        return G_STATUS_FAIL;
+    }
+
+    return scene_sys_load_components(item->scene_comp_list);
 }
 
 SceneItem_TypeDef* scene_get_scene_item(const char* name, int scene_id) {

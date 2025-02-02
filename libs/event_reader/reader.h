@@ -33,17 +33,17 @@ and change, but not for commercial use
 //reader utils
 G_STATUS evt_init();
 G_STATUS evt_deinit();
-G_STATUS register_sys_event(SysEvt_TypeDef* evt);
-G_STATUS register_key_event(KeyEvt_TypeDef* evt);
-G_STATUS register_mouse_event(MouseEvt_TypeDef* evt);
+G_STATUS register_sys_event(bool essential, SysEvt_TypeDef* evt);
+G_STATUS register_key_event(bool essential, KeyEvt_TypeDef* evt);
+G_STATUS register_mouse_event(bool essential, MouseEvt_TypeDef* evt);
 
 G_STATUS poll_events(SDL_Event *e);
 
 //conatiner utils
-G_STATUS add_event_item(uint8_t type_flag, void *list, void *item);
+G_STATUS add_event_item(uint8_t type_flag, void *list, void *item, bool essential);
 void* get_event_by_hook(uint8_t type_flag, void *list, int hook);
 void* get_event_by_mpos(int x, int y);
-void* init_event_list(uint8_t type_flag, void *item);
+void* init_event_list(uint8_t type_flag, void *item, bool essential);
 void* get_event_list(uint8_t type_flag);
 
 //event control

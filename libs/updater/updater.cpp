@@ -19,6 +19,8 @@ and change, but not for commercial use
 */
 
 #include "updater.h"
+
+#include "logger.h"
 #include "reader.h"
 
 uint32_t u_ticks_count;
@@ -76,7 +78,8 @@ UpdateComponent_Typedef* updater_component_to_instance(UpdateComponent_Typedef i
 
 G_STATUS call_updater(UpdateCallback_TypeDef *target) {
     if(target == nullptr) {
-        return G_STATUS_FAIL;
+        log_error("UPDT", "Function was null", -2);
+        return G_STATUS_OK;
     }
 
     target->obj_callback(target->value);
@@ -159,7 +162,6 @@ G_STATUS update_sys_events(SysEvtItem_TypeDef *list) {
     return G_STATUS_OK;
 }
 
-//@TODO: may cause segfault because some functions are actually nullptr
 G_STATUS update_key_events(KeyEvtItem_TypeDef *list) {
     G_STATUS status;
     
