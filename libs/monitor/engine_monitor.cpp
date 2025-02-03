@@ -84,10 +84,21 @@ void* debugger_get_rndrstack_instance() {
 
 //add scenes module typedef
 G_STATUS scene_sys_clear_components() {
+    evt_clear_nonessential();
+    updater_clear_comp_nonessentials();
+    renderer_clear_stack();
     return G_STATUS_OK;
 }
 
 G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list) {
+
+    //loop through list
+    //register events with noness
+    //register updater comp if needed with noess
+    //register renderer components with noess
+
+    //return
+
     return G_STATUS_OK;
 }
 

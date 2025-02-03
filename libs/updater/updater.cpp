@@ -87,7 +87,36 @@ G_STATUS call_updater(UpdateCallback_TypeDef *target) {
     return G_STATUS_OK;
 }
 
+void updater_clear_comp_nonessentials() {
+    UpdateComponent_Typedef* ind = update_comp_list;
+    if(ind == nullptr) {
+#if DEBUG
+        log_debug(EVT_TAG, "key list is already empty", -2);
+#endif
+        return;
+    }
 
+    UpdateComponent_Typedef* prev = nullptr;
+
+    while(ind != nullptr) {
+        if(ind->essential == ENGINE_NONESSENTIAL_COMPONENT) {
+            if(prev == nullptr) {
+                update_comp_list = update_comp_list->next;
+                free(ind);
+                ind = update_comp_list;
+            }else {
+                prev->next = ind->next;
+                free(ind);
+                ind = prev->next;
+            }
+        }else {
+            prev = ind;
+            ind = ind->next;
+        }
+    }
+
+    return;
+}
 
 G_STATUS updater_run_time_delta() {
     G_STATUS status;

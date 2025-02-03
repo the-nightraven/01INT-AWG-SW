@@ -24,6 +24,8 @@ and change, but not for commercial use
 //@TODO: Xbox Controller support          WIP
 
 #include "reader.h"
+
+#include "logger.h"
 #include "updater.h"
 
 
@@ -197,6 +199,110 @@ G_STATUS poll_events(SDL_Event* e) {
         }
     }
     return G_STATUS_OK;
+}
+
+void evt_clear_nonessential() {
+    evt_clear_key_nonessential();
+    evt_clear_mouse_nonessential();
+    evt_clear_sys_nonessential();
+    log_info(EVT_TAG, "Cleared nonessentials");
+    return;
+}
+
+void evt_clear_key_nonessential() {
+
+    KeyEvtItem_TypeDef* ind = key_list;
+    if(ind == nullptr) {
+#if DEBUG
+        log_debug(EVT_TAG, "key list is already empty", -2);
+#endif
+        return;
+    }
+
+    KeyEvtItem_TypeDef* prev = nullptr;
+
+    while(ind != nullptr) {
+        if(ind->essential == ENGINE_NONESSENTIAL_COMPONENT) {
+            if(prev == nullptr) {
+                key_list = key_list->next;
+                free(ind);
+                ind = key_list;
+            }else {
+                prev->next = ind->next;
+                free(ind);
+                ind = prev->next;
+            }
+        }else {
+            prev = ind;
+            ind = ind->next;
+        }
+    }
+
+    return;
+}
+
+void evt_clear_mouse_nonessential() {
+
+    MouseEvtItem_TypeDef* ind = mouse_list;
+    if(ind == nullptr) {
+#if DEBUG
+        log_debug(EVT_TAG, "key list is already empty", -2);
+#endif
+        return;
+    }
+
+    MouseEvtItem_TypeDef* prev = nullptr;
+
+    while(ind != nullptr) {
+        if(ind->essential == ENGINE_NONESSENTIAL_COMPONENT) {
+            if(prev == nullptr) {
+                mouse_list = mouse_list->next;
+                free(ind);
+                ind = mouse_list;
+            }else {
+                prev->next = ind->next;
+                free(ind);
+                ind = prev->next;
+            }
+        }else {
+            prev = ind;
+            ind = ind->next;
+        }
+    }
+
+    return;
+}
+
+void evt_clear_sys_nonessential() {
+
+    SysEvtItem_TypeDef* ind = sys_list;
+    if(ind == nullptr) {
+#if DEBUG
+        log_debug(EVT_TAG, "key list is already empty", -2);
+#endif
+        return;
+    }
+
+    SysEvtItem_TypeDef* prev = nullptr;
+
+    while(ind != nullptr) {
+        if(ind->essential == ENGINE_NONESSENTIAL_COMPONENT) {
+            if(prev == nullptr) {
+                sys_list = sys_list->next;
+                free(ind);
+                ind = sys_list;
+            }else {
+                prev->next = ind->next;
+                free(ind);
+                ind = prev->next;
+            }
+        }else {
+            prev = ind;
+            ind = ind->next;
+        }
+    }
+
+    return;
 }
 
 G_STATUS add_event_item(uint8_t type_flag, void *list, void *item, bool essential) {

@@ -25,6 +25,9 @@ and change, but not for commercial use
 
 #include "includes.h"
 
+#define SCENE_MODE_ON_TOP    0x00
+#define SCENE_MODE_CLEAR     0x01
+
 //externs
 extern G_STATUS scene_sys_clear_components();
 extern G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list);
@@ -34,7 +37,7 @@ extern G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list);
 G_STATUS scenes_init();
 G_STATUS scenes_deinit();
 
-G_STATUS scene_load(const char* name, int scene_id);
+G_STATUS scene_load(const char* name, int scene_id, int mode);
 
 G_STATUS scene_add(SceneItem_TypeDef scene);
 G_STATUS scene_remove(const char* name, int id);

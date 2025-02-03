@@ -93,6 +93,7 @@ typedef struct UpdateComponent_Typedef {
     UpdateComponent_Typedef* next;
 } UpdateComponent_Typedef;
 
+//@TODO add object free method pointer
 typedef struct RendererComponent_Typedef {
     RendererComponentHandler handler;
     char* name;

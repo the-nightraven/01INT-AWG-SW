@@ -19,6 +19,7 @@ and change, but not for commercial use
 */
 
 #include "renderer.h"
+#include "logger.h"
 
 RendererComponent_Typedef* renderer_visible_list;
 RendererComponentHandler obj_handler_counter;
@@ -71,27 +72,59 @@ RendererComponentHandler renderer_register_component(RendererComponent_Typedef i
 }
 
 G_STATUS renderer_remove_component(RendererComponentHandler handler) {
-    RendererComponent_Typedef* prev = renderer_visible_list;
+    RendererComponent_Typedef* prev = nullptr;
     RendererComponent_Typedef* curr = renderer_visible_list;
 
-    bool found = false;
-    while(curr != nullptr  && !found) {
-        if(curr->handler == handler) {
-            found = true;
-            prev->next = curr->next;
-            free(curr->name);
-            free(curr);
-        }
-        if(!found) {
-            prev = curr;
-            curr = curr->next;
-        }
+    if(curr == nullptr) {
+#if DEBUG
+        log_debug("RNDR", "List is empty", -2);
+#endif
+        return G_STATUS_FAIL;
     }
-    
-    if(found) {
+
+    if(curr->handler == handler) {
+        renderer_visible_list = renderer_visible_list->next;
+        free(curr);
         return G_STATUS_OK;
     }
-    return G_STATUS_FAIL;
+
+    while(curr != nullptr &&  curr->handler != handler) {
+        prev = curr;
+        curr = curr->next;
+    }
+    
+    if(curr == nullptr) {
+#if DEBUG
+        log_debug("RNDR", "No handler found", -2);
+#endif
+        return G_STATUS_FAIL;
+    }
+
+    prev->next = curr->next;
+    return G_STATUS_OK;
+}
+
+//@TODO add object free method pointer
+void renderer_clear_stack() {
+    if(renderer_visible_list == nullptr) {
+        log_error(RENDERER_TAG, "List already empty", -1);
+        return;
+    }
+
+    RendererComponent_Typedef* curr = renderer_visible_list;
+    RendererComponent_Typedef* next = nullptr;
+
+    while(curr != nullptr) {
+        next = curr->next;
+        free(curr->name);
+        free(curr->object);
+        free(curr);
+        curr = next;
+    }
+
+    renderer_visible_list = nullptr;
+    obj_handler_counter = 0;
+    return;
 }
 
 void renderer_create_frame(SDL_Renderer** renderer) {

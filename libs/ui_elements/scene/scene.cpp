@@ -97,7 +97,7 @@ G_STATUS scene_remove(const char* name, int id) {
     return G_STATUS_OK;
 }
 
-G_STATUS scene_load(const char* name, int scene_id) {
+G_STATUS scene_load(const char* name, int scene_id, int mode) {
     if(mod_init == 0) {
         log_error(SCENES_TAG, "Module not inited", -1);
         return G_STATUS_FAIL;

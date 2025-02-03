@@ -37,6 +37,8 @@ G_STATUS renderer_remove_component(RendererComponentHandler handler);
 void renderer_create_frame(SDL_Renderer** renderer);
 RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item);
 
+void renderer_clear_stack();
+
 //externs
 extern RenderEngine renderer_get_engine();
 

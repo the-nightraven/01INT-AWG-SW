@@ -50,21 +50,21 @@ G_STATUS player_register_events() {
     KeyEvt_TypeDef pl_move_r_evt = {SDL_SCANCODE_D, pl_move_r, pl_move_r_stop, true};
     KeyEvt_TypeDef pl_move_l_evt = {SDL_SCANCODE_A, pl_move_l, pl_move_l_stop, true};
 
-    status = register_key_event(&pl_move_l_evt);
+    status = register_key_event(ENGINE_NONESSENTIAL_COMPONENT, &pl_move_l_evt);
     if(status == G_STATUS_FAIL) {
         log_error(PLAYER_TAG, "Cannot regsiter key event", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
     log_info(PLAYER_TAG, "Registered key event on A");
 
-    status = register_key_event(&pl_move_r_evt);
+    status = register_key_event(ENGINE_NONESSENTIAL_COMPONENT, &pl_move_r_evt);
     if(status == G_STATUS_FAIL) {
         log_error(PLAYER_TAG, "Cannot regsiter key event", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
     log_info(PLAYER_TAG, "Registered key event on D");
 
-    UpdateComponent_Typedef player_movement = {get_player_instance(), process_player_movement};
+    UpdateComponent_Typedef player_movement = {ENGINE_NONESSENTIAL_COMPONENT, get_player_instance(), process_player_movement};
     status = register_update_components(player_movement);
     if(status == G_STATUS_FAIL) {
         log_error(PLAYER_TAG, "Cannot register player movement cb", -1);
@@ -77,7 +77,7 @@ G_STATUS player_register_events() {
     UpdateCallback_TypeDef pl_hov_in = {false, nullptr, player_hover_in_cb};
     UpdateCallback_TypeDef pl_hov_out = {false, nullptr, player_hover_out_cb};
     MouseEvt_TypeDef pl_click_evt = {&player.dimensions, false, pl_hov_in, pl_hov_out, pl_click};
-    status = register_mouse_event(&pl_click_evt);
+    status = register_mouse_event(ENGINE_NONESSENTIAL_COMPONENT, &pl_click_evt);
     if(status == G_STATUS_FAIL) {
         log_error(PLAYER_TAG, "Cannot register mouse event", G_STATUS_FAIL);
         return G_STATUS_FAIL;
