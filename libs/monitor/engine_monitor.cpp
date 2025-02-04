@@ -24,6 +24,17 @@ and change, but not for commercial use
 //vars
 MonitorComponents_TypeDef engine_components;
 
+//temporary until scenes has component
+bool CHANGE_SCENES_FLAG = false;
+auto* scene_ch_name = static_cast<char *>(malloc(sizeof(char) * 64));
+int SCENE_MODE = -1;
+
+void change_scene_rename(const char* newname, int mode) {
+    CHANGE_SCENES_FLAG = true;
+    strcpy(scene_ch_name, newname);
+    SCENE_MODE = mode;
+}
+
 //externs
 RenderEngine renderer_get_engine() {
     return RENDERER_ENGINE_SDL2;
@@ -85,20 +96,105 @@ void* debugger_get_rndrstack_instance() {
 //add scenes module typedef
 G_STATUS scene_sys_clear_components() {
     evt_clear_nonessential();
+    log_debug(MON_TAG, "Cleared evt", -1);
     updater_clear_comp_nonessentials();
+    log_debug(MON_TAG, "Cleared updt", -1);
     renderer_clear_stack();
+    log_debug(MON_TAG, "Cleared rndr", -1);
     return G_STATUS_OK;
 }
 
-G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list) {
+G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list, int mode) {
+
+    //stop updater thread
+    monitor_stop_updating();
+
+    if(mode == SCENE_MODE_CLEAR) {
+        scene_sys_clear_components();
+    }
 
     //loop through list
-    //register events with noness
-    //register updater comp if needed with noess
-    //register renderer components with noess
+    SceneComponent_TypeDef* ind = comp_list;
+    G_STATUS status;
+
+    while(ind != nullptr) {
+        //register events with noness
+        KeyEvtItem_TypeDef* keind = ind->key_evt_def;
+        MouseEvtItem_TypeDef* meind = ind->mouse_evt_def;
+        SysEvtItem_TypeDef* seind = ind->sys_evt_def;
+
+        while(keind != nullptr) {
+            printf("HERE KEY\n");
+            printf("KEY SCANCODE:\n");
+            status = register_key_event(ENGINE_NONESSENTIAL_COMPONENT, &keind->evt);
+            if(status != G_STATUS_OK) {
+                log_error(MON_TAG, "Failed to add key event", -1);
+                return status;
+            }
+            keind = keind->next;
+        }
+        if(keind != nullptr) {
+            log_info(MON_TAG, "Registered key events");
+        }
+
+        while(meind != nullptr) {
+            printf("HERE MOUSE\n");
+            status = register_mouse_event(ENGINE_NONESSENTIAL_COMPONENT, &meind->evt);
+            if(status != G_STATUS_OK) {
+                log_error(MON_TAG, "Failed to add mouse event", -1);
+                return status;
+            }
+            meind = meind->next;
+        }
+        if(meind != nullptr) {
+            log_info(MON_TAG, "Registered mouse events");
+        }
+
+        while(seind != nullptr) {
+            printf("HERE SYS\n");
+            status = register_sys_event(ENGINE_NONESSENTIAL_COMPONENT, &seind->evt);
+            if(status != G_STATUS_OK) {
+                log_error(MON_TAG, "Failed to add sys event", -1);
+                return status;
+            }
+            seind = seind->next;
+        }
+        if(seind != nullptr) {
+            log_info(MON_TAG, "Registered system events");
+        }
+
+        //register updater comp if needed with noess
+        UpdateComponent_Typedef* ucind = ind->update_def;
+        while(ucind != nullptr) {
+            ucind->essential = ENGINE_NONESSENTIAL_COMPONENT; //privilege escalation guard
+            status = register_update_components(*ucind);
+            if(status != G_STATUS_OK) {
+                log_error(MON_TAG, "Failed to add updater component", -1);
+                return status;
+            }
+            ucind = ucind->next;
+        }
+        if(ucind != nullptr) {
+            log_info(MON_TAG, "Registered updater components");
+        }
+
+        //register renderer components with noess
+        if(ind->rnd_component != nullptr) {
+            RendererComponent_Typedef* rcind = ind->rnd_component;
+            renderer_register_component(*rcind);
+            //loopback handler to object
+
+            log_info(MON_TAG, "Registered renderer component");
+        }
+
+
+        ind = ind->next;
+    }
+
+    //start updater
+    monitor_start_updating();
 
     //return
-
     return G_STATUS_OK;
 }
 
@@ -201,6 +297,12 @@ G_STATUS monitor_init_modules() {
     //feed into component list
     engine_components.renderer_module.status = true;
 
+    //init scenes
+    status = scenes_init();
+    if(status == G_STATUS_FAIL) {
+        return status;
+    }
+
     return G_STATUS_OK;
 }
 
@@ -256,6 +358,9 @@ G_STATUS monitor_deinit_modules() {
     //thread joins
     monitor_stop_updating();
     log_info(MON_TAG, "Unforked updater thread safely");
+
+    monitor_stop_debug();
+    log_info(MON_TAG, "Unforked debug thread safely");
 
     //evt deinit
     evt_deinit();
@@ -315,6 +420,12 @@ G_STATUS monitor_register_comp() {
 }
 
 G_STATUS monitor_process_loop() {
+
+    //actually change scenes here
+    if(CHANGE_SCENES_FLAG) {
+        scene_load(scene_ch_name, 0, SCENE_MODE);
+        CHANGE_SCENES_FLAG = false;
+    }
 
     //chrono start
     const std::chrono::time_point start_timer = std::chrono::high_resolution_clock::now();

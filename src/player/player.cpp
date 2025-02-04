@@ -23,12 +23,15 @@ and change, but not for commercial use
 #include "updater.h"
 #include "reader.h"
 #include "logger.h"
+#include "scene/scene.h"
 
 Player_Typedef player;
 bool is_init = false;
+SceneItem_TypeDef player_scene;
 
 //functions
 G_STATUS init_player() {
+    player.rnd_handler = -1;
     player.dimensions.w = PLAYER_SIZE_W;
     player.dimensions.h = PLAYER_SIZE_H;
     player.dimensions.x = PLAYER_START_X;
@@ -42,6 +45,7 @@ G_STATUS init_player() {
 G_STATUS player_register_events() {
     G_STATUS status;
 
+    //evt stack
     UpdateCallback_TypeDef pl_move_r = {false, &player, player_move_right};
     UpdateCallback_TypeDef pl_move_l = {false, &player, player_move_left};
     UpdateCallback_TypeDef pl_move_r_stop = {false, &player, player_stop_move_right};
@@ -50,39 +54,42 @@ G_STATUS player_register_events() {
     KeyEvt_TypeDef pl_move_r_evt = {SDL_SCANCODE_D, pl_move_r, pl_move_r_stop, true};
     KeyEvt_TypeDef pl_move_l_evt = {SDL_SCANCODE_A, pl_move_l, pl_move_l_stop, true};
 
-    status = register_key_event(ENGINE_NONESSENTIAL_COMPONENT, &pl_move_l_evt);
-    if(status == G_STATUS_FAIL) {
-        log_error(PLAYER_TAG, "Cannot regsiter key event", G_STATUS_FAIL);
-        return G_STATUS_FAIL;
-    }
-    log_info(PLAYER_TAG, "Registered key event on A");
+    KeyEvtItem_TypeDef pl_mv_r_evt = {ENGINE_NONESSENTIAL_COMPONENT, pl_move_r_evt, nullptr};
+    KeyEvtItem_TypeDef pl_mv_l_evt = {ENGINE_NONESSENTIAL_COMPONENT, pl_move_l_evt, nullptr};
 
-    status = register_key_event(ENGINE_NONESSENTIAL_COMPONENT, &pl_move_r_evt);
-    if(status == G_STATUS_FAIL) {
-        log_error(PLAYER_TAG, "Cannot regsiter key event", G_STATUS_FAIL);
-        return G_STATUS_FAIL;
-    }
-    log_info(PLAYER_TAG, "Registered key event on D");
+    KeyEvtItem_TypeDef* ppmr = &pl_mv_r_evt;
+    KeyEvtItem_TypeDef* ppml = &pl_mv_l_evt;
 
-    UpdateComponent_Typedef player_movement = {ENGINE_NONESSENTIAL_COMPONENT, get_player_instance(), process_player_movement};
-    status = register_update_components(player_movement);
-    if(status == G_STATUS_FAIL) {
-        log_error(PLAYER_TAG, "Cannot register player movement cb", -1);
-        return G_STATUS_FAIL;
-    }
-    log_info(PLAYER_TAG, "Registered player movement callback");
+    ppmr->next = ppml;
+    ppml->next = nullptr;
+
+
+    //update stack
+    UpdateComponent_Typedef player_movement = {ENGINE_NONESSENTIAL_COMPONENT, get_player_instance(), process_player_movement, nullptr};
+
+
+    //rnd stack
+    RendererComponent_Typedef player_render = {0, "Player", true, get_player_instance(), 1, player_render_cb, nullptr};
 
     //test click
     UpdateCallback_TypeDef pl_click = {false, nullptr, player_click_cb};
     UpdateCallback_TypeDef pl_hov_in = {false, nullptr, player_hover_in_cb};
     UpdateCallback_TypeDef pl_hov_out = {false, nullptr, player_hover_out_cb};
     MouseEvt_TypeDef pl_click_evt = {&player.dimensions, false, pl_hov_in, pl_hov_out, pl_click};
-    status = register_mouse_event(ENGINE_NONESSENTIAL_COMPONENT, &pl_click_evt);
-    if(status == G_STATUS_FAIL) {
-        log_error(PLAYER_TAG, "Cannot register mouse event", G_STATUS_FAIL);
-        return G_STATUS_FAIL;
-    }
-    log_info(PLAYER_TAG, "Registered mouse event on click");
+
+    MouseEvtItem_TypeDef mevt = {ENGINE_NONESSENTIAL_COMPONENT, pl_click_evt, nullptr};
+    MouseEvtItem_TypeDef* pmevt = &mevt;
+    pmevt->next = nullptr;
+
+    SceneComponent_TypeDef start_comp = {&player_movement, ppmr, pmevt, nullptr, &player_render, nullptr};
+
+    player_scene.name = "Player";
+    player_scene.active = false;
+    player_scene.type = 0;
+    player_scene.scene_comp_list = &start_comp;
+    player_scene.next = nullptr;
+
+    scene_add(player_scene);
 
     return G_STATUS_OK;
 }
@@ -144,4 +151,9 @@ void player_hover_in_cb(void* val) {
 
 void player_hover_out_cb(void* val) {
     log_info(PLAYER_TAG, "Player hover out");
+}
+
+G_STATUS player_set_active() {
+    scene_load("Player", 0, SCENE_MODE_CLEAR);
+    return G_STATUS_OK;
 }

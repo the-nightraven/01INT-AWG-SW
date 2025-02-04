@@ -36,17 +36,19 @@ G_STATUS updater_init() {
 }
 
 G_STATUS updater_deinit() {
-    UpdateComponent_Typedef* prev = update_comp_list;
-    UpdateComponent_Typedef* curr = update_comp_list->next;
+    if(update_comp_list != nullptr) {
+        UpdateComponent_Typedef* prev = update_comp_list;
+        UpdateComponent_Typedef* curr = update_comp_list->next;
 
-    do {
-        free(prev);
-        prev = curr;
+        do {
+            free(prev);
+            prev = curr;
 
-        if(curr != nullptr) {
-            curr = curr->next;
-        }
-    }while(curr != nullptr);
+            if(curr != nullptr) {
+                curr = curr->next;
+            }
+        }while(curr != nullptr);
+    }
 
     return G_STATUS_OK;
 }
@@ -64,6 +66,7 @@ G_STATUS register_update_components(UpdateComponent_Typedef component) {
 
         tmp->next = updater_component_to_instance(component);
     }
+    log_info("UPDT", "Adding update to list");
     return G_STATUS_OK;
 }
 
@@ -157,6 +160,8 @@ G_STATUS updater_run_time_delta() {
         return status;
     }
 
+
+
     //get component updates
     UpdateComponent_Typedef* tmp = update_comp_list;
 
@@ -165,7 +170,6 @@ G_STATUS updater_run_time_delta() {
         tmp->comp_callback(tmp->value);
         tmp = tmp->next;
     }
-
     return G_STATUS_OK;
 }
 

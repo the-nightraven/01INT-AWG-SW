@@ -45,43 +45,49 @@ G_STATUS evt_deinit() {
     //@TODO memory leak on component
 
     //sys
-    SysEvtItem_TypeDef* prev = sys_list;
-    SysEvtItem_TypeDef* curr = sys_list->next;
+    if(sys_list != nullptr) {
+        SysEvtItem_TypeDef* prev = sys_list;
+        SysEvtItem_TypeDef* curr = sys_list->next;
 
-    do{
-        free(prev);
-        prev = curr;
+        do{
+            free(prev);
+            prev = curr;
 
-        if(curr != nullptr) {
-            curr = curr->next;
-        }
-    }while(curr != nullptr);
+            if(curr != nullptr) {
+                curr = curr->next;
+            }
+        }while(curr != nullptr);
+    }
 
     //key
-    KeyEvtItem_TypeDef* prevk = key_list;
-    KeyEvtItem_TypeDef* currk = key_list->next;
+    if(key_list != nullptr) {
+        KeyEvtItem_TypeDef* prevk = key_list;
+        KeyEvtItem_TypeDef* currk = key_list->next;
 
-    do {
-        free(prevk);
-        prevk = currk;
+        do {
+            free(prevk);
+            prevk = currk;
 
-        if(currk != nullptr) {
-            currk = currk->next;
-        }
-    }while(currk != nullptr);
+            if(currk != nullptr) {
+                currk = currk->next;
+            }
+        }while(currk != nullptr);
+    }
 
     //mouse
-    MouseEvtItem_TypeDef* prevm = mouse_list;
-    MouseEvtItem_TypeDef* currm = mouse_list->next;
+    if(mouse_list != nullptr) {
+        MouseEvtItem_TypeDef* prevm = mouse_list;
+        MouseEvtItem_TypeDef* currm = mouse_list->next;
 
-    do {
-        free(prevm);
-        prevm = currm;
+        do {
+            free(prevm);
+            prevm = currm;
 
-        if(currm != nullptr) {
-            currm = currm->next;
-        }
-    }while(currm != nullptr);
+            if(currm != nullptr) {
+                currm = currm->next;
+            }
+        }while(currm != nullptr);
+    }
 
     return G_STATUS_OK;
 }
@@ -246,7 +252,7 @@ void evt_clear_mouse_nonessential() {
     MouseEvtItem_TypeDef* ind = mouse_list;
     if(ind == nullptr) {
 #if DEBUG
-        log_debug(EVT_TAG, "key list is already empty", -2);
+        log_debug(EVT_TAG, "mouse list is already empty", -2);
 #endif
         return;
     }
@@ -278,7 +284,7 @@ void evt_clear_sys_nonessential() {
     SysEvtItem_TypeDef* ind = sys_list;
     if(ind == nullptr) {
 #if DEBUG
-        log_debug(EVT_TAG, "key list is already empty", -2);
+        log_debug(EVT_TAG, "sys list is already empty", -2);
 #endif
         return;
     }
@@ -324,6 +330,7 @@ G_STATUS add_event_item(uint8_t type_flag, void *list, void *item, bool essentia
         }
         
         ind->next = static_cast<SysEvtItem_TypeDef *>(tmp);
+        log_info("EVNT", "Adding event to list");
         return G_STATUS_OK;
 
     }
@@ -336,6 +343,7 @@ G_STATUS add_event_item(uint8_t type_flag, void *list, void *item, bool essentia
         }
 
         ind->next = static_cast<KeyEvtItem_TypeDef *>(tmp);
+        log_info("EVNT", "Adding event to list");
         return G_STATUS_OK;
     }
 
@@ -347,6 +355,7 @@ G_STATUS add_event_item(uint8_t type_flag, void *list, void *item, bool essentia
         }
 
         ind->next = static_cast<MouseEvtItem_TypeDef *>(tmp);
+        log_info("EVNT", "Adding event to list");
         return G_STATUS_OK;
     }
 

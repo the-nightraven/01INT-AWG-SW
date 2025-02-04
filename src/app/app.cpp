@@ -23,6 +23,7 @@ and change, but not for commercial use
 
 
 #include "app.h"
+#include "game_scenes/menu/start_menu/start_menu.h"
 
 G_STATUS app_init() {
     G_STATUS status;
@@ -41,28 +42,28 @@ G_STATUS app_init() {
     }
     log_info(APP_TAG, "Inited engine modules");
 
-    status = init_player();
-    if(status == G_STATUS_FAIL) {
-        log_error(APP_TAG, "Cannot init player", -1);
-        return G_STATUS_FAIL;
-    }
-    log_info(APP_TAG, "Inited player");
+    // status = init_player();
+    // if(status == G_STATUS_FAIL) {
+    //     log_error(APP_TAG, "Cannot init player", -1);
+    //     return G_STATUS_FAIL;
+    // }
+    // log_info(APP_TAG, "Inited player");
 
-    status = player_register_events();
-    if(status == G_STATUS_FAIL) {
-        log_error(APP_TAG, "Cannot init player events", -1);
-        return G_STATUS_FAIL;
-    }
-    log_info(APP_TAG, "Inited player events");
+    // status = player_register_events();
+    // if(status == G_STATUS_FAIL) {
+    //     log_error(APP_TAG, "Cannot init player events", -1);
+    //     return G_STATUS_FAIL;
+    // }
+    // log_info(APP_TAG, "Inited player events");
 
     //register render components
-    RendererComponent_Typedef player_render = {0, "Player", true, get_player_instance(), 1, player_render_cb, nullptr};
-    status = renderer_register_component(player_render);
-    if(status == G_STATUS_FAIL) {
-        log_error(APP_TAG, "Cannot set player render function", -1);
-        return G_STATUS_FAIL;
-    }
-    log_info(APP_TAG, "Set player render function");
+    // RendererComponent_Typedef player_render = {0, "Player", true, get_player_instance(), 1, player_render_cb, nullptr};
+    // status = renderer_register_component(player_render);
+    // if(status == G_STATUS_FAIL) {
+    //     log_error(APP_TAG, "Cannot set player render function", -1);
+    //     return G_STATUS_FAIL;
+    // }
+    // log_info(APP_TAG, "Set player render function");
 
     status = monitor_init_window_module();
     if(status == G_STATUS_FAIL) {
@@ -80,10 +81,50 @@ G_STATUS app_init() {
 
     status = monitor_start_updating();
     if(status == G_STATUS_FAIL) {
-        log_error(APP_TAG, "Rendering did not start", -1);
+        log_error(APP_TAG, "updating did not start", -1);
         return G_STATUS_FAIL;
     }
-    log_info(APP_TAG, "Renderer forked successfuly");
+    log_info(APP_TAG, "updater forked successfuly");
+
+
+    //start menu test
+    status = init_start_menu();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot init start menu", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Inited start menu");
+
+    status = register_start_menu();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot register start menu", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Registered start menu");
+
+    status = init_player();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot init player", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Inited player");
+    status = player_register_events();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot register player", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Registered player");
+
+    status = start_menu_set_active();
+    if(status == G_STATUS_FAIL) {
+        log_error(APP_TAG, "Cannot activate start menu", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(APP_TAG, "Activated start menu");
+
+
+    //till here
+
 
     return G_STATUS_OK;
 }

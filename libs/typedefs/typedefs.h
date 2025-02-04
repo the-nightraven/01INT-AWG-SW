@@ -109,12 +109,13 @@ typedef struct RendererComponent_Typedef {
 //event stack
 //updatestack
 
+//TODO boil all events into one tpedef with type wildcard
 typedef struct SceneComponent_TypeDef {
-    bool continuous_update;
-    bool evt_type;
-    void* update_def;
-    void* evt_def;
-    RendererComponent_Typedef rnd_component;
+    UpdateComponent_Typedef* update_def;
+    KeyEvtItem_TypeDef* key_evt_def;
+    MouseEvtItem_TypeDef* mouse_evt_def;
+    SysEvtItem_TypeDef* sys_evt_def;
+    RendererComponent_Typedef* rnd_component;
     SceneComponent_TypeDef* next;
 } SceneComponent_TypeDef;
 
@@ -122,6 +123,7 @@ typedef struct SceneItem_TypeDef {
     int type;
     int scene_id;
     char* name;
+    bool active;
     SceneComponent_TypeDef* scene_comp_list;
     SceneItem_TypeDef *next;
 } SceneItem_TypeDef;

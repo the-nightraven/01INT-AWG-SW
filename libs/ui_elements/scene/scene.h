@@ -30,7 +30,7 @@ and change, but not for commercial use
 
 //externs
 extern G_STATUS scene_sys_clear_components();
-extern G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list);
+extern G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list, int mode);
 
 
 //core
@@ -53,7 +53,7 @@ SceneComponent_TypeDef* scene_comp_to_obj(SceneComponent_TypeDef comp);
 
 SceneItem_TypeDef* scene_item_to_obj(SceneItem_TypeDef scene);
 G_STATUS scene_clear();
-G_STATUS scene_load_components(const char* name, int scene_id);
+G_STATUS scene_load_components(const char* name, int scene_id, int mode);
 SceneItem_TypeDef* scene_get_scene_item(const char* name, int scene_id);
 
 #endif //SCENE_H

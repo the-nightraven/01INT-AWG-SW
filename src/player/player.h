@@ -32,6 +32,7 @@ and change, but not for commercial use
 #define PLAYER_START_Y         (float)WINDOW_HEIGHT / 2 - PLAYER_SIZE_H / 2
 
 typedef struct Player_Typedef {
+    RendererComponentHandler rnd_handler;
     AWG_Rect dimensions;
     float speed;
 } Player_Typedef;
@@ -57,5 +58,6 @@ void player_render_cb(void* player_ins, SDL_Renderer** renderer);
 void player_click_cb(void* val);
 void player_hover_in_cb(void* val);
 void player_hover_out_cb(void* val);
+G_STATUS player_set_active();
 
 #endif

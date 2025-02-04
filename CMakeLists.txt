@@ -70,6 +70,7 @@ include_directories(libs/updater)
 include_directories(libs/window)
 include_directories(src/app)
 include_directories(src/player)
+include_directories(src)
 include_directories(libs)
 include_directories(libs/ui_elements)
 include_directories(libs/tiny_xml)
@@ -107,7 +108,9 @@ add_executable(01INT_AWG_SW
     libs/tiny_xml/tinyxml2.cpp
     libs/tiny_xml/tinyxml2.h
     libs/ui_elements/scene/scene.cpp
-    libs/ui_elements/scene/scene.h)
+    libs/ui_elements/scene/scene.h
+    src/game_scenes/menu/start_menu/start_menu.cpp
+    src/game_scenes/menu/start_menu/start_menu.h)
 
 target_link_libraries(
         ${PROJECT_NAME}

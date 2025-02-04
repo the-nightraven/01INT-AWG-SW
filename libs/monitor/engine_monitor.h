@@ -40,6 +40,9 @@ and change, but not for commercial use
 #define FORCE_QUIT_KEY   SDL_SCANCODE_Q
 #define FULLSCREEN_KEY   SDL_SCANCODE_F
 
+//temp
+void change_scene_rename(const char* newname, int mode);
+
 //inits
 G_STATUS monitor_init();
 G_STATUS monitor_deinit();

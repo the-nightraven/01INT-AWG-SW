@@ -37,18 +37,20 @@ G_STATUS renderer_init() {
 }
 
 G_STATUS renderer_deinit() {
-    RendererComponent_Typedef* prev = renderer_visible_list;
-    RendererComponent_Typedef* curr = renderer_visible_list->next;
+    if(renderer_visible_list != nullptr) {
+        RendererComponent_Typedef* prev = renderer_visible_list;
+        RendererComponent_Typedef* curr = renderer_visible_list->next;
 
-    do{
-        free(prev->name);
-        free(prev);
-        prev = curr;
+        do{
+            free(prev->name);
+            free(prev);
+            prev = curr;
 
-        if(curr != nullptr) {
-            curr = curr->next;
-        }
-    }while(curr != nullptr);
+            if(curr != nullptr) {
+                curr = curr->next;
+            }
+        }while(curr != nullptr);
+    }
 
     return G_STATUS_OK;
 }
@@ -68,6 +70,8 @@ RendererComponentHandler renderer_register_component(RendererComponent_Typedef i
 
         ind->next = tmp;
     }
+
+    log_info("RNDR", "Adding render to list");
     return tmp->handler;
 }
 
@@ -117,7 +121,7 @@ void renderer_clear_stack() {
     while(curr != nullptr) {
         next = curr->next;
         free(curr->name);
-        free(curr->object);
+        //free(curr->object);
         free(curr);
         curr = next;
     }
