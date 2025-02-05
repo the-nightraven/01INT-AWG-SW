@@ -3,9 +3,11 @@ project(01INT_AWG_SW)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions(-DDEBUG=1)
+    set(CMAKE_CXX_FLAGS "-Wall -std=c++17 ${CMAKE_CXX_FLAGS}")
+else()
+    set(CMAKE_CXX_FLAGS "-Wall -std=c++17 -mwindows ${CMAKE_CXX_FLAGS}")
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wall -std=c++17 ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_STANDARD 17)
 set(SDL2_PATH "C:/mingw64/x86_64-w64-mingw32")
 set(SDL2_ttf_PATH "C:/mingw64/x86_64-w64-mingw32")
