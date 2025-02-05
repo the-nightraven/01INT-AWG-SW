@@ -24,6 +24,8 @@ and change, but not for commercial use
 //@TODO: Xbox Controller support          WIP
 
 #include "reader.h"
+
+#include "logger.h"
 #include "updater.h"
 
 
@@ -40,95 +42,103 @@ G_STATUS evt_init() {
 
 //@TODO: Possible memory leak if updatecallback is allocated with malloc
 G_STATUS evt_deinit() {
+    //@TODO memory leak on component
+
     //sys
-    SysEvtItem_TypeDef* prev = sys_list;
-    SysEvtItem_TypeDef* curr = sys_list->next;
+    if(sys_list != nullptr) {
+        SysEvtItem_TypeDef* prev = sys_list;
+        SysEvtItem_TypeDef* curr = sys_list->next;
 
-    do{
-        free(prev);
-        prev = curr;
+        do{
+            free(prev);
+            prev = curr;
 
-        if(curr != nullptr) {
-            curr = curr->next;
-        }
-    }while(curr != nullptr);
+            if(curr != nullptr) {
+                curr = curr->next;
+            }
+        }while(curr != nullptr);
+    }
 
     //key
-    KeyEvtItem_TypeDef* prevk = key_list;
-    KeyEvtItem_TypeDef* currk = key_list->next;
+    if(key_list != nullptr) {
+        KeyEvtItem_TypeDef* prevk = key_list;
+        KeyEvtItem_TypeDef* currk = key_list->next;
 
-    do {
-        free(prevk);
-        prevk = currk;
+        do {
+            free(prevk);
+            prevk = currk;
 
-        if(currk != nullptr) {
-            currk = currk->next;
-        }
-    }while(currk != nullptr);
+            if(currk != nullptr) {
+                currk = currk->next;
+            }
+        }while(currk != nullptr);
+    }
 
     //mouse
-    MouseEvtItem_TypeDef* prevm = mouse_list;
-    MouseEvtItem_TypeDef* currm = mouse_list->next;
+    if(mouse_list != nullptr) {
+        MouseEvtItem_TypeDef* prevm = mouse_list;
+        MouseEvtItem_TypeDef* currm = mouse_list->next;
 
-    do {
-        free(prevm);
-        prevm = currm;
+        do {
+            free(prevm);
+            prevm = currm;
 
-        if(currm != nullptr) {
-            currm = currm->next;
-        }
-    }while(currm != nullptr);
+            if(currm != nullptr) {
+                currm = currm->next;
+            }
+        }while(currm != nullptr);
+    }
 
     return G_STATUS_OK;
 }
 
-G_STATUS register_sys_event(SysEvt_TypeDef* evt) {
+G_STATUS register_sys_event(bool essential, SysEvt_TypeDef* evt) {
     if(evt == nullptr) {
         return G_STATUS_FAIL;
     }
 
     if(sys_list == nullptr) {
-        sys_list = static_cast<SysEvtItem_TypeDef *>(init_event_list(SYS_EVENT_FLAG, (void *) evt));
+        sys_list = static_cast<SysEvtItem_TypeDef *>(init_event_list(SYS_EVENT_FLAG, (void *) evt, essential));
         if(sys_list == nullptr) {
                 return G_STATUS_FAIL;
             }
             return G_STATUS_OK;
     }
 
-    return add_event_item(SYS_EVENT_FLAG, (void*)sys_list, (void*)evt);
+    return add_event_item(SYS_EVENT_FLAG, (void*)sys_list, (void*)evt, essential);
 }
 
-G_STATUS register_key_event(KeyEvt_TypeDef* evt){
+G_STATUS register_key_event(bool essential, KeyEvt_TypeDef* evt){
     if(evt == nullptr) {
         return G_STATUS_FAIL;
     }
 
 
     if(key_list == nullptr) {
-        key_list = static_cast<KeyEvtItem_TypeDef *>(init_event_list(KEY_EVENT_FLAG, (void *) evt));
+        key_list = static_cast<KeyEvtItem_TypeDef *>(init_event_list(KEY_EVENT_FLAG, (void *) evt, essential));
         if(key_list == nullptr) {
             return G_STATUS_FAIL;
         }
         return G_STATUS_OK;
     }
 
-    return add_event_item(KEY_EVENT_FLAG, (void*)key_list, (void*)evt);
+    return add_event_item(KEY_EVENT_FLAG, (void*)key_list, (void*)evt, essential);
 }
 
-G_STATUS register_mouse_event(MouseEvt_TypeDef* evt) {
+G_STATUS register_mouse_event(bool essential, MouseEvt_TypeDef* evt) {
     if(evt == nullptr) {
         return G_STATUS_FAIL;
     }
 
     if(mouse_list == nullptr) {
-        mouse_list = static_cast<MouseEvtItem_TypeDef *>(init_event_list(MOUSE_EVENT_FLAG, (void*)evt));
+        mouse_list = static_cast<MouseEvtItem_TypeDef *>(init_event_list(MOUSE_EVENT_FLAG, (void*)evt, essential));
         if(mouse_list == nullptr) {
             return G_STATUS_FAIL;
         }
         return G_STATUS_OK;
     }
 
-    return add_event_item(MOUSE_EVENT_FLAG, (void*)mouse_list, (void*)evt);
+    return add_event_item(MOUSE_EVENT_FLAG, (void*)mouse_list, (void*)evt, essential);
 }
 
 G_STATUS poll_events(SDL_Event* e) {
@@ -197,12 +207,116 @@ G_STATUS poll_events(SDL_Event* e) {
     return G_STATUS_OK;
 }
 
-G_STATUS add_event_item(uint8_t type_flag, void *list, void *item) {
+void evt_clear_nonessential() {
+    evt_clear_key_nonessential();
+    evt_clear_mouse_nonessential();
+    evt_clear_sys_nonessential();
+    log_info(EVT_TAG, "Cleared nonessentials");
+    return;
+}
+
+void evt_clear_key_nonessential() {
+
+    KeyEvtItem_TypeDef* ind = key_list;
+    if(ind == nullptr) {
+#if DEBUG
+        log_debug(EVT_TAG, "key list is already empty", -2);
+#endif
+        return;
+    }
+
+    KeyEvtItem_TypeDef* prev = nullptr;
+
+    while(ind != nullptr) {
+        if(ind->essential == ENGINE_NONESSENTIAL_COMPONENT) {
+            if(prev == nullptr) {
+                key_list = key_list->next;
+                free(ind);
+                ind = key_list;
+            }else {
+                prev->next = ind->next;
+                free(ind);
+                ind = prev->next;
+            }
+        }else {
+            prev = ind;
+            ind = ind->next;
+        }
+    }
+
+    return;
+}
+
+void evt_clear_mouse_nonessential() {
+
+    MouseEvtItem_TypeDef* ind = mouse_list;
+    if(ind == nullptr) {
+#if DEBUG
+        log_debug(EVT_TAG, "mouse list is already empty", -2);
+#endif
+        return;
+    }
+
+    MouseEvtItem_TypeDef* prev = nullptr;
+
+    while(ind != nullptr) {
+        if(ind->essential == ENGINE_NONESSENTIAL_COMPONENT) {
+            if(prev == nullptr) {
+                mouse_list = mouse_list->next;
+                free(ind);
+                ind = mouse_list;
+            }else {
+                prev->next = ind->next;
+                free(ind);
+                ind = prev->next;
+            }
+        }else {
+            prev = ind;
+            ind = ind->next;
+        }
+    }
+
+    return;
+}
+
+void evt_clear_sys_nonessential() {
+
+    SysEvtItem_TypeDef* ind = sys_list;
+    if(ind == nullptr) {
+#if DEBUG
+        log_debug(EVT_TAG, "sys list is already empty", -2);
+#endif
+        return;
+    }
+
+    SysEvtItem_TypeDef* prev = nullptr;
+
+    while(ind != nullptr) {
+        if(ind->essential == ENGINE_NONESSENTIAL_COMPONENT) {
+            if(prev == nullptr) {
+                sys_list = sys_list->next;
+                free(ind);
+                ind = sys_list;
+            }else {
+                prev->next = ind->next;
+                free(ind);
+                ind = prev->next;
+            }
+        }else {
+            prev = ind;
+            ind = ind->next;
+        }
+    }
+
+    return;
+}
+
+G_STATUS add_event_item(uint8_t type_flag, void *list, void *item, bool essential) {
     if(list == item) {
         return G_STATUS_FAIL;
     }
 
-    void* tmp = init_event_list(type_flag, item);
+    void* tmp = init_event_list(type_flag, item, essential);
 
     if(tmp == nullptr) {
         return G_STATUS_FAIL;
@@ -216,6 +330,7 @@ G_STATUS add_event_item(uint8_t type_flag, void *list, void *item) {
         }
         
         ind->next = static_cast<SysEvtItem_TypeDef *>(tmp);
+        log_info("EVNT", "Adding event to list");
         return G_STATUS_OK;
 
     }
@@ -228,6 +343,7 @@ G_STATUS add_event_item(uint8_t type_flag, void *list, void *item) {
         }
 
         ind->next = static_cast<KeyEvtItem_TypeDef *>(tmp);
+        log_info("EVNT", "Adding event to list");
         return G_STATUS_OK;
     }
 
@@ -239,13 +355,14 @@ G_STATUS add_event_item(uint8_t type_flag, void *list, void *item) {
         }
 
         ind->next = static_cast<MouseEvtItem_TypeDef *>(tmp);
+        log_info("EVNT", "Adding event to list");
         return G_STATUS_OK;
     }
 
     return G_STATUS_FAIL;
 }
 
-void* init_event_list(uint8_t type_flag, void *item) {
+void* init_event_list(uint8_t type_flag, void *item, bool essential) {
     void* status;
 
     if(type_flag == SYS_EVENT_FLAG) {
@@ -257,6 +374,7 @@ void* init_event_list(uint8_t type_flag, void *item) {
         }
 
         tmp->next = nullptr;
+        tmp->essential = essential;
         return tmp;
     }
 
@@ -269,6 +387,7 @@ void* init_event_list(uint8_t type_flag, void *item) {
         }
 
         tmp->next = nullptr;
+        tmp->essential = essential;
         return tmp;
     }
 
@@ -281,6 +400,7 @@ void* init_event_list(uint8_t type_flag, void *item) {
         }
 
         tmp->next = nullptr;
+        tmp->essential = essential;
         return tmp;
     }
 

@@ -27,7 +27,10 @@ and change, but not for commercial use
 #include "reader.h"
 #include "updater.h"
 #include "renderer.h"
+#if DEBUG
 #include "debugger.h"
+#endif
+#include "ui_elements/scene/scene.h"
 
 #define MON_TAG          "ENG"
 #define EVT_WILDCARD     1
@@ -35,9 +38,13 @@ and change, but not for commercial use
 #define RND_WILDCARD     3
 #define WDW_WILDCARD     4
 #define DBG_WILDCARD     5
+#define SCE_WILDCARD     6
 
 #define FORCE_QUIT_KEY   SDL_SCANCODE_Q
 #define FULLSCREEN_KEY   SDL_SCANCODE_F
+
+//temp
+void change_scene_rename(const char* newname, int mode);
 
 //inits
 G_STATUS monitor_init();

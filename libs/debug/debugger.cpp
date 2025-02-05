@@ -36,7 +36,7 @@ G_STATUS debugger_init(DebugModule_TypeDef* dbg) {
         0,
         "Debugger",
         true,
-        debugger_get_evtstack_instance(DEBUGGER_MOUSE_EVT_WILDCARD),
+        nullptr,
         1,
         dbg_render,
         nullptr
@@ -147,7 +147,7 @@ void dbg_render(void* obj, SDL_Renderer** renderer) {
     FC_Draw(dbg_font, *renderer, 0, 0, "%d FPS\n", self_module->fps);
 
     if(self_module->mouseStackVisible) {
-        auto *ind = static_cast<MouseEvtItem_TypeDef *>(obj);
+        auto *ind = static_cast<MouseEvtItem_TypeDef *>(debugger_get_evtstack_instance(DEBUGGER_MOUSE_EVT_WILDCARD));
         while(ind != nullptr) {
             int r = 0, b = 0;
             if(ind->evt.click_cb.obj_callback != nullptr) {
@@ -160,7 +160,7 @@ void dbg_render(void* obj, SDL_Renderer** renderer) {
             SDL_FRect rect = {ind->evt.dim->x, ind->evt.dim->y, ind->evt.dim->w, ind->evt.dim->h};
             SDL_SetRenderDrawColor(*renderer, r, 0, b, 60);
             SDL_RenderFillRectF(*renderer, &rect);
-            //SDL_RenderDrawRectF(*renderer, &rect);
+            SDL_RenderDrawRectF(*renderer, &rect);
 
             ind = ind->next;
         }

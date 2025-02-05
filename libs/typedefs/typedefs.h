@@ -23,7 +23,9 @@ and change, but not for commercial use
 
 #include "includes.h"
 
-#define DEFAULT_UPDATER_CB         (UpdateCallback_TypeDef){false, nullptr, nullptr}
+#define DEFAULT_UPDATER_CB             (UpdateCallback_TypeDef){false, nullptr, nullptr}
+#define ENGINE_ESSENTIAL_COMPONENT     true
+#define ENGINE_NONESSENTIAL_COMPONENT  false
 
 //data types
 typedef int RendererComponentHandler;
@@ -37,6 +39,8 @@ typedef struct AWG_Rect {
     float w;
     float h;
 } AWG_Rect;
+
+//maybe add control stacks
 
 typedef struct UpdateCallback_TypeDef{
     bool flag;
@@ -65,26 +69,31 @@ typedef struct MouseEvt_TypeDef {
 } MouseEvt_TypeDef;
 
 typedef struct SysEvtItem_TypeDef {
+    bool essential;
     SysEvt_TypeDef evt;
     SysEvtItem_TypeDef *next;
 } SysEvtItem_TypeDef;
 
 typedef struct KeyEvtItem_TypeDef {
+    bool essential;
     KeyEvt_TypeDef evt;
     KeyEvtItem_TypeDef *next;
 } KeyEvtItem_TypeDef;
 
 typedef struct MouseEvtItem_TypeDef {
+    bool essential;
     MouseEvt_TypeDef evt;
     MouseEvtItem_TypeDef *next;
 } MouseEvtItem_TypeDef;
 
 typedef struct UpdateComponent_Typedef {
+    bool essential;
     void* value;
     void (*comp_callback)(void*);
     UpdateComponent_Typedef* next;
 } UpdateComponent_Typedef;
 
+//@TODO add object free method pointer
 typedef struct RendererComponent_Typedef {
     RendererComponentHandler handler;
     char* name;
@@ -94,6 +103,36 @@ typedef struct RendererComponent_Typedef {
     void (*obj_render)(void*, SDL_Renderer**);
     RendererComponent_Typedef* next;
 } RendererComponent_Typedef;
+
+
+//scenes
+//event stack
+//updatestack
+
+//TODO implement init/deinit
+//TODO (maybe for optimisation) boil each event into one general type
+typedef struct SceneComponent_TypeDef {
+    /* staged for engine alpha 0.0.2
+    int (*init_component)();
+    int (*destroy_component)();
+    */
+
+    UpdateComponent_Typedef* update_def;
+    KeyEvtItem_TypeDef* key_evt_def;
+    MouseEvtItem_TypeDef* mouse_evt_def;
+    SysEvtItem_TypeDef* sys_evt_def;
+    RendererComponent_Typedef* rnd_component;
+    SceneComponent_TypeDef* next;
+} SceneComponent_TypeDef;
+
+typedef struct SceneItem_TypeDef {
+    int type;
+    int scene_id;
+    char* name;
+    bool active;
+    SceneComponent_TypeDef* scene_comp_list;
+    SceneItem_TypeDef *next;
+} SceneItem_TypeDef;
 
 
 //engine monitor
@@ -125,12 +164,22 @@ typedef struct WindowModule_TypeDef {
     bool status;
 } WindowModule_TypeDef;
 
+typedef struct ScenesModule_TypeDef {
+    bool status;
+    int first_scene_id; //TODO add separate ids for menu, loading and stuff
+    bool change_flag;
+    int change_id;
+    int change_mode;
+    int id_pointer;
+} ScenesModule_TypeDef;
+
 typedef struct MonitorComponents_TypeDef {
     EvtModule_TypeDef event_module;
     UpdaterModule_TypeDef updater_module;
     RendererModule_TypeDef renderer_module;
     DebugModule_TypeDef debug_module;
     WindowModule_TypeDef window_module;
+    ScenesModule_TypeDef scenes_module;
     bool isRunning;
     SDL_Window* engine_display;
     SDL_Renderer* engine_renderer;

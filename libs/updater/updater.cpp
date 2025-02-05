@@ -19,6 +19,8 @@ and change, but not for commercial use
 */
 
 #include "updater.h"
+
+#include "logger.h"
 #include "reader.h"
 
 uint32_t u_ticks_count;
@@ -34,17 +36,19 @@ G_STATUS updater_init() {
 }
 
 G_STATUS updater_deinit() {
-    UpdateComponent_Typedef* prev = update_comp_list;
-    UpdateComponent_Typedef* curr = update_comp_list->next;
+    if(update_comp_list != nullptr) {
+        UpdateComponent_Typedef* prev = update_comp_list;
+        UpdateComponent_Typedef* curr = update_comp_list->next;
 
-    do {
-        free(prev);
-        prev = curr;
+        do {
+            free(prev);
+            prev = curr;
 
-        if(curr != nullptr) {
-            curr = curr->next;
-        }
-    }while(curr != nullptr);
+            if(curr != nullptr) {
+                curr = curr->next;
+            }
+        }while(curr != nullptr);
+    }
 
     return G_STATUS_OK;
 }
@@ -62,6 +66,7 @@ G_STATUS register_update_components(UpdateComponent_Typedef component) {
 
         tmp->next = updater_component_to_instance(component);
     }
+    log_info("UPDT", "Adding update to list");
     return G_STATUS_OK;
 }
 
@@ -76,7 +81,8 @@ UpdateComponent_Typedef* updater_component_to_instance(UpdateComponent_Typedef i
 
 G_STATUS call_updater(UpdateCallback_TypeDef *target) {
     if(target == nullptr) {
-        return G_STATUS_FAIL;
+        log_error("UPDT", "Function was null", -2);
+        return G_STATUS_OK;
     }
 
     target->obj_callback(target->value);
@@ -84,7 +90,36 @@ G_STATUS call_updater(UpdateCallback_TypeDef *target) {
     return G_STATUS_OK;
 }
 
+void updater_clear_comp_nonessentials() {
+    UpdateComponent_Typedef* ind = update_comp_list;
+    if(ind == nullptr) {
+#if DEBUG
+        log_debug(EVT_TAG, "key list is already empty", -2);
+#endif
+        return;
+    }
 
+    UpdateComponent_Typedef* prev = nullptr;
+
+    while(ind != nullptr) {
+        if(ind->essential == ENGINE_NONESSENTIAL_COMPONENT) {
+            if(prev == nullptr) {
+                update_comp_list = update_comp_list->next;
+                free(ind);
+                ind = update_comp_list;
+            }else {
+                prev->next = ind->next;
+                free(ind);
+                ind = prev->next;
+            }
+        }else {
+            prev = ind;
+            ind = ind->next;
+        }
+    }
+
+    return;
+}
 
 G_STATUS updater_run_time_delta() {
     G_STATUS status;
@@ -125,6 +160,8 @@ G_STATUS updater_run_time_delta() {
         return status;
     }
 
+
+
     //get component updates
     UpdateComponent_Typedef* tmp = update_comp_list;
 
@@ -133,7 +170,6 @@ G_STATUS updater_run_time_delta() {
         tmp->comp_callback(tmp->value);
         tmp = tmp->next;
     }
-
     return G_STATUS_OK;
 }
 
@@ -159,7 +195,6 @@ G_STATUS update_sys_events(SysEvtItem_TypeDef *list) {
     return G_STATUS_OK;
 }
 
-//@TODO: may cause segfault because some functions are actually nullptr
 G_STATUS update_key_events(KeyEvtItem_TypeDef *list) {
     G_STATUS status;
     
