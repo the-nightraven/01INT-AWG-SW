@@ -1,0 +1,5 @@
+build
+.ideea
+cmake-build-debug
+cmake-build-release
+.git
