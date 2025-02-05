@@ -154,6 +154,6 @@ void player_hover_out_cb(void* val) {
 }
 
 G_STATUS player_set_active() {
-    scene_load("Player", 0, SCENE_MODE_CLEAR);
+    scenes_stage_scene("Player", 0, SCENE_MODE_CLEAR);
     return G_STATUS_OK;
 }

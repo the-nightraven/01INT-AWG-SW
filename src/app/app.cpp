@@ -42,29 +42,6 @@ G_STATUS app_init() {
     }
     log_info(APP_TAG, "Inited engine modules");
 
-    // status = init_player();
-    // if(status == G_STATUS_FAIL) {
-    //     log_error(APP_TAG, "Cannot init player", -1);
-    //     return G_STATUS_FAIL;
-    // }
-    // log_info(APP_TAG, "Inited player");
-
-    // status = player_register_events();
-    // if(status == G_STATUS_FAIL) {
-    //     log_error(APP_TAG, "Cannot init player events", -1);
-    //     return G_STATUS_FAIL;
-    // }
-    // log_info(APP_TAG, "Inited player events");
-
-    //register render components
-    // RendererComponent_Typedef player_render = {0, "Player", true, get_player_instance(), 1, player_render_cb, nullptr};
-    // status = renderer_register_component(player_render);
-    // if(status == G_STATUS_FAIL) {
-    //     log_error(APP_TAG, "Cannot set player render function", -1);
-    //     return G_STATUS_FAIL;
-    // }
-    // log_info(APP_TAG, "Set player render function");
-
     status = monitor_init_window_module();
     if(status == G_STATUS_FAIL) {
         log_error(APP_TAG, "Cannot init engine display module", -1);

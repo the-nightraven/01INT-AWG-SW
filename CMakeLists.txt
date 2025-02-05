@@ -54,63 +54,120 @@ else()
     message(STATUS "Using local SDL2_ttf")
 endif()
 
-include_directories(${FREETYPE_INCLUDE_DIRS})
-include_directories(${SDL2_INCLUDE_DIR})
-include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
-include_directories(${SDL2_ttf_INCLUDE_DIR})
-include_directories(libs/debug)
-include_directories(libs/event_reader)
-include_directories(libs/font_cache)
-include_directories(libs/logger)
-include_directories(libs/monitor)
-include_directories(libs/physics)
-include_directories(libs/renderer)
-include_directories(libs/typedefs)
-include_directories(libs/updater)
-include_directories(libs/window)
-include_directories(src/app)
-include_directories(src/player)
-include_directories(src)
-include_directories(libs)
-include_directories(libs/ui_elements)
-include_directories(libs/tiny_xml)
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    include_directories(${FREETYPE_INCLUDE_DIRS})
+    include_directories(${SDL2_INCLUDE_DIR})
+    include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
+    include_directories(${SDL2_ttf_INCLUDE_DIR})
+    include_directories(libs/debug)
+    include_directories(libs/event_reader)
+    include_directories(libs/font_cache)
+    include_directories(libs/logger)
+    include_directories(libs/monitor)
+    include_directories(libs/physics)
+    include_directories(libs/renderer)
+    include_directories(libs/typedefs)
+    include_directories(libs/updater)
+    include_directories(libs/window)
+    include_directories(src/app)
+    include_directories(src/player)
+    include_directories(src)
+    include_directories(libs)
+    include_directories(libs/ui_elements)
+    include_directories(libs/tiny_xml)
 
-add_executable(01INT_AWG_SW
-    libs/debug/debugger.cpp
-    libs/debug/debugger.h
-    libs/event_reader/reader.cpp
-    libs/event_reader/reader.h
-    libs/font_cache/font_cache.cpp
-    libs/font_cache/font_cache.h
-    libs/logger/logger.cpp
-    libs/logger/logger.h
-    libs/monitor/engine_monitor.cpp
-    libs/monitor/engine_monitor.h
-    libs/physics/collisions/collisions.cpp
-    libs/physics/collisions/collisions.h
-    libs/physics/rigidbody/rigidbody.cpp
-    libs/physics/rigidbody/rigidbody.h
-    libs/renderer/renderer.cpp
-    libs/renderer/renderer.h
-    libs/typedefs/typedefs.h
-    libs/updater/updater.cpp
-    libs/updater/updater.h
-    libs/window/window.cpp
-    libs/window/window.h
-    src/app/app.cpp
-    src/app/app.h
-    src/player/player.cpp
-    src/player/player.h
-    main.cpp
-    libs/includes.h
-    libs/ui_elements/touchable/touchable.cpp
-    libs/ui_elements/touchable/touchable.h
-    libs/tiny_xml/tinyxml2.cpp
-    libs/tiny_xml/tinyxml2.h
-    libs/ui_elements/scene/scene.cpp
-    libs/ui_elements/scene/scene.h
-    src/game_scenes/menu/start_menu/start_menu.cpp
-    src/game_scenes/menu/start_menu/start_menu.h)
+    add_executable(01INT_AWG_SW
+        libs/debug/debugger.cpp
+        libs/debug/debugger.h
+        libs/event_reader/reader.cpp
+        libs/event_reader/reader.h
+        libs/font_cache/font_cache.cpp
+        libs/font_cache/font_cache.h
+        libs/logger/logger.cpp
+        libs/logger/logger.h
+        libs/monitor/engine_monitor.cpp
+        libs/monitor/engine_monitor.h
+        libs/physics/collisions/collisions.cpp
+        libs/physics/collisions/collisions.h
+        libs/physics/rigidbody/rigidbody.cpp
+        libs/physics/rigidbody/rigidbody.h
+        libs/renderer/renderer.cpp
+        libs/renderer/renderer.h
+        libs/typedefs/typedefs.h
+        libs/updater/updater.cpp
+        libs/updater/updater.h
+        libs/window/window.cpp
+        libs/window/window.h
+        src/app/app.cpp
+        src/app/app.h
+        src/player/player.cpp
+        src/player/player.h
+        main.cpp
+        libs/includes.h
+        libs/ui_elements/touchable/touchable.cpp
+        libs/ui_elements/touchable/touchable.h
+        libs/tiny_xml/tinyxml2.cpp
+        libs/tiny_xml/tinyxml2.h
+        libs/ui_elements/scene/scene.cpp
+        libs/ui_elements/scene/scene.h
+        src/game_scenes/menu/start_menu/start_menu.cpp
+        src/game_scenes/menu/start_menu/start_menu.h)
+else()
+    include_directories(${FREETYPE_INCLUDE_DIRS})
+    include_directories(${SDL2_INCLUDE_DIR})
+    include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
+    include_directories(${SDL2_ttf_INCLUDE_DIR})
+    include_directories(libs/event_reader)
+    include_directories(libs/font_cache)
+    include_directories(libs/logger)
+    include_directories(libs/monitor)
+    include_directories(libs/physics)
+    include_directories(libs/renderer)
+    include_directories(libs/typedefs)
+    include_directories(libs/updater)
+    include_directories(libs/window)
+    include_directories(src/app)
+    include_directories(src/player)
+    include_directories(src)
+    include_directories(libs)
+    include_directories(libs/ui_elements)
+    include_directories(libs/tiny_xml)
+
+    add_executable(01INT_AWG_SW
+            libs/event_reader/reader.cpp
+            libs/event_reader/reader.h
+            libs/font_cache/font_cache.cpp
+            libs/font_cache/font_cache.h
+            libs/logger/logger.cpp
+            libs/logger/logger.h
+            libs/monitor/engine_monitor.cpp
+            libs/monitor/engine_monitor.h
+            libs/physics/collisions/collisions.cpp
+            libs/physics/collisions/collisions.h
+            libs/physics/rigidbody/rigidbody.cpp
+            libs/physics/rigidbody/rigidbody.h
+            libs/renderer/renderer.cpp
+            libs/renderer/renderer.h
+            libs/typedefs/typedefs.h
+            libs/updater/updater.cpp
+            libs/updater/updater.h
+            libs/window/window.cpp
+            libs/window/window.h
+            src/app/app.cpp
+            src/app/app.h
+            src/player/player.cpp
+            src/player/player.h
+            main.cpp
+            libs/includes.h
+            libs/ui_elements/touchable/touchable.cpp
+            libs/ui_elements/touchable/touchable.h
+            libs/tiny_xml/tinyxml2.cpp
+            libs/tiny_xml/tinyxml2.h
+            libs/ui_elements/scene/scene.cpp
+            libs/ui_elements/scene/scene.h
+            src/game_scenes/menu/start_menu/start_menu.cpp
+            src/game_scenes/menu/start_menu/start_menu.h)
+endif()
 
 target_link_libraries(
         ${PROJECT_NAME}

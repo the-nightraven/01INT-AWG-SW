@@ -40,6 +40,7 @@ RenderEngine renderer_get_engine() {
     return RENDERER_ENGINE_SDL2;
 }
 
+#if DEBUG
 SDL_Renderer* debugger_get_renderer_instance() {
     return engine_components.engine_renderer;
 }
@@ -92,15 +93,22 @@ void* debugger_get_evtstack_instance(int wildcard) {
 void* debugger_get_rndrstack_instance() {
     return renderer_get_list();
 }
+#endif
 
 //add scenes module typedef
 G_STATUS scene_sys_clear_components() {
     evt_clear_nonessential();
+#if DEBUG
     log_debug(MON_TAG, "Cleared evt", -1);
+#endif
     updater_clear_comp_nonessentials();
+#if DEBUG
     log_debug(MON_TAG, "Cleared updt", -1);
+#endif
     renderer_clear_stack();
+#if DEBUG
     log_debug(MON_TAG, "Cleared rndr", -1);
+#endif
     return G_STATUS_OK;
 }
 
@@ -201,11 +209,8 @@ G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list, int mode) 
 
 
 DWORD WINAPI updater_thread_lifecycle(LPVOID lpParam) {
-    int status;
     while(engine_components.updater_module.th_isRunning) {
-        status = updater_run_time_delta();
-
-        if(status == G_STATUS_FAIL) {
+        if(const int status = updater_run_time_delta(); status == G_STATUS_FAIL) {
             log_error(MON_TAG, "Updater thread encountered problems", -1);
             engine_components.updater_module.th_isRunning = false;
             engine_components.updater_module.status = false;
@@ -254,15 +259,22 @@ G_STATUS monitor_init() {
     engine_components.debug_module.status = false;
     engine_components.debug_module.th_isRunning = false;
     engine_components.debug_module.dbg_thread = nullptr;
-    //somehow init rnd component
     engine_components.debug_module.rnd_handler = 0;
     engine_components.debug_module.mouseStackVisible = false;
 
     engine_components.window_module.status = false;
 
+    engine_components.scenes_module.status = false;
+    engine_components.scenes_module.first_scene_id = -1;
+    engine_components.scenes_module.change_flag = false;
+    engine_components.scenes_module.change_id = -1;
+    engine_components.scenes_module.change_mode = -1;
+    engine_components.scenes_module.id_pointer = -1;
+
     return G_STATUS_OK;
 }
 
+//TODO free memory
 G_STATUS monitor_deinit() {
     return G_STATUS_OK;
 }
@@ -296,12 +308,16 @@ G_STATUS monitor_init_modules() {
     }
     //feed into component list
     engine_components.renderer_module.status = true;
+#if DEBUG
+    log_debug(MON_TAG, "Inited renderer", 0);
+#endif
 
     //init scenes
-    status = scenes_init();
+    status = scenes_init(&engine_components.scenes_module);
     if(status == G_STATUS_FAIL) {
         return status;
     }
+    engine_components.scenes_module.status = true;
 
     return G_STATUS_OK;
 }
@@ -315,6 +331,7 @@ G_STATUS monitor_init_window_module() {
     //feed into component list
     engine_components.window_module.status = true;
 
+#if DEBUG
     //init debug
     status = debugger_init(&engine_components.debug_module);
     if(status == G_STATUS_FAIL) {
@@ -325,6 +342,8 @@ G_STATUS monitor_init_window_module() {
         return status;
     }
     engine_components.debug_module.status = true;
+#endif
+
     return G_STATUS_OK;
 }
 
@@ -332,7 +351,8 @@ G_STATUS monitor_check_env() {
     if(engine_components.event_module.status && 
        engine_components.updater_module.status && 
        engine_components.renderer_module.status && 
-       engine_components.window_module.status) {
+       engine_components.window_module.status &&
+       engine_components.scenes_module.status) {
         engine_components.isRunning = true;
         return G_STATUS_OK;
     }
@@ -342,54 +362,76 @@ G_STATUS monitor_check_env() {
 int monitor_audit_module(int wildcard) {
     if(wildcard == EVT_WILDCARD) {
         return (int)engine_components.event_module.status;
-    }else if(wildcard == UPD_WILDCARD) {
+    }
+
+    if(wildcard == UPD_WILDCARD) {
         return (int)engine_components.updater_module.status;
-    }else if(wildcard == RND_WILDCARD) {
+    }
+
+    if(wildcard == RND_WILDCARD) {
         return (int)engine_components.renderer_module.status;
-    }else if(wildcard == WDW_WILDCARD) {
+    }
+
+    if(wildcard == WDW_WILDCARD) {
         return (int)engine_components.window_module.status;
-    }else if(wildcard == DBG_WILDCARD) {
+    }
+
+#if DEBUG
+    if(wildcard == DBG_WILDCARD) {
         return (int)engine_components.debug_module.status;
     }
+#endif
+
+    if(wildcard == SCE_WILDCARD) {
+        return (int)engine_components.scenes_module.status;
+    }
+
     return -1;
 }
 
 G_STATUS monitor_deinit_modules() {
     //thread joins
     monitor_stop_updating();
-    log_info(MON_TAG, "Unforked updater thread safely");
+    log_info(MON_TAG, "Un forked updater thread safely");
 
+#if DEBUG
     monitor_stop_debug();
-    log_info(MON_TAG, "Unforked debug thread safely");
+    log_info(MON_TAG, "Un forked debug thread safely");
+#endif
 
-    //evt deinit
+    //scenes de init
+    scenes_deinit();
+    log_info(MON_TAG, "Scenes Module de inited successfully");
+
+    //evt de init
     evt_deinit();
-    log_info(MON_TAG, "Event module deinited successfuly");
+    log_info(MON_TAG, "Event module de inited successfully");
 
     //updater
     updater_deinit();
-    log_info(MON_TAG, "Updater module deinited successfuly");
+    log_info(MON_TAG, "Updater module de inited successfully");
 
-    //render deinit
+    //render de init
     renderer_deinit();
-    log_info(MON_TAG, "Render module deinited succesfully");
+    log_info(MON_TAG, "Render module de inited successfully");
 
-    //debug deinit
+#if DEBUG
+    //debug de init
     debugger_deinit();
-    log_info(MON_TAG, "Debugger module deinited successfully");
+    log_info(MON_TAG, "Debugger module de inited successfully");
+#endif
 
-    //window deinit
+    //window de init
     deinit_window(&engine_components.engine_display, &engine_components.engine_renderer);
-    log_info(MON_TAG, "Window deinited successfully");
+    log_info(MON_TAG, "Window de inited successfully");
 
     return G_STATUS_OK;
 }
 
 G_STATUS monitor_register_comp() {
-    G_STATUS status;
-    UpdateCallback_TypeDef sysExit = {false, &engine_components.isRunning, end_game};
+    constexpr UpdateCallback_TypeDef sysExit = {false, &engine_components.isRunning, end_game};
     SysEvt_TypeDef sysExit_evt = {SDL_QUIT, sysExit};
-    status = register_sys_event(ENGINE_ESSENTIAL_COMPONENT, &sysExit_evt);
+    G_STATUS status = register_sys_event(ENGINE_ESSENTIAL_COMPONENT, &sysExit_evt);
 
     if(status == G_STATUS_FAIL) {
         log_error(MON_TAG, "Cannot register QUIT event", G_STATUS_FAIL);
@@ -422,21 +464,21 @@ G_STATUS monitor_register_comp() {
 G_STATUS monitor_process_loop() {
 
     //actually change scenes here
-    if(CHANGE_SCENES_FLAG) {
-        scene_load(scene_ch_name, 0, SCENE_MODE);
-        CHANGE_SCENES_FLAG = false;
+    if(engine_components.scenes_module.change_flag) {
+        scene_load(nullptr, engine_components.scenes_module.change_id, engine_components.scenes_module.change_mode);
+
+        engine_components.scenes_module.change_flag = false;
+        engine_components.scenes_module.change_id = -1;
+        engine_components.scenes_module.change_mode = -1;
     }
 
-    //chrono start
     const std::chrono::time_point start_timer = std::chrono::high_resolution_clock::now();
 
-    G_STATUS status;
     SDL_Event e;
+    // ReSharper disable once CppLocalVariableMightNotBeInitialized
     engine_components.engine_event_pool = e;
-    
-    status = poll_events(&engine_components.engine_event_pool);
 
-    if(status == G_STATUS_FAIL) {
+    if(const G_STATUS status = poll_events(&engine_components.engine_event_pool); status == G_STATUS_FAIL) {
         engine_components.isRunning = false;
         log_error(MON_TAG, "cannot poll event", G_STATUS_FAIL);
         return G_STATUS_FAIL;
@@ -450,12 +492,12 @@ G_STATUS monitor_process_loop() {
 
     SDL_RenderPresent(engine_components.engine_renderer);
 
-    //chrono end
+    //cron end
     const std::chrono::time_point stop_timer = std::chrono::high_resolution_clock::now();
 
-    //calc frametime
-    const int exec_micros = std::chrono::duration_cast<std::chrono::microseconds>(stop_timer - start_timer).count();
-    engine_components.frameTime = exec_micros;
+    //calc frame time
+    const long long exec_micros = std::chrono::duration_cast<std::chrono::microseconds>(stop_timer - start_timer).count();
+    engine_components.frameTime = static_cast<int>(exec_micros);
 
     return G_STATUS_OK;
 }
@@ -476,6 +518,7 @@ void monitor_force_exit() {
     engine_components.isRunning = false;
 }
 
+#if DEBUG
 G_STATUS monitor_start_debug() {
     if(engine_components.debug_module.th_isRunning) {
         return G_STATUS_FAIL;
@@ -522,6 +565,7 @@ G_STATUS monitor_stop_debug() {
     engine_components.debug_module.dbg_thread = nullptr;
     return G_STATUS_OK;
 }
+#endif
 
 G_STATUS monitor_start_updating() {
     if(engine_components.updater_module.th_isRunning) {

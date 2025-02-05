@@ -26,24 +26,36 @@ and change, but not for commercial use
 
 SceneItem_TypeDef* scenes_list = nullptr;
 SceneComponent_TypeDef* temp_comp_list = nullptr;
-int len;
-int mod_init = 0;
-int comp_init = 0;
+ScenesModule_TypeDef* scene_self_module = nullptr;
 
-G_STATUS scenes_init() {
-    if (mod_init != 0) {
+
+
+//CORE FUNCTIONS
+/*
+  @desc Init the module
+  @param (void)
+  @returns G_STATUS_OK, G_STATUS_FAIL on failure
+*/
+G_STATUS scenes_init(ScenesModule_TypeDef* self_comp) {
+    if (scene_self_module != nullptr) {
         log_error(SCENES_TAG, "Module already inited", -1);
         return G_STATUS_FAIL;
     }
-    //scenes_list = static_cast<SceneItem_TypeDef *>(malloc(sizeof(SceneItem_TypeDef)));
-    len = 0;
-    mod_init = 1;
+
+    scene_self_module = self_comp;
+    scene_self_module->id_pointer = 0;
+
     log_info(SCENES_TAG, "Inited module");
     return G_STATUS_OK;
 }
 
+/*
+  @desc Deinit the module and free memory
+  @param (void)
+  @returns G_STATUS_OK, G_STATUS_FAIL on failure
+*/
 G_STATUS scenes_deinit() {
-    if(mod_init == 0) {
+    if(!scene_self_module->status) {
         log_error(SCENES_TAG, "Module not inited", -1);
         return G_STATUS_FAIL;
     }
@@ -55,27 +67,158 @@ G_STATUS scenes_deinit() {
         curr = head;
         head = curr->next;
         free(curr->name);
-        //comp free workaround
-        temp_comp_list = curr->scene_comp_list;
-        scene_deinit_comp_list();
+        //TODO free comp list
+
         free(curr);
     }
 
-    len = 0;
-    mod_init = 0;
+    scene_self_module->id_pointer = 0;
+    scene_self_module->status = false;
     log_info(SCENES_TAG, "Deinited module");
     return G_STATUS_OK;
 }
 
-G_STATUS scene_add(SceneItem_TypeDef scene) {
-    if (mod_init == 0) {
+
+/*
+  @desc High level load the scene given by name or id
+  @param name (const char*) -> the name of the scene
+  @param scene_id (int) -> the id of the scene
+  @returns void
+*/
+G_STATUS scenes_stage_default(const char* name, int scene_id) {
+    if(!scene_self_module->status) {
         log_error(SCENES_TAG, "Module not inited", -1);
         return G_STATUS_FAIL;
     }
 
-    printf("HERE");
+    SceneItem_TypeDef* ind = scene_get_scene_item(name, scene_id);
+    if(ind == nullptr) {
+        log_error(SCENES_TAG, "Scene not found", -1);
+        return G_STATUS_FAIL;
+    }
+
+    scene_self_module->first_scene_id = scene_id;
+    scene_self_module->change_id = ind->scene_id;
+    scene_self_module->change_mode = SCENE_MODE_ON_TOP;
+    scene_self_module->change_flag = true;
+
+    return G_STATUS_OK;
+}
+
+/*
+  @desc High level load the scene given by name or id
+  @param name (const char*) -> the name of the scene
+  @param scene_id (int) -> the id of the scene
+  @param mode (int) -> the mode of loading
+  @returns void
+*/
+G_STATUS scenes_stage_scene(const char* name, int scene_id, int mode) {
+    if(!scene_self_module->status) {
+        log_error(SCENES_TAG, "Module not inited", -1);
+        return G_STATUS_FAIL;
+    }
+
+    SceneItem_TypeDef* ind = scene_get_scene_item(name, scene_id);
+    if(ind == nullptr) {
+        log_error(SCENES_TAG, "Scene not found", -1);
+        return G_STATUS_FAIL;
+    }
+
+    scene_self_module->change_id = ind->scene_id;
+    scene_self_module->change_mode = mode;
+    scene_self_module->change_flag = true;
+
+    return G_STATUS_OK;
+}
+
+/*
+  @desc High level load the scene given by name or id
+  @param name (const char*) -> the name of the scene
+  @param scene_id (int) -> the id of the scene
+  @param mode (int) -> the mode of loading
+  @returns G_STATUS_OK, G_STATUS_FAIL on failure
+*/
+G_STATUS scene_load(const char* name, int scene_id, int mode) {
+    if(!scene_self_module->status) {
+        log_error(SCENES_TAG, "Module not inited", -1);
+        return G_STATUS_FAIL;
+    }
+
+    if(scene_load_components(name, scene_id, mode) == G_STATUS_FAIL) {
+        log_error(SCENES_TAG, "Cannot load scene", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(SCENES_TAG, "Loaded scene");
+
+    return G_STATUS_OK;
+}
+
+/*
+  @desc High level load the scene components given by name or id
+  @param name (const char*) -> the name of the scene
+  @param scene_id (int) -> the id of the scene
+  @param mode (int) -> the mode of loading
+  @returns G_STATUS_OK, G_STATUS_FAIL on failure
+*/
+G_STATUS scene_load_components(const char* name, int scene_id, int mode) {
+    if(!scene_self_module->status) {
+        log_error(SCENES_TAG, "Module not inited", -1);
+        return G_STATUS_FAIL;
+    }
+
+    //load evt, updt, rnd components via extern funtion
+
+    SceneItem_TypeDef* item = scene_get_scene_item(name, scene_id);
+    if(item == nullptr) {
+        log_error(SCENES_TAG, "Cannot find scene", -1);
+        return G_STATUS_FAIL;
+    }
+
+
+    G_STATUS status = scene_sys_load_components(item->scene_comp_list, mode);
+    if(status != G_STATUS_OK) {
+        log_error(SCENES_TAG, "Cannot load scene", -1);
+        return G_STATUS_FAIL;
+    }
+    log_info(SCENES_TAG, "Loaded scene");
+
+    SceneItem_TypeDef* ind = scenes_list;
+    while(ind != nullptr) {
+        ind->active = false;
+        ind = ind->next;
+    }
+
+    item->active = true;
+    return G_STATUS_OK;
+}
+
+/*
+  @desc High level clear of the current scene
+  @param (void)
+  @returns G_STATUS_OK, G_STATUS_FAIL on failure
+*/
+G_STATUS scene_clear() {
+    if(!scene_self_module->status) {
+        log_error(SCENES_TAG, "Module not inited", -1);
+        return G_STATUS_FAIL;
+    }
+    //clear evt, upd, rnd components via extern function
+    return scene_sys_clear_components();
+}
+
+
+/*
+  @desc High level appending of a scene
+  @param scene (SceneItem_TypeDef) -> the scene item
+  @returns G_STATUS_OK, G_STATUS_FAIL on failure
+*/
+G_STATUS scene_add(SceneItem_TypeDef scene) {
+    if (!scene_self_module->status) {
+        log_error(SCENES_TAG, "Module not inited", -1);
+        return G_STATUS_FAIL;
+    }
+
     SceneItem_TypeDef* scene_temp = scene_item_to_obj(scene);
-    printf("HERE");
     if (scene_temp == nullptr) {
         log_error(SCENES_TAG, "Cannot add scene", -1);
         return G_STATUS_FAIL;
@@ -98,100 +241,29 @@ G_STATUS scene_add(SceneItem_TypeDef scene) {
     return G_STATUS_OK;
 }
 
+/*
+  @desc High level removal of the scene given by name or id
+  @param name (const char*) -> the name of the scene
+  @param id (int) -> the id of the scene
+  @returns G_STATUS_OK, G_STATUS_FAIL on failure
+*/
 G_STATUS scene_remove(const char* name, int id) {
     //remove scene
     return G_STATUS_OK;
 }
 
-G_STATUS scene_load(const char* name, int scene_id, int mode) {
-    if(mod_init == 0) {
+
+//transform
+/*
+  @desc Low level allocation of memory for a scene component
+  @param comp (SceneComponent_TypeDef) -> the object to be allocated
+  @returns pointer to newly allocated memory, nullptr on failure
+*/
+SceneComponent_TypeDef* scene_comp_to_obj(SceneComponent_TypeDef comp) {
+    if (!scene_self_module->status) {
         log_error(SCENES_TAG, "Module not inited", -1);
-        return G_STATUS_FAIL;
-    }
-
-    if(scene_load_components(name, scene_id, mode) == G_STATUS_FAIL) {
-        log_error(SCENES_TAG, "Cannot load scene", -1);
-        return G_STATUS_FAIL;
-    }
-    log_info(SCENES_TAG, "Loaded scene");
-
-    return G_STATUS_OK;
-}
-
-
-//helpers
-G_STATUS scene_init_comp_list() {
-    if(comp_init != 0) {
-        log_error(SCENES_TAG, "Component list already inited", -1);
-        return G_STATUS_FAIL;
-    }
-
-    comp_init = 1;
-    log_info(SCENES_TAG, "Inited component list");
-    return G_STATUS_OK;
-}
-
-G_STATUS scene_deinit_comp_list() {
-    if(comp_init == 0) {
-        log_error(SCENES_TAG, "Component list already deinited", -1);
-        return G_STATUS_FAIL;
-    }
-
-
-    SceneComponent_TypeDef* head = temp_comp_list;
-    SceneComponent_TypeDef* curr;
-
-    while(head != nullptr) {
-        curr = head;
-        head = head->next;
-        free(curr);
-    }
-
-    comp_init = 0;
-    log_info(SCENES_TAG, "Deinited component list");
-    return G_STATUS_OK;
-}
-
-G_STATUS scene_add_comp(SceneComponent_TypeDef comp) {
-    if(comp_init == 0) {
-        log_error(SCENES_TAG, "Component list not inited", -1);
-        return G_STATUS_FAIL;
-    }
-
-    auto* comp_temp = scene_comp_to_obj(comp);
-    if(comp_temp == nullptr) {
-        log_error(SCENES_TAG, "Cannot add scene", -1);
-        return G_STATUS_FAIL;
-    }
-
-    if(temp_comp_list == nullptr) {
-        temp_comp_list = comp_temp;
-        return G_STATUS_OK;
-    }
-
-    SceneComponent_TypeDef* ind = temp_comp_list;
-    while(ind->next != nullptr) {
-        ind = ind->next;
-    }
-    ind->next = comp_temp;
-    log_info(SCENES_TAG, "Added scene component");
-    return G_STATUS_OK;
-
-}
-
-SceneComponent_TypeDef* scene_get_comp_list() {
-    if(comp_init == 0) {
-        log_error(SCENES_TAG, "Component list not inited", -1);
         return nullptr;
     }
-    return temp_comp_list;
-}
-
-SceneComponent_TypeDef* scene_comp_to_obj(SceneComponent_TypeDef comp) {
-    // if(comp_init == 0) {
-    //     log_error(SCENES_TAG, "Component list not inited", -1);
-    //     return nullptr;
-    // }
 
     auto* temp = static_cast<SceneComponent_TypeDef *>(malloc(sizeof(SceneComponent_TypeDef)));
     temp->key_evt_def = nullptr;
@@ -204,7 +276,9 @@ SceneComponent_TypeDef* scene_comp_to_obj(SceneComponent_TypeDef comp) {
     //key events
     KeyEvtItem_TypeDef* keind = comp.key_evt_def;
     if(keind == nullptr) {
-        //log_debug(SCENES_TAG, "key is null", -2);
+#if DEBUG
+        log_debug(SCENES_TAG, "key is null", -2);
+#endif
         temp->key_evt_def = nullptr;
     }else {
         while(keind != nullptr) {
@@ -228,11 +302,12 @@ SceneComponent_TypeDef* scene_comp_to_obj(SceneComponent_TypeDef comp) {
     //mouse
     MouseEvtItem_TypeDef* meind = comp.mouse_evt_def;
     if(meind == nullptr) {
-        //log_debug(SCENES_TAG, "mouse is null", -2);
+#if DEBUG
+        log_debug(SCENES_TAG, "mouse is null", -2);
+#endif
         temp->mouse_evt_def = nullptr;
     }else {
         while(meind != nullptr) {
-            printf("DADADAD");
             auto* tmp = static_cast<MouseEvtItem_TypeDef *>(malloc(sizeof(MouseEvtItem_TypeDef)));
             memcpy(tmp, meind, sizeof(MouseEvtItem_TypeDef));
             tmp->next = nullptr;
@@ -253,7 +328,9 @@ SceneComponent_TypeDef* scene_comp_to_obj(SceneComponent_TypeDef comp) {
     //system
     SysEvtItem_TypeDef* seind = comp.sys_evt_def;
     if(seind == nullptr) {
-        //log_debug(SCENES_TAG, "sys is null", -2);
+#if DEBUG
+        log_debug(SCENES_TAG, "sys is null", -2);
+#endif
         temp->sys_evt_def = nullptr;
     }else {
         while(seind != nullptr) {
@@ -277,7 +354,9 @@ SceneComponent_TypeDef* scene_comp_to_obj(SceneComponent_TypeDef comp) {
     //update
     UpdateComponent_Typedef* ucind = comp.update_def;
     if(ucind == nullptr) {
-        //log_debug(SCENES_TAG, "upd is null", -2);
+#if DEBUG
+        log_debug(SCENES_TAG, "upd is null", -2);
+#endif
         temp->update_def = nullptr;
     }else {
         while(ucind != nullptr) {
@@ -303,7 +382,9 @@ SceneComponent_TypeDef* scene_comp_to_obj(SceneComponent_TypeDef comp) {
         memcpy(rndtmp, comp.rnd_component, sizeof(RendererComponent_Typedef));
         temp->rnd_component = rndtmp;
     }else {
-        //log_debug(SCENES_TAG, "rnd is null", -2);
+#if DEBUG
+        log_debug(SCENES_TAG, "rnd is null", -2);
+#endif
         temp->rnd_component = nullptr;
     }
 
@@ -312,10 +393,13 @@ SceneComponent_TypeDef* scene_comp_to_obj(SceneComponent_TypeDef comp) {
     return temp;
 }
 
-
-
+/*
+  @desc Low level allocation of memory for a scene
+  @param comp (SceneItem_TypeDef) -> the object to be allocated
+  @returns pointer to newly allocated memory, nullptr on failure
+*/
 SceneItem_TypeDef* scene_item_to_obj(SceneItem_TypeDef scene) {
-    if (mod_init == 0) {
+    if (!scene_self_module->status) {
         log_error(SCENES_TAG, "Module not inited", -1);
         return nullptr;
     }
@@ -330,7 +414,6 @@ SceneItem_TypeDef* scene_item_to_obj(SceneItem_TypeDef scene) {
     while(scind != nullptr) {
         auto* tmp = scene_comp_to_obj(*scind);
         tmp->next = nullptr;
-        //add to real list
         if(temp->scene_comp_list == nullptr) {
             temp->scene_comp_list = tmp;
         }else {
@@ -344,58 +427,26 @@ SceneItem_TypeDef* scene_item_to_obj(SceneItem_TypeDef scene) {
         scind = scind->next;
     }
 
-    //temp->scene_comp_list = scene.scene_comp_list;
     temp->type = 0;
-    temp->scene_id = len++;
+    temp->scene_id = scene_self_module->id_pointer;
     temp->active = false;
     temp->next = nullptr;
+
+    scene_self_module->id_pointer++;
 
     return temp;
 }
 
-G_STATUS scene_clear() {
-    if(mod_init == 0) {
-        log_error(SCENES_TAG, "Module not inited", -1);
-        return G_STATUS_FAIL;
-    }
-    //clear evt, upd, rnd components via extern function
-    return scene_sys_clear_components();
-}
 
-G_STATUS scene_load_components(const char* name, int scene_id, int mode) {
-    if(mod_init == 0) {
-        log_error(SCENES_TAG, "Module not inited", -1);
-        return G_STATUS_FAIL;
-    }
-
-    //load evt, updt, rnd components via extern funtion
-
-    SceneItem_TypeDef* item = scene_get_scene_item(name, scene_id);
-    if(item == nullptr) {
-        log_error(SCENES_TAG, "Cannot find scene", -1);
-        return G_STATUS_FAIL;
-    }
-    printf("LOADING SCENE: %s\n", item->name);
-
-    G_STATUS status = scene_sys_load_components(item->scene_comp_list, mode);
-    if(status != G_STATUS_OK) {
-        log_error(SCENES_TAG, "Cannot load scene", -1);
-        return G_STATUS_FAIL;
-    }
-    log_info(SCENES_TAG, "Loaded scene");
-
-    SceneItem_TypeDef* ind = scenes_list;
-    while(ind != nullptr) {
-        ind->active = false;
-        ind = ind->next;
-    }
-
-    item->active = true;
-    return G_STATUS_OK;
-}
-
+//getters
+/*
+  @desc return the object
+  @param name (const char*) -> the name of the scene
+  @param id (int) -> the id of the scene
+  @returns pointer to allocated memory, nullptr on failure
+*/
 SceneItem_TypeDef* scene_get_scene_item(const char* name, int scene_id) {
-    if(mod_init == 0) {
+    if(!scene_self_module->status) {
         log_error(SCENES_TAG, "Module not inited", -1);
         return nullptr;
     }
@@ -407,7 +458,6 @@ SceneItem_TypeDef* scene_get_scene_item(const char* name, int scene_id) {
 
     SceneItem_TypeDef* ind = scenes_list;
     while(ind != nullptr) {
-        printf("AAAAPR: %s\n", ind->name);
         if(mode == 0) {
             if(strcmp(ind->name, name) == 0) {
                 return ind;
@@ -419,5 +469,15 @@ SceneItem_TypeDef* scene_get_scene_item(const char* name, int scene_id) {
         }
         ind = ind->next;
     }
+    return nullptr;
+}
+
+/*
+  @desc return the object components (TODO WIP)
+  @param name (const char*) -> the name of the scene
+  @param id (int) -> the id of the scene
+  @returns pointer to allocated memory, nullptr on failure
+*/
+SceneComponent_TypeDef* scene_get_comp_list() {
     return nullptr;
 }

@@ -101,15 +101,14 @@ G_STATUS register_start_menu() {
 }
 
 G_STATUS start_menu_set_active() {
-    scene_load("start_menu", 0, SCENE_MODE_CLEAR);
-    return G_STATUS_OK;
+    return scenes_stage_default("start_menu", 0);
 }
 
 
 //callbacks
 void start_press(void* obj) {
     log_info(START_MENU_TAG, "Pressed start");
-    change_scene_rename("Player", SCENE_MODE_CLEAR);
+    player_set_active();
 }
 
 void start_hover_in(void* obj) {
@@ -149,7 +148,7 @@ void exit_hover_out(void* obj) {
 
 
 void start_menu_render(void* obj, SDL_Renderer** renderer) {
-    auto* sm = (StartMenu_TypeDef*)obj;
+    auto* sm = static_cast<StartMenu_TypeDef *>(obj);
     int status;
     SDL_FRect start;
     SDL_FRect options;

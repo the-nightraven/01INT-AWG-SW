@@ -109,8 +109,14 @@ typedef struct RendererComponent_Typedef {
 //event stack
 //updatestack
 
-//TODO boil all events into one tpedef with type wildcard
+//TODO implement init/deinit
+//TODO (maybe for optimisation) boil each event into one general type
 typedef struct SceneComponent_TypeDef {
+    /* staged for engine alpha 0.0.2
+    int (*init_component)();
+    int (*destroy_component)();
+    */
+
     UpdateComponent_Typedef* update_def;
     KeyEvtItem_TypeDef* key_evt_def;
     MouseEvtItem_TypeDef* mouse_evt_def;
@@ -158,12 +164,22 @@ typedef struct WindowModule_TypeDef {
     bool status;
 } WindowModule_TypeDef;
 
+typedef struct ScenesModule_TypeDef {
+    bool status;
+    int first_scene_id; //TODO add separate ids for menu, loading and stuff
+    bool change_flag;
+    int change_id;
+    int change_mode;
+    int id_pointer;
+} ScenesModule_TypeDef;
+
 typedef struct MonitorComponents_TypeDef {
     EvtModule_TypeDef event_module;
     UpdaterModule_TypeDef updater_module;
     RendererModule_TypeDef renderer_module;
     DebugModule_TypeDef debug_module;
     WindowModule_TypeDef window_module;
+    ScenesModule_TypeDef scenes_module;
     bool isRunning;
     SDL_Window* engine_display;
     SDL_Renderer* engine_renderer;
