@@ -301,8 +301,21 @@ G_STATUS monitor_init_modules() {
         return status;
     }
 
+    if(status = init_window(&(engine_components.engine_display), &(engine_components.engine_renderer)); status == G_STATUS_FAIL) {
+        return G_STATUS_FAIL;
+    }
+    //feed into component list
+    engine_components.window_module.status = true;
+
+#if DEBUG
+    //init debug
+    status = debugger_init(&engine_components.debug_module);
+    if(status == G_STATUS_FAIL) {
+        return status;
+    }
+
     //init renderer
-    status = renderer_init();
+    status = renderer_init(&(engine_components.engine_renderer));
     if(status != G_STATUS_OK) {
         return status;
     }
@@ -319,30 +332,20 @@ G_STATUS monitor_init_modules() {
     }
     engine_components.scenes_module.status = true;
 
-    return G_STATUS_OK;
-}
-
-G_STATUS monitor_init_window_module() {
-    G_STATUS status;
-    //init window
-    if(status = init_window(&(engine_components.engine_display), &(engine_components.engine_renderer)); status == G_STATUS_FAIL) {
-        return G_STATUS_FAIL;
-    }
-    //feed into component list
-    engine_components.window_module.status = true;
-
-#if DEBUG
-    //init debug
-    status = debugger_init(&engine_components.debug_module);
-    if(status == G_STATUS_FAIL) {
-        return status;
-    }
     status = debugger_register_events();
     if(status == G_STATUS_FAIL) {
         return status;
     }
     engine_components.debug_module.status = true;
 #endif
+
+    return G_STATUS_OK;
+}
+
+G_STATUS monitor_init_window_module() {
+    G_STATUS status;
+    //init window
+
 
     return G_STATUS_OK;
 }

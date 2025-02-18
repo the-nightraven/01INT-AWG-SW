@@ -32,15 +32,19 @@ G_STATUS debugger_init(DebugModule_TypeDef* dbg) {
     }
 
     self_module = dbg;
-    self_module->rnd_comp = (RendererComponent_Typedef){
-        0,
-        "Debugger",
-        true,
-        nullptr,
-        1,
-        dbg_render,
-        nullptr
-    };
+
+    RendererComponent_Typedef dbg_render_comp;
+    dbg_render_comp.handler = 0;
+    dbg_render_comp.name = "Debugger";
+    dbg_render_comp.visibility = true;
+    dbg_render_comp.sprite.map_path = nullptr;
+    dbg_render_comp.sprite.texture = nullptr;
+    dbg_render_comp.object = nullptr;
+    dbg_render_comp.obj_render = dbg_render;
+    dbg_render_comp.obj_type = 1;
+    dbg_render_comp.next = nullptr;
+    self_module->rnd_comp = dbg_render_comp;
+
     self_module->fps = 0;
     dbg_font = FC_CreateFont();
     FC_LoadFont(dbg_font, debugger_get_renderer_instance(), "../assets/fonts/Lato-Regular.ttf", 20,
@@ -143,7 +147,7 @@ void debugger_print_rndr(void* value) {
 }
 
 //@TODO: split debug rendering objects into their own components
-void dbg_render(void* obj, SDL_Renderer** renderer) {
+void dbg_render(void* obj, SDL_Renderer** renderer, SDL_Texture* texture) {
     FC_Draw(dbg_font, *renderer, 0, 0, "%d FPS\n", self_module->fps);
 
     if(self_module->mouseStackVisible) {

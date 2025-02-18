@@ -29,9 +29,9 @@ and change, but not for commercial use
 #define RENDERER_ENGINE_SDL2           1
 
 //methods
-G_STATUS renderer_init();
+G_STATUS renderer_init(SDL_Renderer** eng_renderer);
 G_STATUS renderer_deinit();
-RendererComponentHandler renderer_register_component(RendererComponent_Typedef item);
+RendererComponentHandler renderer_register_component(const RendererComponent_Typedef &item);
 G_STATUS renderer_remove_component(RendererComponentHandler handler);
 
 void renderer_create_frame(SDL_Renderer** renderer);

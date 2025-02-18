@@ -19,12 +19,24 @@ and change, but not for commercial use
 */
 
 #include "renderer.h"
+
+#include <SDL_image.h>
+
 #include "logger.h"
 
 RendererComponent_Typedef* renderer_visible_list;
 RendererComponentHandler obj_handler_counter;
+SDL_Renderer** renderer_ref;
 
-G_STATUS renderer_init() {
+//TODO renderer_ref notnull protection
+
+G_STATUS renderer_init(SDL_Renderer** eng_renderer) {
+    if(eng_renderer == nullptr) {
+        log_error(RENDERER_TAG, "Renderer doesnt exist", -1);
+        return G_STATUS_FAIL;
+    }
+    renderer_ref = eng_renderer;
+
     renderer_visible_list = nullptr;
     obj_handler_counter = 0;
 
@@ -55,7 +67,7 @@ G_STATUS renderer_deinit() {
     return G_STATUS_OK;
 }
 
-RendererComponentHandler renderer_register_component(RendererComponent_Typedef item) {
+RendererComponentHandler renderer_register_component(const RendererComponent_Typedef &item) {
     RendererComponent_Typedef* tmp = renderer_to_instance(item);
     tmp->handler = obj_handler_counter++;
 
@@ -75,7 +87,7 @@ RendererComponentHandler renderer_register_component(RendererComponent_Typedef i
     return tmp->handler;
 }
 
-G_STATUS renderer_remove_component(RendererComponentHandler handler) {
+G_STATUS renderer_remove_component(const RendererComponentHandler handler) {
     RendererComponent_Typedef* prev = nullptr;
     RendererComponent_Typedef* curr = renderer_visible_list;
 
@@ -128,7 +140,6 @@ void renderer_clear_stack() {
 
     renderer_visible_list = nullptr;
     obj_handler_counter = 0;
-    return;
 }
 
 void renderer_create_frame(SDL_Renderer** renderer) {
@@ -136,16 +147,44 @@ void renderer_create_frame(SDL_Renderer** renderer) {
     RendererComponent_Typedef* ind = renderer_visible_list;
 
     while(ind != nullptr) {
-        ind->obj_render(ind->object, renderer);
+        ind->obj_render(ind->object, renderer, ind->sprite.texture);
         ind = ind->next;
     }
 }
 
+//TODO solve memory leak
 RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item) {
     auto* tmp = static_cast<RendererComponent_Typedef *>(malloc(sizeof(RendererComponent_Typedef)));
     tmp->visibility = item.visibility;
     tmp->name = static_cast<char*>(malloc(sizeof(char) * 50));
     strcpy(tmp->name, item.name);
+
+    if(item.sprite.map_path != nullptr) {
+        tmp->sprite.active = true;
+        log_debug(RENDERER_TAG, "has sprite", 0);
+        tmp->sprite.map_path = item.sprite.map_path;
+
+        SDL_Surface* tmp_srf = IMG_Load(tmp->sprite.map_path);
+        if(tmp_srf == nullptr) {
+            log_error(RENDERER_TAG, "Image location error", -1);
+            return nullptr;
+        }
+        log_debug(RENDERER_TAG, "loaded image", 0);
+
+        tmp->sprite.texture = SDL_CreateTextureFromSurface(*renderer_ref, tmp_srf);
+        if(tmp->sprite.texture == nullptr) {
+            log_error(RENDERER_TAG, "Texture could not be created", -1);
+            return nullptr;
+        }
+        log_debug(RENDERER_TAG, "created texture", 0);
+        SDL_FreeSurface(tmp_srf);
+
+    } else {
+        tmp->sprite.map_path = nullptr;
+        tmp->sprite.texture = nullptr;
+        tmp->sprite.active = false;
+    }
+
     tmp->obj_type = item.obj_type;
     tmp->object = item.object;
     tmp->obj_render = item.obj_render;

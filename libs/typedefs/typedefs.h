@@ -93,14 +93,34 @@ typedef struct UpdateComponent_Typedef {
     UpdateComponent_Typedef* next;
 } UpdateComponent_Typedef;
 
+typedef struct RendererSprite_TypeDef {
+    bool active;
+    const char* map_path;
+    SDL_Texture* texture;
+    int frameWidth;
+    int frameHeight;
+
+    //animations
+    int state;
+    int frameCount;
+    int frameIndex;
+    Uint32 lastUpdate;
+} RendererSprite_TypeDef;
+
 //@TODO add object free method pointer
 typedef struct RendererComponent_Typedef {
     RendererComponentHandler handler;
     char* name;
     bool visibility;
+
+    //sprites
+    RendererSprite_TypeDef sprite;
+
+    //object
     void* object;
     int obj_type;
-    void (*obj_render)(void*, SDL_Renderer**);
+    void (*obj_render)(void*, SDL_Renderer**, SDL_Texture*);
+
     RendererComponent_Typedef* next;
 } RendererComponent_Typedef;
 

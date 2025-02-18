@@ -75,6 +75,6 @@ void exit_press(void* obj);
 void exit_hover_in(void* obj);
 void exit_hover_out(void* obj);
 
-void start_menu_render(void* obj, SDL_Renderer** renderer);
+void start_menu_render(void* obj, SDL_Renderer** renderer, SDL_Texture* texture);
 
 #endif //START_MENU_H

@@ -42,13 +42,6 @@ G_STATUS app_init() {
     }
     log_info(APP_TAG, "Inited engine modules");
 
-    status = monitor_init_window_module();
-    if(status == G_STATUS_FAIL) {
-        log_error(APP_TAG, "Cannot init engine display module", -1);
-        return G_STATUS_FAIL;
-    }
-    log_info(APP_TAG, "Inited engine display module");
-
     status = monitor_check_env();
     if(status == G_STATUS_FAIL) {
         log_error(APP_TAG, "Engine modules not inited successfuly", -1);
@@ -107,9 +100,9 @@ G_STATUS app_init() {
 }
 
 G_STATUS app_loop() {
-    G_STATUS status;
-    SDL_Renderer* eng_renderer = monitor_get_renderer_instance();
-    SDL_Window* eng_display = monitor_get_display_instance();
+    G_STATUS status = monitor_get_run_cond();
+    // SDL_Renderer* eng_renderer = monitor_get_renderer_instance();
+    // SDL_Window* eng_display = monitor_get_display_instance();
 
     log_info(APP_TAG, "Loop Started!");
     while(monitor_get_run_cond()) {

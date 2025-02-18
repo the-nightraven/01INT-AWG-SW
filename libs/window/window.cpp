@@ -46,6 +46,12 @@ G_STATUS init_window(SDL_Window **mainFrame, SDL_Renderer **renderer) {
 
     SDL_SetRenderDrawBlendMode(*renderer, SDL_BLENDMODE_BLEND);
 
+#if DEBUG
+    SDL_RendererInfo info;
+    SDL_GetRendererInfo(*renderer, &info);
+    printf("%s Using renderer: %s\n", WINDOW_TAG, info.name);
+#endif
+
     return G_STATUS_OK;
 }
 

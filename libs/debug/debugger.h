@@ -85,7 +85,7 @@ extern void* debugger_get_rndrstack_instance();
 extern SDL_Renderer* debugger_get_renderer_instance();
 
 //render
-void dbg_render(void* obj, SDL_Renderer** renderer);
+void dbg_render(void* obj, SDL_Renderer** renderer, SDL_Texture* texture);
 
 
 

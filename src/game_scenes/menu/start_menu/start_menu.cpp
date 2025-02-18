@@ -83,7 +83,9 @@ G_STATUS register_start_menu() {
     peme->next = nullptr;
 
     //renderer callback
-    RendererComponent_Typedef menu_render_comp = {0, "start_menu", true, &start_menu_obj, 0, start_menu_render, nullptr};
+    RendererSprite_TypeDef s;
+    s.map_path = nullptr;
+    RendererComponent_Typedef menu_render_comp = {0, "start_menu", true, s, &start_menu_obj, 0, start_menu_render, nullptr};
 
     //scene components
     SceneComponent_TypeDef start_comp = {nullptr, nullptr, psme, nullptr, &menu_render_comp, nullptr};
@@ -147,7 +149,7 @@ void exit_hover_out(void* obj) {
 }
 
 
-void start_menu_render(void* obj, SDL_Renderer** renderer) {
+void start_menu_render(void* obj, SDL_Renderer** renderer, SDL_Texture* texture) {
     auto* sm = static_cast<StartMenu_TypeDef *>(obj);
     int status;
     SDL_FRect start;
