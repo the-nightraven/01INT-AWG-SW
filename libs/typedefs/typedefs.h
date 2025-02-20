@@ -93,6 +93,7 @@ typedef struct UpdateComponent_Typedef {
     UpdateComponent_Typedef* next;
 } UpdateComponent_Typedef;
 
+//TODO (rev0.0.2) share textures
 typedef struct RendererSprite_TypeDef {
     bool active;
     const char* map_path;
