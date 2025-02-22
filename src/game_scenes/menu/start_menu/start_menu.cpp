@@ -79,9 +79,11 @@ G_STATUS register_start_menu() {
     //renderer callback
     RendererSprite_TypeDef s;
     s.map_path = "../assets/ui-ux/UIMenu.png";
-    RendererComponent_Typedef start_render_comp = {0, "start_button", true, s, &start_menu_obj, 0, start_button_render, nullptr};
-    RendererComponent_Typedef options_render_comp = {0, "options_button", true, s, &start_menu_obj, 0, options_button_render, nullptr};
-    RendererComponent_Typedef exit_render_comp = {0, "exit_button", true, s, &start_menu_obj, 0, exit_button_render, nullptr};
+    UpdateComponent_Typedef u = {};
+
+    RendererComponent_Typedef start_render_comp = {0, "start_button", true,  false,s, u, &start_menu_obj, 0, start_button_render, nullptr};
+    RendererComponent_Typedef options_render_comp = {0, "options_button", true, false, s, u, &start_menu_obj, 0, options_button_render, nullptr};
+    RendererComponent_Typedef exit_render_comp = {0, "exit_button", true, false, s, u, &start_menu_obj, 0, exit_button_render, nullptr};
 
     //scene components
     SceneComponent_TypeDef start_comp = {nullptr, nullptr, &sme, nullptr, &start_render_comp, nullptr};

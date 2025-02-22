@@ -98,14 +98,6 @@ typedef struct RendererSprite_TypeDef {
     bool active;
     const char* map_path;
     SDL_Texture* texture;
-    int frameWidth;
-    int frameHeight;
-
-    //animations
-    int state;
-    int frameCount;
-    int frameIndex;
-    Uint32 lastUpdate;
 } RendererSprite_TypeDef;
 
 //@TODO add object free method pointer
@@ -115,7 +107,9 @@ typedef struct RendererComponent_Typedef {
     bool visibility;
 
     //sprites
+    bool animatable;
     RendererSprite_TypeDef sprite;
+    UpdateComponent_Typedef animation_cb;
 
     //object
     void* object;

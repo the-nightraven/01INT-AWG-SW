@@ -44,5 +44,7 @@ extern RenderEngine renderer_get_engine();
 
 //helpers
 RendererComponent_Typedef* renderer_get_list();
+RendererComponent_Typedef* renderer_get_component(RendererComponentHandler hnd, const char* name);
+G_STATUS renderer_change_comp_state(RendererComponentHandler hnd, const char* name, int state);
 
 #endif

@@ -31,10 +31,35 @@ and change, but not for commercial use
 #define PLAYER_START_X         (float)WINDOW_WIDTH / 2 - PLAYER_SIZE_W / 2
 #define PLAYER_START_Y         (float)WINDOW_HEIGHT / 2 - PLAYER_SIZE_H / 2
 
+//player sprite definitions
+#define PLAYER_ANIMATION_FRAME_RATIO            8
+
+#define PLAYER_STATE_IDLE                       0
+#define PLAYER_STATE_IDLE_INDEX                 0
+#define PLAYER_STATE_IDLE_LENGTH                4
+
+#define PLAYER_STATE_MOVING                     1
+#define PLAYER_STATE_MOVING_INDEX               4
+#define PLAYER_STATE_MOVING_LENGTH              8
+
+
+#define PLAYER_SPRITE_FRAME_WIDTH               48
+#define PLAYER_SPRITE_FRAME_HEIGHT              48
+
 typedef struct Player_Typedef {
     RendererComponentHandler rnd_handler;
     AWG_Rect dimensions;
     float speed;
+
+    //animations
+    int curr_state;
+    int frame_width;
+    int frame_height;
+    int frame_index;
+    int frame_length;
+    int frame_counter;
+
+    bool orientation; //0 left, 1 right
 } Player_Typedef;
 
 //functions
@@ -53,6 +78,7 @@ void process_player_movement(void* player_instance);
 
 //renderer callback
 void player_render_cb(void* player_ins, SDL_Renderer** renderer, SDL_Texture* texture);
+void player_animations_statemachine(void* state);
 
 //test
 void player_click_cb(void* val);

@@ -48,6 +48,7 @@ G_STATUS renderer_init(SDL_Renderer** eng_renderer) {
     return G_STATUS_OK;
 }
 
+//TODO MEMORY LEAKS
 G_STATUS renderer_deinit() {
     if(renderer_visible_list != nullptr) {
         RendererComponent_Typedef* prev = renderer_visible_list;
@@ -185,6 +186,8 @@ RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item) 
         tmp->sprite.active = false;
     }
 
+    tmp->animatable = item.animatable;
+    tmp->animation_cb = item.animation_cb;
     tmp->obj_type = item.obj_type;
     tmp->object = item.object;
     tmp->obj_render = item.obj_render;
@@ -196,4 +199,34 @@ RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item) 
 
 RendererComponent_Typedef* renderer_get_list() {
     return renderer_visible_list;
+}
+
+RendererComponent_Typedef* renderer_get_component(RendererComponentHandler hnd, const char* name) {
+    RendererComponent_Typedef* curr = renderer_visible_list;
+    int mode = 0;
+
+    if(name == nullptr) {
+        mode = 1;
+    }
+
+    while(curr != nullptr) {
+        if(curr->handler == hnd && mode == 1) {
+            return curr;
+        }
+        if(strcmp(curr->name, name) == 0 && mode == 0) {
+            return curr;
+        }
+        curr = curr->next;
+    }
+    return nullptr;
+}
+
+//depricated
+G_STATUS renderer_change_comp_state(RendererComponentHandler hnd, const char* name, int state) {
+    RendererComponent_Typedef* curr = renderer_get_component(hnd, name);
+    if(curr == nullptr) {
+        log_error(RENDERER_TAG, "No such component", -1);
+        return G_STATUS_FAIL;
+    }
+    return G_STATUS_OK;
 }

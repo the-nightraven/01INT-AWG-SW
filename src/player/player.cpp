@@ -21,32 +21,19 @@ and change, but not for commercial use
 #include "includes.h"
 #include "player.h"
 
+#include <chrono>
 #include <SDL_image.h>
 
 #include "updater.h"
 #include "reader.h"
 #include "logger.h"
+#include "renderer.h"
 #include "scene/scene.h"
 
 Player_Typedef player;
 bool is_init = false;
 SceneItem_TypeDef player_scene;
-
-//test background
-// SDL_Texture* player_texture1 = nullptr;
-// SDL_Surface* player_surface1 = nullptr;
-//
-// SDL_Texture* player_texture2 = nullptr;
-// SDL_Surface* player_surface2 = nullptr;
-//
-// SDL_Texture* player_texture3 = nullptr;
-// SDL_Surface* player_surface3 = nullptr;
-//
-// SDL_Texture* player_texture4 = nullptr;
-// SDL_Surface* player_surface4 = nullptr;
-//
-// SDL_Texture* player_texture5 = nullptr;
-// SDL_Surface* player_surface5 = nullptr;
+bool evt_trigger = false;
 
 //functions
 G_STATUS init_player() {
@@ -56,15 +43,15 @@ G_STATUS init_player() {
     player.dimensions.x = PLAYER_START_X;
     player.dimensions.y = PLAYER_START_Y;
     player.speed = 0;
+    player.curr_state = 0;
+    player.frame_width = PLAYER_SPRITE_FRAME_WIDTH;
+    player.frame_height = PLAYER_SPRITE_FRAME_HEIGHT;
+    player.frame_index = PLAYER_STATE_IDLE_INDEX;
+    player.frame_length = PLAYER_STATE_IDLE_LENGTH;
+    player.frame_counter = 0;
+    player.orientation = false;
+
     is_init = true;
-
-    //test background
-    // player_surface1 = IMG_Load("../assets/background/Background-1.png");
-    // player_surface2 = IMG_Load("../assets/background/Background-2.png");
-    // player_surface3 = IMG_Load("../assets/background/Background-3.png");
-    // player_surface4 = IMG_Load("../assets/background/Background-4.png");
-    // player_surface5 = IMG_Load("../assets/background/Background-5.png");
-
     return G_STATUS_OK;
 }
 
@@ -95,16 +82,25 @@ G_STATUS player_register_events() {
 
 
     //rnd stack
-    RendererComponent_Typedef player_render;
+
+    RendererComponent_Typedef player_render = {};
     player_render.handler = 0;
     player_render.name = "Player";
     player_render.visibility = true;
+
     player_render.sprite.map_path = "../assets/characters/main/default.png";
     player_render.sprite.texture = nullptr;
+
+    player_render.animatable = true;
+    player_render.animation_cb = {false, nullptr, player_animations_statemachine, nullptr};
+
+
     player_render.object = get_player_instance();
     player_render.obj_type = 1;
     player_render.obj_render = player_render_cb;
     player_render.next = nullptr;
+
+    //animations
 
     //test click
     // UpdateCallback_TypeDef pl_click = {false, nullptr, player_click_cb};
@@ -137,6 +133,9 @@ G_STATUS player_register_events() {
 }
 
 void player_move_left(void* val) {
+    //update animation state
+    evt_trigger = true;
+
     auto *pu = static_cast<Player_Typedef *>(val);
     if(pu->speed > -1 * PLAYER_BASE_SPEED) {
         pu->speed -= PLAYER_BASE_SPEED;
@@ -144,6 +143,9 @@ void player_move_left(void* val) {
 }
 
 void player_move_right(void* val) {
+    //update animation state
+    evt_trigger = true;
+
     auto *pu = static_cast<Player_Typedef *>(val);
     if(pu->speed < PLAYER_BASE_SPEED) {
         pu->speed += PLAYER_BASE_SPEED;
@@ -151,11 +153,17 @@ void player_move_right(void* val) {
 }
 
 void player_stop_move_left(void *val) {
+    //update animation state
+    evt_trigger = true;
+
     auto* pu = static_cast<Player_Typedef *>(val);
     pu->speed += PLAYER_BASE_SPEED;
 }
 
 void player_stop_move_right(void *val) {
+    //update animation state
+    evt_trigger = true;
+
     auto* pu = static_cast<Player_Typedef *>(val);
     pu->speed -= PLAYER_BASE_SPEED;
 }
@@ -171,6 +179,19 @@ Player_Typedef* get_player_instance() {
 void process_player_movement(void* player_instance) {
     auto* pl = static_cast<Player_Typedef *>(player_instance);
     pl->dimensions.x += pl->speed * updater_get_delta_time();
+
+    if(evt_trigger) {
+        if(pl->speed == 0) {
+            player.curr_state = PLAYER_STATE_IDLE;
+            player.frame_index = PLAYER_STATE_IDLE_INDEX;
+            evt_trigger = false;
+        }else {
+            player.curr_state = PLAYER_STATE_MOVING;
+            player.frame_index = PLAYER_STATE_MOVING_INDEX;
+            player.orientation = pl->speed > 0;
+        }
+        evt_trigger = false;
+    }
     //pl->x += (pl->x * updater_get_delta_time())/pl->speed;
 }
 
@@ -178,8 +199,43 @@ void player_render_cb(void* player_ins, SDL_Renderer** renderer, SDL_Texture* te
     auto* pl = static_cast<Player_Typedef *>(player_ins);
 
     SDL_FRect player_rect = {pl->dimensions.x, pl->dimensions.y, pl->dimensions.w, pl->dimensions.h};
-    SDL_RenderCopyF(*renderer, texture, nullptr, &player_rect);
+    SDL_Rect player_frame_rect = {pl->frame_index * PLAYER_SPRITE_FRAME_WIDTH, 0, PLAYER_SPRITE_FRAME_WIDTH, PLAYER_SPRITE_FRAME_HEIGHT};
 
+    if(!player.orientation) {
+        SDL_RenderCopyF(*renderer, texture, &player_frame_rect, &player_rect);
+    }else {
+        SDL_RenderCopyExF(*renderer, texture, &player_frame_rect, &player_rect, 0, nullptr, SDL_FLIP_HORIZONTAL);
+    }
+
+}
+
+void player_animations_statemachine(void* state) {
+
+    if(player.curr_state == PLAYER_STATE_MOVING) {
+        if(player.frame_counter < 7) {
+            player.frame_counter++;
+        }else {
+            player.frame_counter = 0;
+
+            if(player.frame_index < PLAYER_STATE_MOVING_INDEX + PLAYER_STATE_MOVING_LENGTH - 1) {
+                player.frame_index++;
+            }else {
+                player.frame_index = PLAYER_STATE_MOVING_INDEX;
+            }
+        }
+    }else if(player.curr_state == PLAYER_STATE_IDLE) {
+        if(player.frame_counter < 7) {
+            player.frame_counter++;
+        }else {
+            player.frame_counter = 0;
+
+            if(player.frame_index < PLAYER_STATE_IDLE_INDEX + PLAYER_STATE_IDLE_LENGTH - 1) {
+                player.frame_index++;
+            }else {
+                player.frame_index = PLAYER_STATE_IDLE_INDEX;
+            }
+        }
+    }
 }
 
 //testing
