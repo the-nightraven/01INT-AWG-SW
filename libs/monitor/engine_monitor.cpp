@@ -189,8 +189,22 @@ G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list, int mode) 
         //register renderer components with noess
         if(ind->rnd_component != nullptr) {
             RendererComponent_Typedef* rcind = ind->rnd_component;
-            renderer_register_component(*rcind);
+            RendererComponentHandler hnd;
+            hnd = renderer_register_component(*rcind);
             //loopback handler to object
+
+            //register animations updater component if exists
+            if(rcind->animatable) {
+                RendererComponent_Typedef* rcurr = renderer_get_component(hnd, nullptr);
+
+                rcurr->animation_cb.essential = ENGINE_NONESSENTIAL_COMPONENT;
+                rcurr->animation_cb.value = nullptr;
+                status = register_update_components(rcurr->animation_cb);
+                if(status != G_STATUS_OK) {
+                    log_error(MON_TAG, "Failed to add updater component", -1);
+                    return status;
+                }
+            }
 
             log_info(MON_TAG, "Registered renderer component");
         }
