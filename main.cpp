@@ -18,25 +18,48 @@ and change, but not for commercial use
 ###########################################################
 */
 
+/*
+ * Main import file
+ */
 #include "app.h"
 
+
+/*
+ * Production profile includes
+ */
 #ifndef DEBUG
 #include <windows.h>
 #define SDL_MAIN_HANDLED
 #endif
 
+/*
+ * Debug tag for MAIN
+ */
 #define MAIN_TAG       "MAIN"
 
-//external definitions
+
+/*
+ * @Desc: printf wrapper for current system
+ * @Param: str (char*) -> string to be printed
+ * @returns: (void)
+ */
 void system_print(char* str) {
     printf("%s\n", str);
 }
 
+/*
+ * Main entrypoint for DEBUG profile
+ */
 #if DEBUG
 
+/*
+ * @Desc: main entrypoint
+ * @Param: argc (int) -> CLI argument length
+ *         argv (char**) -> CLI arguments
+ * @Returns: status (int) -> exit status
+ */
 int main(int argc, char* args[]) {
-    G_STATUS status;   
-    status = app_init();
+    G_STATUS status = app_init();
 
     if(status == G_STATUS_FAIL) {
         log_error(MAIN_TAG, "Cannot init app", G_STATUS_FAIL);
@@ -59,8 +82,20 @@ int main(int argc, char* args[]) {
     return status;
 }
 
+
+/*
+ * Main entrypoint for Prod profile
+ */
 #else
 
+/*
+ * @Desc: Main entrypoint for Production Profile for Windows
+ * @Param: hInstance (HINSTANCE) -> current window instance handler
+ *         hPrevInstance (HINSTANCE) -> previous window instance handler
+ *         lpCmdLine (LPSTR) -> CLI parameters
+ *         nCmdShow (int) -> show/hide CLI Terminal
+ * @Returns: status (int WINAPI) -> exit status
+ */
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     SDL_SetMainReady();
 

@@ -23,9 +23,17 @@ and change, but not for commercial use
 #include "logger.h"
 #include "font_cache.h"
 
+/*
+ * module variables
+ */
 DebugModule_TypeDef* self_module;
 FC_Font* dbg_font;
 
+/*
+ * @Desc: Debugger module init function
+ * @Params: dbg(DebugModule_TypeDef*) -> module settings
+ * @Returns: G_STATUS_OK, G_STATUS_FAIL on failure
+ */
 G_STATUS debugger_init(DebugModule_TypeDef* dbg) {
     if(dbg == nullptr) {
         return G_STATUS_FAIL;
@@ -52,6 +60,11 @@ G_STATUS debugger_init(DebugModule_TypeDef* dbg) {
     return G_STATUS_OK;
 }
 
+/*
+ * @Desc: Debugger module deinit function
+ * @Params:
+ * @Returns: G_STATUS_OK, G_STATUS_FAIL on failure
+ */
 G_STATUS debugger_deinit() {
     if(self_module->th_isRunning) {
         return G_STATUS_FAIL;
@@ -61,6 +74,11 @@ G_STATUS debugger_deinit() {
     return G_STATUS_OK;
 }
 
+/*
+ * @Desc: Registers main functionalities
+ * @Params:
+ * @Returns: G_STATUS_OK, G_STATUS_FAIL on failure
+ */
 G_STATUS debugger_register_events() {
     G_STATUS status;
 
@@ -97,6 +115,11 @@ G_STATUS debugger_register_events() {
 }
 
 //thread lifecycle
+/*
+ * @Desc: Debugger module thread function
+ * @Params: lpParam(LPVOID) -> thread param
+ * @Returns: DWORD
+ */
 DWORD WINAPI debugger_lifecycle(LPVOID lpParam) {
     //push to visible stack
     self_module->rnd_handler = debugger_register_to_renderer(self_module);
@@ -112,6 +135,11 @@ DWORD WINAPI debugger_lifecycle(LPVOID lpParam) {
 }
 
 //callbacks
+/*
+ * @Desc: Event callback to start/stop debug thread
+ * @Params: value(void*) -> current state
+ * @Returns: void
+ */
 void debugger_toggle_cb(void* value) {
     if(bool state = *static_cast<bool *>(value)) {
         debugger_stop_th();
@@ -120,6 +148,11 @@ void debugger_toggle_cb(void* value) {
     debugger_start_th();
 }
 
+/*
+ * @Desc: Event callback to show clickable and hoverable areas
+ * @Params: value(void*) renderer task flag
+ * @Returns: void
+ */
 void debugger_print_evt(void* value) {
     if(!self_module->th_isRunning) {
         return;
@@ -129,6 +162,11 @@ void debugger_print_evt(void* value) {
     *static_cast<bool *>(value) = !*static_cast<bool *>(value);
 }
 
+/*
+ * @Desc: Event callback to show renderer components
+ * @Params: value(void*) not used
+ * @Returns: void
+ */
 void debugger_print_rndr(void* value) {
     if(!self_module->th_isRunning) {
         return;
@@ -147,6 +185,13 @@ void debugger_print_rndr(void* value) {
 }
 
 //@TODO: split debug rendering objects into their own components
+/*
+ * @Desc: Renderer callback function for debugger module
+ * @Params: obj(void*) -> source structure
+ * @Params: renderer(SDL_Renderer**) -> reference to renderer pointer
+ * @Params: texture(SDL_Texture*) -> source texture
+ * @Returns: void
+ */
 void dbg_render(void* obj, SDL_Renderer** renderer, SDL_Texture* texture) {
     FC_Draw(dbg_font, *renderer, 0, 0, "%d FPS\n", self_module->fps);
 

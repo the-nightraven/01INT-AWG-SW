@@ -38,7 +38,7 @@ else()
     message(STATUS "Using local SDL2")
 endif()
 
-# add SDL2_image support
+# Add SDL2_image support
 find_package(SDL2_image QUIET)
 if (NOT SDL2_image_FOUND)
     message(STATUS "Getting SDL2_image from Github")
@@ -46,6 +46,10 @@ if (NOT SDL2_image_FOUND)
 else()
     message(STATUS "Using local SDL2_image")
 endif()
+
+message(STATUS "SDL2_image Include Directory: ${SDL2_IMAGE_INCLUDE_DIRS}")
+message(STATUS "SDL2_image Libraries: ${SDL2_IMAGE_LIBRARIES}")
+
 
 # add SDL2_ttf support
 find_package(SDL2_ttf QUIET)

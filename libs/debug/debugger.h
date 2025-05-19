@@ -67,14 +67,6 @@ void debugger_toggle_cb(void* value);
 void debugger_print_evt(void* value);
 void debugger_print_rndr(void* value);
 
-//helpers
-//TODO: get fps
-int debugger_get_fps();
-//TODO: get lists
-void* debugger_get_list(int wildcard);
-//TODO: display functions
-void debugger_show_list(int wildcard);
-
 //externs
 extern G_STATUS debugger_register_event(void* evt, int wildcard);
 extern int debugger_register_to_renderer(void* obj);
