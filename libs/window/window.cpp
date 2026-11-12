@@ -20,24 +20,25 @@ and change, but not for commercial use
 
 #include "window.h"
 #include "logger.h"
+#include <SDL3/SDL_init.h>
 
 
 G_STATUS init_window(SDL_Window **mainFrame, SDL_Renderer **renderer) {
     *mainFrame = nullptr;
-    if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+    if(!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
         log_error("SDL", "Could not init video, code: ", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
     log_info(WINDOW_TAG, "SDL Inited");
 
-    *mainFrame = SDL_CreateWindow("AWG", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+    *mainFrame = SDL_CreateWindow("AWG", WINDOW_WIDTH, WINDOW_HEIGHT, 0);
 
     if(*mainFrame == nullptr) {
         log_error(WINDOW_TAG, "Could not create window", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
     log_info(WINDOW_TAG, "Created window");
-    *renderer = SDL_CreateRenderer(*mainFrame, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    *renderer = SDL_CreateRenderer(*mainFrame, nullptr);
 
     if(*renderer == nullptr) {
         log_error(WINDOW_TAG, "Could not init renderer", G_STATUS_FAIL);
@@ -46,11 +47,11 @@ G_STATUS init_window(SDL_Window **mainFrame, SDL_Renderer **renderer) {
 
     SDL_SetRenderDrawBlendMode(*renderer, SDL_BLENDMODE_BLEND);
 
-#if DEBUG
-    SDL_RendererInfo info;
-    SDL_GetRendererInfo(*renderer, &info);
-    printf("%s Using renderer: %s\n", WINDOW_TAG, info.name);
-#endif
+// #if DEBUG
+//     SDL_RendererInfo info;
+//     SDL_GetRendererInfo(*renderer, &info);
+//     printf("%s Using renderer: %s\n", WINDOW_TAG, info.name);
+// #endif
 
     return G_STATUS_OK;
 }

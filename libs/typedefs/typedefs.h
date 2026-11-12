@@ -22,6 +22,7 @@ and change, but not for commercial use
 #define TYPEDEFS_H
 
 #include "includes.h"
+#include <thread>
 
 #define DEFAULT_UPDATER_CB             (UpdateCallback_TypeDef){false, nullptr, nullptr}
 #define ENGINE_ESSENTIAL_COMPONENT     true
@@ -156,7 +157,7 @@ typedef struct EvtModule_TypeDef {
 } EvtModule_TypeDef;
 
 typedef struct UpdaterModule_TypeDef {
-    HANDLE upd_thread;
+    std::thread upd_thread;
     bool th_isRunning;
     bool status;
 } UpdaterModule_TypeDef;
@@ -166,7 +167,7 @@ typedef struct RendererModule_TypeDef {
 } RendererModule_TypeDef;
 
 typedef struct DebugModule_TypeDef {
-    HANDLE dbg_thread;
+    std::thread dbg_thread;
     bool th_isRunning;
     bool status;
     RendererComponent_Typedef rnd_comp;

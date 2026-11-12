@@ -18,63 +18,48 @@ and change, but not for commercial use
 ###########################################################
 */
 
-/*
- * Main import file
- */
 #include "app.h"
+#include <cstdio>
 
-
-/*
- * Production profile includes
- */
-#ifndef DEBUG
+// Only include Windows headers if compiling natively on Windows
+#if defined(_WIN32) && !defined(DEBUG)
 #include <windows.h>
 #define SDL_MAIN_HANDLED
 #endif
 
 /*
- * Debug tag for MAIN
+- Debug tag for MAIN
  */
-#define MAIN_TAG       "MAIN"
-
+#define MAIN_TAG "MAIN"
 
 /*
- * @Desc: printf wrapper for current system
- * @Param: str (char*) -> string to be printed
- * @returns: (void)
+- @Desc: printf wrapper for current system
+- @Param: str (char*) -> string to be printed
+- @returns: (void)
  */
-void system_print(char* str) {
+void system_print(const char* str) {
     printf("%s\n", str);
 }
 
 /*
- * Main entrypoint for DEBUG profile
+- Core application routine shared between entry points
  */
-#if DEBUG
-
-/*
- * @Desc: main entrypoint
- * @Param: argc (int) -> CLI argument length
- *         argv (char**) -> CLI arguments
- * @Returns: status (int) -> exit status
- */
-int main(int argc, char* args[]) {
+static int run_app() {
     G_STATUS status = app_init();
 
-    if(status == G_STATUS_FAIL) {
+    if (status == G_STATUS_FAIL) {
         log_error(MAIN_TAG, "Cannot init app", G_STATUS_FAIL);
         return G_STATUS_FAIL;
     }
 
     status = app_loop();
-    if(status == G_STATUS_FAIL) {
+    if (status == G_STATUS_FAIL) {
         log_error(MAIN_TAG, "Loop returned errors", -1);
     }
     log_info(MAIN_TAG, "Successful loop exit");
 
-    //TODO: verbose deinit
     status = app_deinit();
-    if(status == G_STATUS_FAIL) {
+    if (status == G_STATUS_FAIL) {
         log_error(MAIN_TAG, "Error on deinit", -1);
     }
     log_info(MAIN_TAG, "Successful deinit");
@@ -82,45 +67,31 @@ int main(int argc, char* args[]) {
     return status;
 }
 
+/*
+- Windows Release GUI Entrypoint (Hides Console Window on Windows)
+ */
+#if defined(_WIN32) && !defined(DEBUG)
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+    (void)hInstance;
+    (void)hPrevInstance;
+    (void)lpCmdLine;
+    (void)nCmdShow;
+
+    SDL_SetMainReady();
+    return run_app();
+}
 
 /*
- * Main entrypoint for Prod profile
+- Standard Entrypoint for Linux (Debug & Release) and Windows (Debug)
  */
 #else
 
-/*
- * @Desc: Main entrypoint for Production Profile for Windows
- * @Param: hInstance (HINSTANCE) -> current window instance handler
- *         hPrevInstance (HINSTANCE) -> previous window instance handler
- *         lpCmdLine (LPSTR) -> CLI parameters
- *         nCmdShow (int) -> show/hide CLI Terminal
- * @Returns: status (int WINAPI) -> exit status
- */
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    SDL_SetMainReady();
+int main(int argc, char* argv[]) {
+    (void)argc;
+    (void)argv;
 
-    G_STATUS status;
-    status = app_init();
-
-    if(status == G_STATUS_FAIL) {
-        log_error(MAIN_TAG, "Cannot init app", G_STATUS_FAIL);
-        return G_STATUS_FAIL;
-    }
-
-    status = app_loop();
-    if(status == G_STATUS_FAIL) {
-        log_error(MAIN_TAG, "Loop returned errors", -1);
-    }
-    log_info(MAIN_TAG, "Successful loop exit");
-
-    //TODO: verbose deinit
-    status = app_deinit();
-    if(status == G_STATUS_FAIL) {
-        log_error(MAIN_TAG, "Error on deinit", -1);
-    }
-    log_info(MAIN_TAG, "Successful deinit");
-
-    return status;
+    return run_app();
 }
 
 #endif

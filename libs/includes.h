@@ -21,24 +21,26 @@ and change, but not for commercial use
 #ifndef INCLUDES_H
 #define INCLUDES_H
 
+#if defined(_WIN32) && !defined(DEBUG)
 #include <windows.h>
+#endif
+
 #include <cinttypes>
 #include <cstdio>
-#include <SDL2/SDL.h>
-#include <malloc.h>
-#include <cstdbool>
-#include "typedefs.h"
-#include <SDL2/SDL_ttf.h>
+#include <cstdlib>
 #include <cstring>
 
-//typedefs
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <SDL3_image/SDL_image.h>
+
+#include "typedefs.h"
+
 typedef uint8_t G_STATUS;
 
-//macros
 #define G_STATUS_OK          0x00
 #define G_STATUS_FAIL        0x01
 
-//config
 #define WINDOW_WIDTH            1000
 #define WINDOW_HEIGHT           480
 

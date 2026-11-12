@@ -58,7 +58,7 @@ G_STATUS debugger_deinit();
 G_STATUS debugger_register_events();
 
 //thread lifecycle
-DWORD WINAPI debugger_lifecycle(LPVOID lpParam);
+void debugger_lifecycle();
 extern G_STATUS debugger_start_th();
 extern G_STATUS debugger_stop_th();
 

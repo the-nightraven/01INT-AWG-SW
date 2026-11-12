@@ -1,79 +1,25 @@
-##################################################################################
-#
-# GNU Makefile for Animal War game
-#
-# @author: Tanasescu Darius for game engine and code, Ivan Corina for concept 
-#          art, visuals and mechanics
-#
-# @desc: build rules for cpp targets including flags for compiling and linking
-#
-##################################################################################
+.PHONY: build build-debug build-win build-win-debug clean
 
-BUILD_DIR = build/
-LIBS_DIR = libs/
-SRC_DIR = src/
+# 1. Native Linux Release
+build:
+	cmake -B build-linux-release -G Ninja -DCMAKE_BUILD_TYPE=Release
+	cmake --build build-linux-release
 
-BIN_NAME = game
-CXX = g++
-FILES = $(BUILD_DIR)main.o \
-		$(BUILD_DIR)logger.o \
-		$(BUILD_DIR)app.o \
-		$(BUILD_DIR)window.o \
-		$(BUILD_DIR)reader.o \
-		$(BUILD_DIR)updater.o \
-		$(BUILD_DIR)player.o \
-		$(BUILD_DIR)renderer.o \
-		$(BUILD_DIR)engine_monitor.o \
-		$(BUILD_DIR)font_cache.o \
-		$(BUILD_DIR)debugger.o
+# 2. Native Linux Debug
+build-debug:
+	cmake -B build-linux-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
+	cmake --build build-linux-debug
 
-CXXFLAGS = -w -lSDL2 -lSDL2_ttf
+# 3. Windows MinGW Release
+build-win:
+	cmake -B build-win-release -G Ninja -DCMAKE_TOOLCHAIN_FILE=/usr/share/mingw/toolchain-mingw64.cmake -DCMAKE_BUILD_TYPE=Release
+	cmake --build build-win-release
 
-INC = -Ilibs/ \
-      -Isrc/
+# 4. Windows MinGW Debug
+build-win-debug:
+	cmake -B build-win-debug -G Ninja -DCMAKE_TOOLCHAIN_FILE=/usr/share/mingw/toolchain-mingw64.cmake -DCMAKE_BUILD_TYPE=Debug
+	cmake --build build-win-debug
 
+# Clean all build outputs
 clean:
-	rm -rf build
-
-all: dir $(FILES)
-	$(CXX) $(CXXFLAGS) $(INC) ./$(FILES) -o ./$(BUILD_DIR)$(BIN_NAME)
-	chmod +x ./$(BUILD_DIR)$(BIN_NAME)
-	rm -f $(FILES)
-	./$(BUILD_DIR)$(BIN_NAME)
-
-
-dir:
-	mkdir $(BUILD_DIR)
-
-$(BUILD_DIR)main.o: main.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c main.cpp -o $(BUILD_DIR)main.o
-
-$(BUILD_DIR)logger.o: $(LIBS_DIR)logger/logger.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)logger/logger.cpp -o $(BUILD_DIR)logger.o
-
-$(BUILD_DIR)app.o: $(SRC_DIR)app/app.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(SRC_DIR)app/app.cpp -o $(BUILD_DIR)app.o
-
-$(BUILD_DIR)window.o: $(LIBS_DIR)window/window.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)window/window.cpp -o $(BUILD_DIR)window.o
-
-$(BUILD_DIR)reader.o: $(LIBS_DIR)event_reader/reader.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)event_reader/reader.cpp -o $(BUILD_DIR)reader.o
-
-$(BUILD_DIR)updater.o: $(LIBS_DIR)updater/updater.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)updater/updater.cpp -o $(BUILD_DIR)updater.o
-
-$(BUILD_DIR)player.o: $(SRC_DIR)player/player.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(SRC_DIR)player/player.cpp -o $(BUILD_DIR)player.o
-
-$(BUILD_DIR)renderer.o: $(LIBS_DIR)renderer/renderer.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)renderer/renderer.cpp -o $(BUILD_DIR)renderer.o
-
-$(BUILD_DIR)engine_monitor.o: $(LIBS_DIR)monitor/engine_monitor.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)monitor/engine_monitor.cpp -o $(BUILD_DIR)engine_monitor.o
-
-$(BUILD_DIR)debugger.o: $(LIBS_DIR)debug/debugger.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)debug/debugger.cpp -o $(BUILD_DIR)debugger.o
-
-$(BUILD_DIR)font_cache.o: $(LIBS_DIR)font_cache/font_cache.cpp
-	$(CXX) $(CXXFLAGS) $(INC) -c $(LIBS_DIR)font_cache/font_cache.cpp -o $(BUILD_DIR)font_cache.o
+	rm -rf build-linux-release build-linux-debug build-win-release build-win-debug

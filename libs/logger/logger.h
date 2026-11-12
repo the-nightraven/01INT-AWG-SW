@@ -31,7 +31,7 @@ and change, but not for commercial use
 
 #include "includes.h"
 
-extern void system_print(char* str);
+extern void system_print(const char* str);
 
 void log_info(const char* local_tag, const char* str);
 void log_debug(const char* local_tag, const char* str, int value);

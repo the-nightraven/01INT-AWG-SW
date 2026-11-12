@@ -13,13 +13,16 @@ and change, but not for commercial use
 
 @Revision: InfDev
 
-@Description: file engine monitor source code
+@Description: file engine monitor source code (Cross-Platform Threading & SDL3 Updated)
 
 ###########################################################
 */
 
 #include "engine_monitor.h"
 #include <chrono>
+#include <thread>
+#include <cstring>
+#include <cstdlib>
 
 //vars
 MonitorComponents_TypeDef engine_components;
@@ -60,8 +63,8 @@ extern int debugger_calc_fps() {
 G_STATUS debugger_start_th() {
     log_info(MON_TAG, "Got command to start debug");
     return monitor_start_debug();
-    
 }
+
 G_STATUS debugger_stop_th() {
     log_info(MON_TAG, "Got command to stop debug");
     return monitor_stop_debug();
@@ -191,7 +194,6 @@ G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list, int mode) 
             RendererComponent_Typedef* rcind = ind->rnd_component;
             RendererComponentHandler hnd;
             hnd = renderer_register_component(*rcind);
-            //loopback handler to object
 
             //register animations updater component if exists
             if(rcind->animatable) {
@@ -209,29 +211,24 @@ G_STATUS scene_sys_load_components(SceneComponent_TypeDef* comp_list, int mode) 
             log_info(MON_TAG, "Registered renderer component");
         }
 
-
         ind = ind->next;
     }
 
     //start updater
     monitor_start_updating();
 
-    //return
     return G_STATUS_OK;
 }
 
-
-
-DWORD WINAPI updater_thread_lifecycle(LPVOID lpParam) {
+void updater_thread_lifecycle() {
     while(engine_components.updater_module.th_isRunning) {
         if(const int status = updater_run_time_delta(); status == G_STATUS_FAIL) {
             log_error(MON_TAG, "Updater thread encountered problems", -1);
             engine_components.updater_module.th_isRunning = false;
             engine_components.updater_module.status = false;
-            engine_components.updater_module.upd_thread = nullptr;
+            break;
         }
     }
-    return 0;
 }
 
 //sys callbacks
@@ -240,17 +237,13 @@ void end_game(void *val) {
 }
 
 void force_end_game(void *val) {
-    evt_push_event(SDL_QUIT, SDL_SCANCODE_UNKNOWN);
+    evt_push_event(SDL_EVENT_QUIT, SDL_SCANCODE_UNKNOWN);
 }
 
 void toggle_fullscreen(void* val) {
     const auto fs = static_cast<bool *>(val);
     *fs = !*fs;
-    if(*fs) {
-        SDL_SetWindowFullscreen(engine_components.engine_display, SDL_WINDOW_FULLSCREEN_DESKTOP);
-        return;
-    }
-    SDL_SetWindowFullscreen(engine_components.engine_display, 0);
+    SDL_SetWindowFullscreen(engine_components.engine_display, *fs);
 }
 
 G_STATUS monitor_init() {
@@ -266,13 +259,11 @@ G_STATUS monitor_init() {
 
     engine_components.updater_module.status = false;
     engine_components.updater_module.th_isRunning = false;
-    engine_components.updater_module.upd_thread = nullptr;
 
     engine_components.renderer_module.status = false;
 
     engine_components.debug_module.status = false;
     engine_components.debug_module.th_isRunning = false;
-    engine_components.debug_module.dbg_thread = nullptr;
     engine_components.debug_module.rnd_handler = 0;
     engine_components.debug_module.mouseStackVisible = false;
 
@@ -288,7 +279,6 @@ G_STATUS monitor_init() {
     return G_STATUS_OK;
 }
 
-//TODO free memory
 G_STATUS monitor_deinit() {
     return G_STATUS_OK;
 }
@@ -309,6 +299,7 @@ G_STATUS monitor_init_modules() {
     }
     //feed into component list
     engine_components.event_module.status = true;
+    
     //register system events
     status = monitor_register_comp();
     if(status == G_STATUS_FAIL) {
@@ -335,9 +326,8 @@ G_STATUS monitor_init_modules() {
     }
     //feed into component list
     engine_components.renderer_module.status = true;
-#if DEBUG
+
     log_debug(MON_TAG, "Inited renderer", 0);
-#endif
 
     //init scenes
     status = scenes_init(&engine_components.scenes_module);
@@ -357,10 +347,6 @@ G_STATUS monitor_init_modules() {
 }
 
 G_STATUS monitor_init_window_module() {
-    G_STATUS status;
-    //init window
-
-
     return G_STATUS_OK;
 }
 
@@ -447,7 +433,7 @@ G_STATUS monitor_deinit_modules() {
 
 G_STATUS monitor_register_comp() {
     constexpr UpdateCallback_TypeDef sysExit = {false, &engine_components.isRunning, end_game};
-    SysEvt_TypeDef sysExit_evt = {SDL_QUIT, sysExit};
+    SysEvt_TypeDef sysExit_evt = {SDL_EVENT_QUIT, sysExit};
     G_STATUS status = register_sys_event(ENGINE_ESSENTIAL_COMPONENT, &sysExit_evt);
 
     if(status == G_STATUS_FAIL) {
@@ -492,7 +478,6 @@ G_STATUS monitor_process_loop() {
     const std::chrono::time_point start_timer = std::chrono::high_resolution_clock::now();
 
     SDL_Event e;
-    // ReSharper disable once CppLocalVariableMightNotBeInitialized
     engine_components.engine_event_pool = e;
 
     if(const G_STATUS status = poll_events(&engine_components.engine_event_pool); status == G_STATUS_FAIL) {
@@ -543,28 +528,16 @@ G_STATUS monitor_start_debug() {
 
     engine_components.debug_module.th_isRunning = true;
 
-    //create thread
-    engine_components.debug_module.dbg_thread = CreateThread(nullptr, 0, debugger_lifecycle, nullptr, 0, nullptr);
-    if(engine_components.debug_module.dbg_thread == nullptr) {
+    try {
+        engine_components.debug_module.dbg_thread = std::thread(debugger_lifecycle);
+    } catch (...) {
         log_error(MON_TAG, "Cannot create debug thread", G_STATUS_FAIL);
-        engine_components.debug_module.dbg_thread = nullptr;
         engine_components.debug_module.th_isRunning = false;
         engine_components.debug_module.status = false;
         return G_STATUS_FAIL;
     }
+
     log_info(MON_TAG, "Forked debug thread");
-
-    //set the lowest priority
-    if(!SetThreadPriority(engine_components.debug_module.dbg_thread, THREAD_PRIORITY_LOWEST)) {
-        log_error(MON_TAG, "Cannot set thread priority", G_STATUS_FAIL);
-        CloseHandle(engine_components.debug_module.dbg_thread);
-        engine_components.debug_module.dbg_thread = nullptr;
-        engine_components.debug_module.th_isRunning = false;
-        engine_components.debug_module.status = false;
-        return G_STATUS_FAIL;
-    }
-    log_info(MON_TAG, "Debugger thread started");
-
     return G_STATUS_OK;
 }
 
@@ -575,11 +548,12 @@ G_STATUS monitor_stop_debug() {
     }
 
     engine_components.debug_module.th_isRunning = false;
-    WaitForSingleObject(engine_components.debug_module.dbg_thread, INFINITE);
-    CloseHandle(engine_components.debug_module.dbg_thread);
+    
+    if (engine_components.debug_module.dbg_thread.joinable()) {
+        engine_components.debug_module.dbg_thread.join();
+    }
+    
     log_info(MON_TAG, "Debugger thread stopped");
-
-    engine_components.debug_module.dbg_thread = nullptr;
     return G_STATUS_OK;
 }
 #endif
@@ -590,29 +564,17 @@ G_STATUS monitor_start_updating() {
     }
 
     engine_components.updater_module.th_isRunning = true;
-    // if(pthread_create(&(engine_components.updater_module.upd_thread), NULL, updater_thread_lifecycle, NULL) == 0) {
-    //     return G_STATUS_OK;
-    // }
-    engine_components.updater_module.upd_thread = CreateThread(nullptr, 0, updater_thread_lifecycle, nullptr, 0, nullptr);
-    if(engine_components.updater_module.upd_thread == nullptr) {
+
+    try {
+        engine_components.updater_module.upd_thread = std::thread(updater_thread_lifecycle);
+    } catch (...) {
         log_error(MON_TAG, "Cannot create updater thread", G_STATUS_FAIL);
-        engine_components.updater_module.upd_thread = nullptr;
         engine_components.updater_module.th_isRunning = false;
         engine_components.updater_module.status = false;
         return G_STATUS_FAIL;
     }
-    log_info(MON_TAG, "Updater thread forked");
 
-    if(!SetThreadPriority(engine_components.updater_module.upd_thread, THREAD_PRIORITY_LOWEST)) {
-        log_error(MON_TAG, "Cannot set thread priority", G_STATUS_FAIL);
-        CloseHandle(engine_components.updater_module.upd_thread);
-        engine_components.updater_module.upd_thread = nullptr;
-        engine_components.updater_module.th_isRunning = false;
-        engine_components.updater_module.status = false;
-        return G_STATUS_FAIL;
-    }
     log_info(MON_TAG, "Updater thread started");
-
     return G_STATUS_OK;
 }
 
@@ -623,13 +585,16 @@ G_STATUS monitor_stop_updating() {
     }
 
     engine_components.updater_module.th_isRunning = false;
-    WaitForSingleObject(engine_components.updater_module.upd_thread, INFINITE);
-    CloseHandle(engine_components.updater_module.upd_thread);
-    log_info(MON_TAG, "Thread joined safely");
+    
+    if (engine_components.updater_module.upd_thread.joinable()) {
+        engine_components.updater_module.upd_thread.join();
+    }
 
+    log_info(MON_TAG, "Thread joined safely");
     return G_STATUS_OK;
 }
 
 int monitor_micros_to_fps(int micros) {
+    if (micros <= 0) return 0;
     return 1000000 / micros;
 }

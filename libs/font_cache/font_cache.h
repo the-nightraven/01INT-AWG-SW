@@ -34,6 +34,8 @@ THE SOFTWARE.
 #define _SDL_FONTCACHE_H__
 
 #include "includes.h"
+#include <SDL3/SDL_iostream.h>
+#include <SDL3/SDL_oldnames.h>
 
 #ifdef FC_USE_SDL_GPU
     #include "SDL_gpu.h"
@@ -139,7 +141,7 @@ Uint8 FC_LoadFont(FC_Font* font, SDL_Renderer* renderer, const char* filename_tt
 
 Uint8 FC_LoadFontFromTTF(FC_Font* font, SDL_Renderer* renderer, TTF_Font* ttf, SDL_Color color);
 
-Uint8 FC_LoadFont_RW(FC_Font* font, SDL_Renderer* renderer, SDL_RWops* file_rwops_ttf, Uint8 own_rwops, Uint32 pointSize, SDL_Color color, int style);
+Uint8 FC_LoadFont_RW(FC_Font* font, SDL_Renderer* renderer, SDL_IOStream* file_rwops_ttf, Uint8 own_rwops, Uint32 pointSize, SDL_Color color, int style);
 #endif
 
 #ifndef FC_USE_SDL_GPU

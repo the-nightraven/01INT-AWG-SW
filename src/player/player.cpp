@@ -21,8 +21,9 @@ and change, but not for commercial use
 #include "includes.h"
 #include "player.h"
 
+#include <SDL3/SDL_render.h>
 #include <chrono>
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 
 #include "updater.h"
 #include "reader.h"
@@ -199,12 +200,12 @@ void player_render_cb(void* player_ins, SDL_Renderer** renderer, SDL_Texture* te
     auto* pl = static_cast<Player_Typedef *>(player_ins);
 
     SDL_FRect player_rect = {pl->dimensions.x, pl->dimensions.y, pl->dimensions.w, pl->dimensions.h};
-    SDL_Rect player_frame_rect = {pl->frame_index * PLAYER_SPRITE_FRAME_WIDTH, 0, PLAYER_SPRITE_FRAME_WIDTH, PLAYER_SPRITE_FRAME_HEIGHT};
+    SDL_FRect player_frame_rect = {static_cast<float>(pl->frame_index * PLAYER_SPRITE_FRAME_WIDTH), 0, PLAYER_SPRITE_FRAME_WIDTH, PLAYER_SPRITE_FRAME_HEIGHT};
 
     if(!player.orientation) {
-        SDL_RenderCopyF(*renderer, texture, &player_frame_rect, &player_rect);
+        SDL_RenderTexture(*renderer, texture, &player_frame_rect, &player_rect);
     }else {
-        SDL_RenderCopyExF(*renderer, texture, &player_frame_rect, &player_rect, 0, nullptr, SDL_FLIP_HORIZONTAL);
+        SDL_RenderTextureRotated(*renderer, texture, &player_frame_rect, &player_rect, 0, nullptr, SDL_FLIP_HORIZONTAL);
     }
 
 }

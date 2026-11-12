@@ -21,6 +21,7 @@ and change, but not for commercial use
 #include "start_menu.h"
 #include "player.h"
 #include "engine_monitor.h"
+#include <SDL3/SDL_render.h>
 
 SceneItem_TypeDef start_menu;
 StartMenu_TypeDef start_menu_obj;
@@ -148,7 +149,7 @@ void options_hover_out(void* obj) {
 void exit_press(void* obj) {
     log_info(START_MENU_TAG, "Pressed exit");
     static_cast<StartMenu_TypeDef *>(obj)->ex_hover = false;
-    evt_push_event(SDL_QUIT, SDL_SCANCODE_UNKNOWN);
+    evt_push_event(SDL_EVENT_QUIT, SDL_SCANCODE_UNKNOWN);
 }
 
 void exit_hover_in(void* obj) {
@@ -163,7 +164,7 @@ void exit_hover_out(void* obj) {
 void start_button_render(void* obj, SDL_Renderer** renderer, SDL_Texture* texture) {
     auto* sm = static_cast<StartMenu_TypeDef *>(obj);
     SDL_FRect start;
-    SDL_Rect src_start;
+    SDL_FRect src_start;
     int ind = sm->st_hover ? MENU_START_HOVER_IN_IND : MENU_START_HOVER_OUT_IND;
 
     src_start.x = ind * 48;
@@ -176,12 +177,12 @@ void start_button_render(void* obj, SDL_Renderer** renderer, SDL_Texture* textur
     start.w = sm->start.w;
     start.h = sm->start.h;
 
-    SDL_RenderCopyF(*renderer, texture, &src_start, &start);
+    SDL_RenderTexture(*renderer, texture, &src_start, &start);
 }
 void options_button_render(void* obj, SDL_Renderer** renderer, SDL_Texture* texture) {
     auto* om = static_cast<StartMenu_TypeDef *>(obj);
     SDL_FRect options;
-    SDL_Rect src_options;
+    SDL_FRect src_options;
     int ind = om->op_hover ? MENU_OPTIONS_HOVER_IN_IND : MENU_OPTIONS_HOVER_OUT_IND;
 
     src_options.x = ind * 48;
@@ -194,13 +195,13 @@ void options_button_render(void* obj, SDL_Renderer** renderer, SDL_Texture* text
     options.w = om->options.w;
     options.h = om->options.h;
 
-    SDL_RenderCopyF(*renderer, texture, &src_options, &options);
+    SDL_RenderTexture(*renderer, texture, &src_options, &options);
 }
 
 void exit_button_render(void* obj, SDL_Renderer** renderer, SDL_Texture* texture) {
     auto* om = static_cast<StartMenu_TypeDef *>(obj);
     SDL_FRect exit;
-    SDL_Rect src_exit;
+    SDL_FRect src_exit;
     int ind = om->ex_hover ? MENU_EXIT_HOVER_IN_IND : MENU_EXIT_HOVER_OUT_IND;
 
     src_exit.x = ind * 48;
@@ -213,6 +214,6 @@ void exit_button_render(void* obj, SDL_Renderer** renderer, SDL_Texture* texture
     exit.w = om->exit.w;
     exit.h = om->exit.h;
 
-    SDL_RenderCopyF(*renderer, texture, &src_exit, &exit);
+    SDL_RenderTexture(*renderer, texture, &src_exit, &exit);
 }
 

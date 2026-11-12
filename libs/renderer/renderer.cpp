@@ -20,7 +20,7 @@ and change, but not for commercial use
 
 #include "renderer.h"
 
-#include <SDL_image.h>
+#include <SDL3_image/SDL_image.h>
 
 #include "logger.h"
 
@@ -178,7 +178,7 @@ RendererComponent_Typedef* renderer_to_instance(RendererComponent_Typedef item) 
             return nullptr;
         }
         log_debug(RENDERER_TAG, "created texture", 0);
-        SDL_FreeSurface(tmp_srf);
+        SDL_DestroySurface(tmp_srf);
 
     } else {
         tmp->sprite.map_path = nullptr;

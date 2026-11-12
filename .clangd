@@ -1,0 +1,20 @@
+CompileFlags:
+  CompilationDatabase: build-linux-debug
+  Add:
+    - -std=c++17
+    - -Isrc
+    - -Isrc/app
+    - -Isrc/player
+    - -Ilibs
+    - -Ilibs/debug
+    - -Ilibs/event_reader
+    - -Ilibs/font_cache
+    - -Ilibs/logger
+    - -Ilibs/monitor
+    - -Ilibs/physics
+    - -Ilibs/renderer
+    - -Ilibs/typedefs
+    - -Ilibs/updater
+    - -Ilibs/window
+    - -Ilibs/ui_elements
+    - -Ilibs/tiny_xml

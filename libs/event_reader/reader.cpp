@@ -27,6 +27,7 @@ and change, but not for commercial use
 
 #include "logger.h"
 #include "updater.h"
+#include <SDL3/SDL_mouse.h>
 
 
 SysEvtItem_TypeDef *sys_list;
@@ -143,8 +144,8 @@ G_STATUS register_mouse_event(bool essential, MouseEvt_TypeDef* evt) {
 
 G_STATUS poll_events(SDL_Event* e) {
     while(SDL_PollEvent(e)) {
-        if(e->type == SDL_KEYDOWN) {
-            auto *ind = static_cast<KeyEvtItem_TypeDef *>(get_event_by_hook(KEY_EVENT_FLAG, key_list, e->key.keysym.scancode));
+        if(e->type == SDL_EVENT_KEY_DOWN) {
+            auto *ind = static_cast<KeyEvtItem_TypeDef *>(get_event_by_hook(KEY_EVENT_FLAG, key_list, e->key.scancode));
             if(ind != nullptr) {
                 if(ind->evt.kdown_update_cb.obj_callback != nullptr) {
                     if(!ind->evt.use_keyhold_protection) {
@@ -156,8 +157,8 @@ G_STATUS poll_events(SDL_Event* e) {
                     }
                 }
             }
-        }else if(e->type == SDL_KEYUP) {
-            auto *ind = static_cast<KeyEvtItem_TypeDef *>(get_event_by_hook(KEY_EVENT_FLAG, key_list, e->key.keysym.scancode));
+        }else if(e->type == SDL_EVENT_KEY_UP) {
+            auto *ind = static_cast<KeyEvtItem_TypeDef *>(get_event_by_hook(KEY_EVENT_FLAG, key_list, e->key.scancode));
             if(ind != nullptr) {
                 if(ind->evt.kup_update_cb.obj_callback != nullptr) {
                     if(!ind->evt.use_keyhold_protection) {
@@ -169,8 +170,8 @@ G_STATUS poll_events(SDL_Event* e) {
                     }
                 }
             }
-        }else if(e->type == SDL_MOUSEBUTTONDOWN) {
-            int x,y;
+        }else if(e->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+            float x,y;
             SDL_GetMouseState(&x,&y);
             auto *ind = static_cast<MouseEvtItem_TypeDef *>(get_event_by_mpos(x, y));
 
@@ -179,8 +180,8 @@ G_STATUS poll_events(SDL_Event* e) {
                     ind->evt.click_cb.flag = true;
                 }
             }
-        }else if(e->type == SDL_MOUSEMOTION) {
-            int x, y;
+        }else if(e->type == SDL_EVENT_MOUSE_MOTION) {
+            float x, y;
             SDL_GetMouseState(&x,&y);
             auto *ind = mouse_list;
 
@@ -470,8 +471,8 @@ void* get_event_list(uint8_t type_flag) {
 G_STATUS evt_push_event(int sdl_hook, SDL_Scancode sdl_key) {
     SDL_Event push_evt;
     push_evt.type = sdl_hook;
-    push_evt.key.keysym.scancode = sdl_key;
-    push_evt.key.keysym.mod = KMOD_NONE;
+    push_evt.key.scancode = sdl_key;
+    push_evt.key.mod = SDL_KMOD_NONE;
     push_evt.key.repeat = 0;
 
     if(SDL_PushEvent(&push_evt) != 0) {

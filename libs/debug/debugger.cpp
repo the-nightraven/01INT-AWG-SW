@@ -23,6 +23,9 @@ and change, but not for commercial use
 #include "logger.h"
 #include "font_cache.h"
 
+#include <thread>
+#include <chrono>
+
 /*
  * module variables
  */
@@ -120,18 +123,17 @@ G_STATUS debugger_register_events() {
  * @Params: lpParam(LPVOID) -> thread param
  * @Returns: DWORD
  */
-DWORD WINAPI debugger_lifecycle(LPVOID lpParam) {
+void debugger_lifecycle() {
     //push to visible stack
     self_module->rnd_handler = debugger_register_to_renderer(self_module);
     while(self_module->th_isRunning) {
         //calculate fps and update
         self_module->fps = debugger_calc_fps();
-        Sleep(500);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
     //pop from visible stack
     debugger_unregister_to_renderer(self_module);
     self_module->rnd_handler = 0;
-    return 0;
 }
 
 //callbacks
@@ -208,8 +210,8 @@ void dbg_render(void* obj, SDL_Renderer** renderer, SDL_Texture* texture) {
 
             SDL_FRect rect = {ind->evt.dim->x, ind->evt.dim->y, ind->evt.dim->w, ind->evt.dim->h};
             SDL_SetRenderDrawColor(*renderer, r, 0, b, 60);
-            SDL_RenderFillRectF(*renderer, &rect);
-            SDL_RenderDrawRectF(*renderer, &rect);
+            SDL_RenderFillRect(*renderer, &rect);
+            SDL_RenderRect(*renderer, &rect);
 
             ind = ind->next;
         }

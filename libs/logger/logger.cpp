@@ -19,29 +19,24 @@ and change, but not for commercial use
 */
 
 #include "logger.h"
-#include <malloc.h>
-#include <cstring>
+#include <cstdio>
+
+constexpr std::size_t LOG_BUFFER_SIZE = 512;
 
 void log_info(const char* local_tag, const char* str) {
-    const auto buffer = static_cast<char *>(malloc(100 * sizeof(char)));
-    sprintf(buffer, "[%s][%s] %s", INFO_TAG, local_tag, str);
+    char buffer[LOG_BUFFER_SIZE];
+    snprintf(buffer, sizeof(buffer), "[%s][%s] %s", INFO_TAG, local_tag, str);
     system_print(buffer);
-    free(buffer);
 }
-
 
 void log_debug(const char* local_tag, const char* str, int value) {
-    const auto buffer = static_cast<char *>(malloc(100 * sizeof(char)));
-    sprintf(buffer, "[%s][%s] %s (%d)", DEBUG_TAG, local_tag, str, value);
+    char buffer[LOG_BUFFER_SIZE];
+    snprintf(buffer, sizeof(buffer), "[%s][%s] %s (%d)", DEBUG_TAG, local_tag, str, value);
     system_print(buffer);
-    free(buffer);
 }
-
 
 void log_error(const char* local_tag, const char* str, int value) {
-    const auto buffer = static_cast<char *>(malloc(100 * sizeof(char)));
-    sprintf(buffer, "[%s][%s] %s (%d)", ERROR_TAG, local_tag, str, value);
+    char buffer[LOG_BUFFER_SIZE];
+    snprintf(buffer, sizeof(buffer), "[%s][%s] %s (%d)", ERROR_TAG, local_tag, str, value);
     system_print(buffer);
-    free(buffer);
 }
-

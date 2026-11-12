@@ -124,8 +124,12 @@ void updater_clear_comp_nonessentials() {
 G_STATUS updater_run_time_delta() {
     G_STATUS status;
 
-    if(u_ticks_count != 0) {
-        while (!SDL_TICKS_PASSED(SDL_GetTicks(), u_ticks_count + 16));
+    if (u_ticks_count != 0) {
+        Uint64 target_ticks = u_ticks_count + 16;
+        Uint64 current_ticks = SDL_GetTicks();
+        if (current_ticks < target_ticks) {
+            SDL_Delay(static_cast<Uint32>(target_ticks - current_ticks));
+        }
     }
 
     delta_time = (SDL_GetTicks() - u_ticks_count) / 1000.0f;
