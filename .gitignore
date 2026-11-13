@@ -6,3 +6,4 @@ build-win
 build-win-debug
 cmake-build-release
 .git
+compile_commands.json
