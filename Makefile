@@ -4,11 +4,13 @@
 build:
 	cmake -B build-linux-release -G Ninja -DCMAKE_BUILD_TYPE=Release
 	cmake --build build-linux-release
+	ln -sf build-linux-release/compile_commands.json compile_commands.json
 
 # 2. Native Linux Debug
 build-debug:
 	cmake -B build-linux-debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
 	cmake --build build-linux-debug
+	ln -sf build-linux-debug/compile_commands.json compile_commands.json
 
 # 3. Windows MinGW Release
 build-win:
@@ -22,4 +24,4 @@ build-win-debug:
 
 # Clean all build outputs
 clean:
-	rm -rf build-linux-release build-linux-debug build-win-release build-win-debug
+	rm -rf build-linux-release build-linux-debug build-win-release build-win-debug compile_commands.json

@@ -1,5 +1,8 @@
 build
 .ideea
-cmake-build-debug
+build-linux-debug
+build-linux
+build-win
+build-win-debug
 cmake-build-release
 .git
